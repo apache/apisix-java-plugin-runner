@@ -17,13 +17,14 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
-import org.reactivestreams.Publisher;
-import reactor.netty.NettyInbound;
-import reactor.netty.NettyOutbound;
+import com.google.flatbuffers.FlatBufferBuilder;
+import org.apache.apisix.plugin.runner.codec.frame.FrameType;
 
-@FunctionalInterface
-public interface ServerHandler {
-    
-    Publisher<Void> handler(NettyInbound in, NettyOutbound out);
-    
+public interface RequestHandler {
+
+    FlatBufferBuilder handler(FlatBufferBuilder builder);
+
+    FlatBufferBuilder builder();
+
+    FrameType type();
 }

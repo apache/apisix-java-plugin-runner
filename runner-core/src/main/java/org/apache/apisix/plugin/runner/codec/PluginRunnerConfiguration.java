@@ -17,22 +17,18 @@
 
 package org.apache.apisix.plugin.runner.codec;
 
-import org.apache.apisix.plugin.runner.codec.impl.FlatBuffersDecoder;
-import org.apache.apisix.plugin.runner.codec.impl.FlatBuffersEncoder;
+import com.google.common.cache.Cache;
+import io.github.api7.A6.PrepareConf.Req;
+import org.apache.apisix.plugin.runner.handler.DefaultPayloadHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PluginRunnerConfiguration {
-    
+
     @Bean
-    public PluginRunnerDecoder createDecoder() {
-        return new FlatBuffersDecoder();
+    public DefaultPayloadHandler createPayloadHandler(Cache<Long, Req> cache) {
+        return new DefaultPayloadHandler(cache);
     }
-    
-    @Bean
-    public PluginRunnerEncoder createEncoder() {
-        return new FlatBuffersEncoder();
-    }
-    
+
 }

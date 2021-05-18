@@ -18,7 +18,6 @@
 package org.apache.apisix.plugin.runner;
 
 import io.github.api7.A6.HTTPReqCall.Req;
-import io.netty.buffer.ByteBuf;
 
 import java.nio.ByteBuffer;
 import java.util.Enumeration;

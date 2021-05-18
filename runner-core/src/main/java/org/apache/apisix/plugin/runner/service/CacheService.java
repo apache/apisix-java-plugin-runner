@@ -19,6 +19,7 @@ package org.apache.apisix.plugin.runner.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +32,10 @@ public class CacheService {
     @Value("${conf.cache.expire:5000}")
     private long expiredOnMills;
     
-    private Cache<String, Properties> configMap;
+    private Cache<String, String> configMap;
+
     
     public void build() {
-    
+
     }
 }

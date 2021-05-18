@@ -17,8 +17,6 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
-import org.apache.apisix.plugin.runner.codec.PluginRunnerDecoder;
-import org.apache.apisix.plugin.runner.codec.PluginRunnerEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,8 +24,8 @@ import org.springframework.context.annotation.Configuration;
 public class IOHandlerConfiguration {
     
     @Bean
-    public IOHandler createIOHandler(PluginRunnerEncoder encoder, PluginRunnerDecoder decoder, Dispatcher dispatcher) {
-        return new IOHandler(encoder, decoder, dispatcher);
+    public IOHandler createIOHandler(PayloadHandler payloadHandler) {
+        return new IOHandler(payloadHandler);
     }
     
 }

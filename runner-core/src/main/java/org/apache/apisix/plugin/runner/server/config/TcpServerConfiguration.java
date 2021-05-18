@@ -42,10 +42,5 @@ public class TcpServerConfiguration {
         }
         return server;
     }
-//
-//    @Bean
-//    public TcpServerCustomizer configureHandler(@Value("${runner.server.socket.file:/tmp/runner.socks") String socketFile) {
-//        return tcpServer -> tcpServer.bindAddress(() -> new DomainSocketAddress(socketFile));
-//    }
     
 }

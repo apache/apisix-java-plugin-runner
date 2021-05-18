@@ -15,31 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec.impl;
-
-import io.netty.buffer.ByteBuf;
-import org.apache.apisix.plugin.runner.A6ConfigRequest;
-import org.apache.apisix.plugin.runner.A6Request;
-import org.apache.apisix.plugin.runner.HttpRequest;
-import org.apache.apisix.plugin.runner.codec.PluginRunnerDecoder;
+package org.apache.apisix.plugin.runner.handler;
 
 import java.nio.ByteBuffer;
 
-public class FlatBuffersDecoder implements PluginRunnerDecoder {
-    
-    @Override
-    public A6Request decode(ByteBuf buf) {
-        final byte type = buf.readByte();
-        final short length = buf.readShort();
-        
-        ByteBuffer buffer = ByteBuffer.allocate(length);
-        buf.getBytes(length, buffer);
-        buffer.flip();
-        
-        if (type == 0) {
-            return A6ConfigRequest.from(buffer);
-        } else {
-            return HttpRequest.from(buffer);
-        }
-    }
+public interface PayloadHandler {
+    RequestHandler decode(ByteBuffer buffer);
+
+    RequestHandler dispatch(RequestHandler handler);
+
+    ByteBuffer encode(RequestHandler handler);
+
+    RequestHandler error();
 }

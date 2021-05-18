@@ -15,17 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec.impl;
+package org.apache.apisix.plugin.runner.handler;
 
+import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.A6Response;
-import org.apache.apisix.plugin.runner.codec.PluginRunnerEncoder;
 
-import java.nio.ByteBuffer;
-
-public class FlatBuffersEncoder implements PluginRunnerEncoder {
-    
-    @Override
-    public ByteBuffer encode(A6Response response) {
-        return response.encode();
-    }
+public interface Filter {
+    A6Response filter(A6Request req);
 }
