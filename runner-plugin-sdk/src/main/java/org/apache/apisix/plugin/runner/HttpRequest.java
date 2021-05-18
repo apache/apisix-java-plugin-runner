@@ -57,7 +57,7 @@ public class HttpRequest implements A6Request {
     }
     
     public String getSourceIP() {
-        return ""; // TODO
+        return "";
     }
     
     public Method getMethod() {
@@ -65,7 +65,7 @@ public class HttpRequest implements A6Request {
     }
     
     public String getPath() {
-        return req.path(); // FiXME
+        return req.path();
     }
     
     public String getParameter(String name) {
@@ -81,7 +81,7 @@ public class HttpRequest implements A6Request {
     }
     
     public String[] getParameterValues(String name) {
-        return null; // todo
+        return null;
     }
     
     @Override
@@ -92,7 +92,6 @@ public class HttpRequest implements A6Request {
     public static HttpRequest from(ByteBuffer buffer) {
         return new HttpRequest(Req.getRootAsReq(buffer));
     }
-    
     
     public enum Method {
         GET,
