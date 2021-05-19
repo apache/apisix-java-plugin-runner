@@ -23,7 +23,6 @@ public interface A6Request {
         return false;
     }
     
-    
     int getConfToken();
     
     default int getType() {

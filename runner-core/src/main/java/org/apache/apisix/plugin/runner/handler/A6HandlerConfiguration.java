@@ -67,7 +67,7 @@ public class A6HandlerConfiguration {
     
     @Bean
     public Dispatcher createDispatcher(A6ConfigHandler configHandler, A6HttpCallHandler httpCallHandler) {
-        return (request) -> {
+        return request -> {
             A6Response response;
             switch (request.getType()) {
                 case 0:

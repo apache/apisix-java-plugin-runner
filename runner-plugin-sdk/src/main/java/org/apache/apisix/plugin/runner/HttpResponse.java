@@ -26,8 +26,8 @@ import java.util.Objects;
 
 /**
  * table Resp {
- *     id:uint32;
- *     action:Action;
+ * id:uint32;
+ * action:Action;
  * }
  */
 @Data

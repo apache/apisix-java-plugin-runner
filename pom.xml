@@ -152,8 +152,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <!-- disable checkstyle temporary -->
-                    <skip>true</skip>
+                    <skip>false</skip>
                     <configLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/checkstyle.xml</configLocation>
                     <headerLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/HEADER</headerLocation>
                     <encoding>UTF-8</encoding>
