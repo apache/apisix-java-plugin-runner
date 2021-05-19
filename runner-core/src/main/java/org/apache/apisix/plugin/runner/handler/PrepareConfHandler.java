@@ -66,6 +66,4 @@ public class PrepareConfHandler implements RequestHandler {
     public FrameType type() {
         return TYPE;
     }
-
-
 }

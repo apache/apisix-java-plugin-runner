@@ -26,7 +26,11 @@ import io.github.api7.A6.HTTPReqCall.Resp;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
 import io.github.api7.A6.HTTPReqCall.Stop;
 import io.github.api7.A6.TextEntry;
-import org.apache.apisix.plugin.runner.*;
+import org.apache.apisix.plugin.runner.A6Config;
+import org.apache.apisix.plugin.runner.A6Request;
+import org.apache.apisix.plugin.runner.A6Response;
+import org.apache.apisix.plugin.runner.HttpRequest;
+import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.codec.frame.FrameType;
 import org.apache.apisix.plugin.runner.filter.FilterChain;
 import org.springframework.util.CollectionUtils;
@@ -83,7 +87,6 @@ public class HTTPReqCallHandler implements RequestHandler, Filter {
         if (response.getActionType() == A6Response.ActionType.Stop) {
             action = buildStopResp(builder, response);
         }
-
 
         Resp.startResp(builder);
         Resp.addAction(builder, action);
@@ -158,7 +161,6 @@ public class HTTPReqCallHandler implements RequestHandler, Filter {
             Rewrite.addHeaders(builder, headers);
         }
     }
-
 
     @Override
     public FlatBufferBuilder builder() {
