@@ -18,30 +18,23 @@
 package org.apache.apisix.plugin.runner;
 
 import io.github.api7.A6.PrepareConf.Req;
+import io.github.api7.A6.TextEntry;
 
-import java.nio.ByteBuffer;
+public class A6Config {
 
-public class A6ConfigRequest implements A6Request {
-    
-    private final int confToken;
-    
-    public A6ConfigRequest(int confToken) {
-        this.confToken = confToken;
+    private final Req req;
+
+    public A6Config(Req req) {
+        this.req = req;
     }
-    
-    @Override
-    public boolean isConfigRequest() {
-        return true;
-    }
-    
-    @Override
-    public int getConfToken() {
-        return confToken;
-    }
-    
-    public static A6ConfigRequest from(ByteBuffer buffer) {
-        // TODO request id and confToken came from client?
-        Req req = Req.getRootAsReq(buffer);
-        return new A6ConfigRequest(0);
+
+    public String get(String key) {
+        for (int i = 0; i < this.req.confLength(); i++) {
+            TextEntry conf = this.req.conf(i);
+            if (conf.name().equals(key)) {
+                return conf.value();
+            }
+        }
+        return null;
     }
 }

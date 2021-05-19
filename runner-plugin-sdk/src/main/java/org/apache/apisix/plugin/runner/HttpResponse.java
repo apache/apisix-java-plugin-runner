@@ -17,9 +17,9 @@
 
 package org.apache.apisix.plugin.runner;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Data;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,26 +32,40 @@ import java.util.Objects;
  */
 @Data
 public class HttpResponse implements A6Response {
-    
+
     private final int requestId;
-    
-    private Action action;
-    
+
+    private ActionType actionType;
+
     private Map<String, String> headers;
-    
+
+    private Map<String, String> args;
+
+    private String path;
+
+    private Map<String, String> body;
+
+    private HttpResponseStatus status;
+
     public HttpResponse(int requestId) {
         this.requestId = requestId;
     }
-    
+
     public void addHeader(String headerKey, String headerValue) {
         if (Objects.isNull(headers)) {
             headers = new HashMap<>();
         }
         headers.put(headerKey, headerValue);
     }
-    
-    @Override
-    public ByteBuffer encode() {
-        return null;
+
+    public void addArg(String argKey, String argValue) {
+        if (Objects.isNull(args)) {
+            args = new HashMap<>();
+        }
+        args.put(argKey, argValue);
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

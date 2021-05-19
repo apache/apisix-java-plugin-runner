@@ -19,80 +19,72 @@ package org.apache.apisix.plugin.runner;
 
 import io.github.api7.A6.HTTPReqCall.Req;
 
-import java.nio.ByteBuffer;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Properties;
 
 // @Readable
 // TODO extends from HttpServletRequest? Netty's HttpRequest?
-public class HttpRequest implements A6Request {
-    
+public class HttpRequest {
+
     private final Req req;
-    
+
     private int id;
-    
+
     private String sourceIP;
-    
+
     private Method method;
-    
+
     private String path;
-    
+
     private Map<String, String> parameter;
-    
+
     private Map<String, String> headers;
-    
-    private String confToken;
-    
-    private Properties config;
-    
+
+    private final A6Config config;
+
     private Map<String, Object> data;
-    
-    HttpRequest(Req req) {
+
+    public HttpRequest(Req req, A6Config config) {
         this.req = req;
+        this.config = config;
     }
-    
+
     public long getRequestId() {
         return req.id();
     }
-    
+
     public String getSourceIP() {
         return "";
     }
-    
+
     public Method getMethod() {
         return Method.values()[req.method()];
     }
-    
+
     public String getPath() {
         return req.path();
     }
-    
+
     public String getParameter(String name) {
         return parameter.get(name);
     }
-    
+
     public Map getParameterMap() {
         return null;
     }
-    
+
     public Enumeration getParameters() {
         return null;
     }
-    
+
     public String[] getParameterValues(String name) {
         return null;
     }
-    
-    @Override
-    public int getConfToken() {
-        return 0;
+
+    public A6Config getConf() {
+        return this.config;
     }
-    
-    public static HttpRequest from(ByteBuffer buffer) {
-        return new HttpRequest(Req.getRootAsReq(buffer));
-    }
-    
+
     public enum Method {
         GET,
         HEAD,

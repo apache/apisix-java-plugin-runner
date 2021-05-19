@@ -15,27 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner;
+package org.apache.apisix.plugin.runner.handler;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
+import org.apache.apisix.plugin.runner.A6Request;
+import org.apache.apisix.plugin.runner.A6Response;
 
-public class A6HttpCallResponse implements A6Response {
-    
-    private final int requestId;
-    
-    private final Map<String, String> headers;
-    
-    private final Map<String, String> parameters;
-    
-    public A6HttpCallResponse(int requestId, Map<String, String> parameters, Map<String, String> headers) {
-        this.requestId = requestId;
-        this.headers = headers;
-        this.parameters = parameters;
-    }
-    
-    @Override
-    public ByteBuffer encode() {
-        return null;
-    }
+public interface Filter {
+    A6Response filter(A6Request req);
 }

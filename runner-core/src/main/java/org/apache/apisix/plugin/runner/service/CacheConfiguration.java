@@ -19,19 +19,19 @@ package org.apache.apisix.plugin.runner.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import io.github.api7.A6.PrepareConf.Req;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
-import java.util.Properties;
 
 @Configuration
 public class CacheConfiguration {
     
     @Bean
-    public Cache<Long, Properties> configurationCache(@Value("${cache.config.expired:5000}") long expired,
-                                                        @Value("${cache.config.capacity:500}") int capacity) {
+    public Cache<Long, Req> configurationCache(@Value("${cache.config.expired:5000}") long expired,
+                                               @Value("${cache.config.capacity:500}") int capacity) {
         return CacheBuilder.newBuilder().expireAfterWrite(Duration.ofMillis(expired)).maximumSize(capacity).build();
     }
 }

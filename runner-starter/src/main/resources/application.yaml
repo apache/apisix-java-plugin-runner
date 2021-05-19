@@ -18,5 +18,5 @@ logging:
     root: debug
 
 cache.config:
-  expired: 200
+  expired: 3600000
   capacity: 12000
