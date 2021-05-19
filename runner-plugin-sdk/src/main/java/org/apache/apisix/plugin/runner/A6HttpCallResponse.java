@@ -34,8 +34,5 @@ public class A6HttpCallResponse implements A6Response {
         this.parameters = parameters;
     }
     
-    @Override
-    public ByteBuffer encode() {
-        return null;
-    }
+
 }

@@ -23,11 +23,15 @@ import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.PrepareConf.Req;
 import lombok.RequiredArgsConstructor;
 import org.apache.apisix.plugin.runner.codec.frame.FrameCodec;
+import org.apache.apisix.plugin.runner.filter.FilterBean;
+import org.apache.apisix.plugin.runner.filter.FilterChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.nio.ByteBuffer;
-import java.util.Properties;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class DefaultPayloadHandler implements PayloadHandler {
@@ -49,7 +53,8 @@ public class DefaultPayloadHandler implements PayloadHandler {
                 handler = new PrepareConfHandler(body, cache);
                 return handler;
             case 2:
-                handler = new HTTPReqCallHandler(body, cache);
+//                FilterChain chain = createFilterChain(null);
+                handler = new HTTPReqCallHandler(body, cache, null);
                 return handler;
             default:
                 break;
@@ -57,6 +62,17 @@ public class DefaultPayloadHandler implements PayloadHandler {
 
         logger.error("receiving unsupport type: {}", type);
         return error(Code.BAD_REQUEST);
+    }
+
+    private FilterChain createFilterChain(ObjectProvider<FilterBean> beanProvider) {
+        List<FilterBean> filterList = beanProvider.orderedStream().collect(Collectors.toList());
+        FilterChain chain = null;
+        if (!filterList.isEmpty()) {
+            for (int i = filterList.size() - 1; i >= 0; i--) {
+                chain = new FilterChain(filterList.get(i), chain);
+            }
+        }
+        return chain;
     }
 
     public ByteBuffer encode(RequestHandler handler) {
