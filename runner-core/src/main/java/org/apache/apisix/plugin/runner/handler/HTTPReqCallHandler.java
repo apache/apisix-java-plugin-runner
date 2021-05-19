@@ -21,6 +21,7 @@ import com.google.common.cache.Cache;
 import com.google.flatbuffers.FlatBufferBuilder;
 import com.google.flatbuffers.Table;
 import io.github.api7.A6.DataEntry;
+import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.HTTPReqCall.Req;
 import io.github.api7.A6.HTTPReqCall.Resp;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
@@ -58,19 +59,21 @@ public class HTTPReqCallHandler implements RequestHandler, Filter {
     public FlatBufferBuilder handler(FlatBufferBuilder builder) {
         this.builder = builder;
         Req req = (Req) this.req;
-        A6Config conf = conf(req);
-        HttpRequest request = new HttpRequest(req, conf);
+
+        io.github.api7.A6.PrepareConf.Req conf = cache.getIfPresent(req.confToken());
+        if (null == conf) {
+            io.github.api7.A6.Err.Resp.startResp(builder);
+            io.github.api7.A6.Err.Resp.addCode(builder, Code.CONF_TOKEN_NOT_FOUND);
+            int orc = io.github.api7.A6.Err.Resp.endResp(builder);
+            builder.finish(orc);
+            return builder;
+        }
+
+        A6Config config = new A6Config(conf);
+        HttpRequest request = new HttpRequest(req, config);
         HttpResponse response = new HttpResponse((int) req.id());
 //        chain.doFilter(request, response);
         return buildRes(builder, response);
-    }
-
-    private A6Config conf(Req req) {
-        io.github.api7.A6.PrepareConf.Req conf = cache.getIfPresent(req.confToken());
-        if (null == conf) {
-            //TODO error handle
-        }
-        return new A6Config(conf);
     }
 
     private FlatBufferBuilder buildRes(FlatBufferBuilder builder, HttpResponse response) {
