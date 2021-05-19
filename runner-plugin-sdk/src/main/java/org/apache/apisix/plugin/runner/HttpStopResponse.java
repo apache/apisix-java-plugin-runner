@@ -19,9 +19,9 @@ package org.apache.apisix.plugin.runner;
 
 /**
  * table Stop {
- *     status:uint16;
- *     headers:[TextEntry];
- *     body:[ubyte];
+ * status:uint16;
+ * headers:[TextEntry];
+ * body:[ubyte];
  * }
  */
 @Deprecated

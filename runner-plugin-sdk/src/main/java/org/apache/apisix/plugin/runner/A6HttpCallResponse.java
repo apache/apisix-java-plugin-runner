@@ -28,12 +28,10 @@ public class A6HttpCallResponse implements A6Response {
     
     private final Map<String, String> parameters;
     
-    
     public A6HttpCallResponse(int requestId, Map<String, String> parameters, Map<String, String> headers) {
         this.requestId = requestId;
         this.headers = headers;
         this.parameters = parameters;
-        
     }
     
     @Override
