@@ -15,33 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner;
+package org.apache.apisix.plugin.runner.codec;
 
-import com.google.flatbuffers.FlatBufferBuilder;
-import io.github.api7.A6.PrepareConf.Resp;
-import lombok.Getter;
+import org.apache.apisix.plugin.runner.A6Response;
 
 import java.nio.ByteBuffer;
 
-public class A6ConfigResponse implements A6Response {
-    @Getter
-    private final long confToken;
-
-    public A6ConfigResponse(long confToken) {
-        this.confToken = confToken;
-    }
-
-    @Override
-    public ByteBuffer encode() {
-        FlatBufferBuilder builder = new FlatBufferBuilder();
-        Resp.startResp(builder);
-        Resp.addConfToken(builder, confToken);
-        builder.finish(Resp.endResp(builder));
-        return builder.dataBuffer();
-    }
-
-    @Override
-    public byte getType() {
-        return 1;
-    }
+@FunctionalInterface
+public interface PluginRunnerEncoder {
+    
+    ByteBuffer encode(A6Response response);
 }

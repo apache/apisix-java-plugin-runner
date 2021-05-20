@@ -14,27 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 package org.apache.apisix.plugin.runner.handler;
 
+import com.google.common.cache.Cache;
+import io.github.api7.A6.Err.Code;
+import io.github.api7.A6.PrepareConf.Req;
+import lombok.RequiredArgsConstructor;
+import org.apache.apisix.plugin.runner.A6Config;
+import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.A6Response;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.filter.FilterChain;
 
+@RequiredArgsConstructor
 public class A6HttpCallHandler implements Handler {
-    
+    private final Cache<Long, Req> cache;
+
     private final FilterChain chain;
-    
-    public A6HttpCallHandler(FilterChain chain) {
-        this.chain = chain;
-    }
-    
+
     @Override
     public void handle(A6Request request, A6Response response) {
-        HttpRequest req = null;
-        HttpResponse rsp = null;
+        HttpRequest req = (HttpRequest) request;
+        HttpResponse rsp = (HttpResponse) response;
+
+        long confToken = ((HttpRequest) request).getConfToken();
+        io.github.api7.A6.PrepareConf.Req conf = cache.getIfPresent(confToken);
+        if (null == conf) {
+            A6ErrResponse errResponse = new A6ErrResponse(Code.CONF_TOKEN_NOT_FOUND);
+            rsp.setErrResponse(errResponse);
+            return;
+        }
+
+        A6Config config = new A6Config(conf);
+        req.setConfig(config);
         chain.doFilter(req, rsp);
+
     }
 }

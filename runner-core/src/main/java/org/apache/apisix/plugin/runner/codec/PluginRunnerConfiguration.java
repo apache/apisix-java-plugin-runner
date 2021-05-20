@@ -17,9 +17,8 @@
 
 package org.apache.apisix.plugin.runner.codec;
 
-import com.google.common.cache.Cache;
-import io.github.api7.A6.PrepareConf.Req;
-import org.apache.apisix.plugin.runner.handler.DefaultPayloadHandler;
+import org.apache.apisix.plugin.runner.codec.impl.FlatBuffersDecoder;
+import org.apache.apisix.plugin.runner.codec.impl.FlatBuffersEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,8 +26,13 @@ import org.springframework.context.annotation.Configuration;
 public class PluginRunnerConfiguration {
 
     @Bean
-    public DefaultPayloadHandler createPayloadHandler(Cache<Long, Req> cache) {
-        return new DefaultPayloadHandler(cache);
+    public PluginRunnerDecoder createDecoder() {
+        return new FlatBuffersDecoder();
+    }
+
+    @Bean
+    public PluginRunnerEncoder createEncoder() {
+        return new FlatBuffersEncoder();
     }
 
 }

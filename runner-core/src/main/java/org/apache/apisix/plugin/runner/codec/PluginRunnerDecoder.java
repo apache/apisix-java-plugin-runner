@@ -15,16 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.handler;
+package org.apache.apisix.plugin.runner.codec;
 
-import com.google.flatbuffers.FlatBufferBuilder;
-import org.apache.apisix.plugin.runner.codec.frame.FrameType;
+import org.apache.apisix.plugin.runner.A6Request;
 
-public interface RequestHandler {
+import java.nio.ByteBuffer;
 
-    FlatBufferBuilder handler(FlatBufferBuilder builder);
+@FunctionalInterface
+public interface PluginRunnerDecoder {
 
-    FlatBufferBuilder builder();
-
-    FrameType type();
+    A6Request decode(ByteBuffer buffer);
 }

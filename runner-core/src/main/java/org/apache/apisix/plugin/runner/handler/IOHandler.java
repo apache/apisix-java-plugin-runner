@@ -18,6 +18,8 @@
 package org.apache.apisix.plugin.runner.handler;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.apisix.plugin.runner.codec.PluginRunnerDecoder;
+import org.apache.apisix.plugin.runner.codec.PluginRunnerEncoder;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.netty.NettyInbound;
@@ -26,13 +28,17 @@ import reactor.netty.NettyOutbound;
 @RequiredArgsConstructor
 public class IOHandler {
 
-    private final PayloadHandler payloadHandler;
-    
+    private final PluginRunnerDecoder decoder;
+
+    private final Dispatcher dispatcher;
+
+    private final PluginRunnerEncoder encoder;
+
     public Publisher<Void> handle(NettyInbound in, NettyOutbound out) {
         return in.receive().asByteBuffer()
-                .map(payloadHandler::decode)
-                .map(payloadHandler::dispatch)
-                .flatMap(e -> out.sendByteArray(Mono.just(payloadHandler.encode(e).array())).then());
+                .map(decoder::decode)
+                .map(dispatcher::dispatch)
+                .flatMap(e -> out.sendByteArray(Mono.just(encoder.encode(e).array())).then());
     }
-    
+
 }

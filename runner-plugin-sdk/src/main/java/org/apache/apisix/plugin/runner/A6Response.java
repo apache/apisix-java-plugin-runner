@@ -17,7 +17,17 @@
 
 package org.apache.apisix.plugin.runner;
 
+import java.nio.ByteBuffer;
+
 public interface A6Response {
+
+    ByteBuffer encode();
+
+    byte getType();
+
+    default A6ErrResponse getErrResponse() {
+        return null;
+    }
 
     enum ActionType {
 

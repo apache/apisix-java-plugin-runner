@@ -15,22 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec.frame;
+package org.apache.apisix.plugin.runner;
 
-public enum FrameType {
-    RPC_ERROR((byte) 0),
+import com.google.flatbuffers.FlatBufferBuilder;
+import io.github.api7.A6.Err.Resp;
 
-    RPC_PREPARE_CONF((byte) 1),
+import java.nio.ByteBuffer;
 
-    RPC_HTTP_REQ_CALL((byte) 2);
+public class A6ErrResponse implements A6Response {
 
-    private final byte type;
+    private final int code;
 
-    FrameType(byte type) {
-        this.type = type;
+    public A6ErrResponse(int code) {
+        this.code = code;
     }
 
+    @Override
+    public ByteBuffer encode() {
+        FlatBufferBuilder builder = new FlatBufferBuilder();
+        Resp.startResp(builder);
+        Resp.addCode(builder, code);
+        builder.finish(Resp.endResp(builder));
+        return builder.dataBuffer();
+    }
+
+    @Override
     public byte getType() {
-        return type;
+        return 0;
     }
 }

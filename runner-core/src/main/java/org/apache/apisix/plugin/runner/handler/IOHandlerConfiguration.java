@@ -17,15 +17,18 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
+import org.apache.apisix.plugin.runner.codec.PluginRunnerDecoder;
+import org.apache.apisix.plugin.runner.codec.PluginRunnerEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class IOHandlerConfiguration {
-    
+
     @Bean
-    public IOHandler createIOHandler(PayloadHandler payloadHandler) {
-        return new IOHandler(payloadHandler);
+    public IOHandler createIOHandler(PluginRunnerDecoder decoder,
+                                     Dispatcher dispatcher,
+                                     PluginRunnerEncoder encoder) {
+        return new IOHandler(decoder, dispatcher, encoder);
     }
-    
 }
