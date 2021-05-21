@@ -18,14 +18,6 @@
 package org.apache.apisix.plugin.runner;
 
 public interface A6Request {
-    
-    default boolean isConfigRequest() {
-        return false;
-    }
-    
-    int getConfToken();
-    
-    default int getType() {
-        return 0;
-    }
+
+    byte getType();
 }

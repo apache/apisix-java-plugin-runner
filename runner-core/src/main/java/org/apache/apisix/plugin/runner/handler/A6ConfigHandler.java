@@ -17,16 +17,25 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
+import com.google.common.cache.Cache;
+import io.github.api7.A6.PrepareConf.Req;
+import lombok.RequiredArgsConstructor;
+import org.apache.apisix.plugin.runner.A6ConfigRequest;
+import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.A6Response;
 
 /**
  * Handle APISIX configuration request.
  */
+@RequiredArgsConstructor
 public class A6ConfigHandler implements Handler {
-    
+    private final Cache<Long, Req> cache;
+
     @Override
     public void handle(A6Request request, A6Response response) {
-    
+        Req req = ((A6ConfigRequest) request).getReq();
+        long token = ((A6ConfigResponse) response).getConfToken();
+        cache.put(token, req);
     }
 }

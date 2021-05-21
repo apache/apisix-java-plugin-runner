@@ -15,11 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.handler;
+package org.apache.apisix.plugin.runner;
 
-import org.apache.apisix.plugin.runner.A6Request;
-import org.apache.apisix.plugin.runner.A6Response;
+public class A6ErrRequest implements A6Request {
 
-public interface Filter {
-    A6Response filter(A6Request req);
+    private final int code;
+
+    public A6ErrRequest(int code) {
+        this.code = code;
+    }
+
+    @Override
+    public byte getType() {
+        return 0;
+    }
+
+    public int getCode() {
+        return code;
+    }
 }

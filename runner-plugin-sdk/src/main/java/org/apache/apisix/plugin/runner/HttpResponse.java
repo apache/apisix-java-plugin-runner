@@ -17,9 +17,17 @@
 
 package org.apache.apisix.plugin.runner;
 
+import com.google.flatbuffers.FlatBufferBuilder;
+import io.github.api7.A6.DataEntry;
+import io.github.api7.A6.HTTPReqCall.Resp;
+import io.github.api7.A6.HTTPReqCall.Rewrite;
+import io.github.api7.A6.HTTPReqCall.Stop;
+import io.github.api7.A6.TextEntry;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -33,7 +41,7 @@ import java.util.Objects;
 @Data
 public class HttpResponse implements A6Response {
 
-    private final int requestId;
+    private final long requestId;
 
     private ActionType actionType;
 
@@ -47,8 +55,10 @@ public class HttpResponse implements A6Response {
 
     private HttpResponseStatus status;
 
-    public HttpResponse(int requestId) {
-        this.requestId = requestId;
+    private A6ErrResponse errResponse;
+
+    public HttpResponse(long requestId) {
+        this.requestId = getRequestId();
     }
 
     public void addHeader(String headerKey, String headerValue) {
@@ -67,5 +77,107 @@ public class HttpResponse implements A6Response {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    @Override
+    public ByteBuffer encode() {
+
+        if (null != getErrResponse()) {
+            return getErrResponse().encode();
+        }
+
+        FlatBufferBuilder builder = new FlatBufferBuilder();
+
+        if (null == getActionType()) {
+            setActionType(A6Response.ActionType.NONE);
+        }
+
+        int action = 0;
+        if (getActionType() == A6Response.ActionType.Rewrite) {
+            action = buildRewriteResp(builder);
+        }
+
+        if (getActionType() == A6Response.ActionType.Stop) {
+            action = buildStopResp(builder);
+        }
+
+        Resp.startResp(builder);
+        Resp.addAction(builder, action);
+        if (null != getActionType()) {
+            Resp.addActionType(builder, getActionType().getType());
+        }
+
+        Resp.addId(builder, getRequestId());
+        builder.finish(Resp.endResp(builder));
+        return builder.dataBuffer();
+    }
+
+    private int buildStopResp(FlatBufferBuilder builder) {
+        Stop.startStop(builder);
+        addHeaders(builder);
+        addBody(builder);
+        Stop.addStatus(builder, getStatus().code());
+        return Stop.endStop(builder);
+    }
+
+    private void addBody(FlatBufferBuilder builder) {
+        if (!CollectionUtils.isEmpty(getBody())) {
+            byte[] bodyTexts = new byte[getBody().size()];
+            for (Map.Entry<String, String> arg : getBody().entrySet()) {
+                int i = -1;
+                int key = builder.createString(arg.getKey());
+                int value = builder.createString(arg.getValue());
+                int text = DataEntry.createDataEntry(builder, key, value);
+                bodyTexts[++i] = (byte) text;
+            }
+            int body = Stop.createBodyVector(builder, bodyTexts);
+            Stop.addBody(builder, body);
+        }
+    }
+
+    private int buildRewriteResp(FlatBufferBuilder builder) {
+        Rewrite.startRewrite(builder);
+        if (null != getPath()) {
+            int path = builder.createString(getPath());
+            Rewrite.addPath(builder, path);
+        }
+        addHeaders(builder);
+        addArgs(builder);
+        return Rewrite.endRewrite(builder);
+    }
+
+    private void addArgs(FlatBufferBuilder builder) {
+        if (!CollectionUtils.isEmpty(getArgs())) {
+            int[] argTexts = new int[getArgs().size()];
+            for (Map.Entry<String, String> arg : getArgs().entrySet()) {
+                int i = -1;
+                int key = builder.createString(arg.getKey());
+                int value = builder.createString(arg.getValue());
+                int text = TextEntry.createTextEntry(builder, key, value);
+                argTexts[++i] = text;
+            }
+            int args = Rewrite.createArgsVector(builder, argTexts);
+            Rewrite.addArgs(builder, args);
+        }
+    }
+
+    private void addHeaders(FlatBufferBuilder builder) {
+        if (!CollectionUtils.isEmpty(getHeaders())) {
+            int[] headerTexts = new int[getHeaders().size()];
+            for (Map.Entry<String, String> header : getHeaders().entrySet()) {
+                int i = -1;
+                int key = builder.createString(header.getKey());
+                int value = builder.createString(header.getValue());
+                int text = TextEntry.createTextEntry(builder, key, value);
+                headerTexts[++i] = text;
+            }
+            int headers = Rewrite.createHeadersVector(builder, headerTexts);
+            Rewrite.addHeaders(builder, headers);
+        }
+    }
+
+    @Override
+    public byte getType() {
+        return 2;
     }
 }

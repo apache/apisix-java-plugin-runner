@@ -17,29 +17,38 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
+import com.google.common.cache.Cache;
+import io.github.api7.A6.Err.Code;
+import io.github.api7.A6.PrepareConf.Req;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
+import org.apache.apisix.plugin.runner.A6ErrRequest;
+import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.A6Response;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.filter.FilterBean;
 import org.apache.apisix.plugin.runner.filter.FilterChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Configuration
 public class A6HandlerConfiguration {
-    
+    private final Logger logger = LoggerFactory.getLogger(A6HandlerConfiguration.class);
+
     @Bean
-    public A6ConfigHandler createConfigHandler() {
-        return new A6ConfigHandler();
+    public A6ConfigHandler createConfigHandler(Cache<Long, Req> cache) {
+        return new A6ConfigHandler(cache);
     }
-    
+
     @Bean
-    public A6HttpCallHandler createHttpHandler(ObjectProvider<FilterBean> beanProvider) {
+    public A6HttpCallHandler createHttpHandler(ObjectProvider<FilterBean> beanProvider, Cache<Long, Req> cache) {
         List<FilterBean> filterList = beanProvider.orderedStream().collect(Collectors.toList());
         FilterChain chain = null;
         if (!filterList.isEmpty()) {
@@ -47,41 +56,45 @@ public class A6HandlerConfiguration {
                 chain = new FilterChain(filterList.get(i), chain);
             }
         }
-        return new A6HttpCallHandler(chain);
+        return new A6HttpCallHandler(cache, chain);
     }
-    
+
     @Bean
     public FilterBean testFilter() {
         return new FilterBean() {
             @Override
             public void doFilter(HttpRequest request, HttpResponse response, FilterChain chain) {
-        
+
             }
-    
+
             @Override
             public int getOrder() {
                 return 0;
             }
         };
     }
-    
+
     @Bean
     public Dispatcher createDispatcher(A6ConfigHandler configHandler, A6HttpCallHandler httpCallHandler) {
         return request -> {
             A6Response response;
             switch (request.getType()) {
                 case 0:
-                    return null;
+                    response = new A6ErrResponse(((A6ErrRequest) request).getCode());
+                    return response;
                 case 1:
-                    response = new A6ConfigResponse(1);
+                    long confToken = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
+                    response = new A6ConfigResponse(confToken);
                     configHandler.handle(request, response);
                     return response;
                 case 2:
-                    response = new HttpResponse(1);
+                    response = new HttpResponse(((HttpRequest) request).getRequestId());
                     httpCallHandler.handle(request, response);
                     return response;
                 default:
-                    return null;
+                    logger.error("can not dispatch type: {}", request.getType());
+                    response = new A6ErrResponse(Code.SERVICE_UNAVAILABLE);
+                    return response;
             }
         };
     }

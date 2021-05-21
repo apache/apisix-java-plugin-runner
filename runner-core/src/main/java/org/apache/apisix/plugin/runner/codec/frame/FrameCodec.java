@@ -38,11 +38,11 @@ public class FrameCodec {
         return buffer;
     }
 
-    public static ByteBuffer setBody(ByteBuffer payload, FrameType frameType) {
+    public static ByteBuffer setBody(ByteBuffer payload, byte type) {
         byte[] data = new byte[payload.remaining()];
         payload.get(data);
         ByteBuffer buffer = ByteBuffer.allocate(data.length + 4);
-        buffer.put(frameType.getType());
+        buffer.put(type);
         // data length
         byte[] length = intToByte3(data.length);
         buffer.put(length);

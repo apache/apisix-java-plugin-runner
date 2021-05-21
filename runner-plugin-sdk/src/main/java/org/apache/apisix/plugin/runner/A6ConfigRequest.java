@@ -17,27 +17,23 @@
 
 package org.apache.apisix.plugin.runner;
 
-import com.google.flatbuffers.FlatBufferBuilder;
-import io.github.api7.A6.PrepareConf.Resp;
+import io.github.api7.A6.PrepareConf.Req;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
 
-public class A6ConfigResponse implements A6Response {
-    @Getter
-    private final long confToken;
+public class A6ConfigRequest implements A6Request {
 
-    public A6ConfigResponse(long confToken) {
-        this.confToken = confToken;
+    @Getter
+    private final Req req;
+
+    public A6ConfigRequest(Req req) {
+        this.req = req;
     }
 
-    @Override
-    public ByteBuffer encode() {
-        FlatBufferBuilder builder = new FlatBufferBuilder();
-        Resp.startResp(builder);
-        Resp.addConfToken(builder, confToken);
-        builder.finish(Resp.endResp(builder));
-        return builder.dataBuffer();
+    public static A6ConfigRequest from(ByteBuffer buffer) {
+        Req req = Req.getRootAsReq(buffer);
+        return new A6ConfigRequest(req);
     }
 
     @Override
