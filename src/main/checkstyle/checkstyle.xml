@@ -28,11 +28,6 @@
         <property name="eachLine" value="true"/>
     </module>
 
-    <module name="RegexpHeader">
-        <property name="headerFile" value="${checkstyle.header.file}"/>
-        <property name="multiLines" value="1, 2, 3, 18"/>
-    </module>
-
     <module name="RegexpSingleline">
         <property name="format" value="System\.out\.println"/>
         <property name="message" value="Prohibit invoking System.out.println in source code !"/>
