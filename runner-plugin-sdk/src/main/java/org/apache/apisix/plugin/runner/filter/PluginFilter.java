@@ -15,26 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner;
+package org.apache.apisix.plugin.runner.filter;
 
-import io.github.api7.A6.PrepareConf.Req;
-import io.github.api7.A6.TextEntry;
+import org.apache.apisix.plugin.runner.HttpRequest;
+import org.apache.apisix.plugin.runner.HttpResponse;
+import org.springframework.core.Ordered;
+import reactor.core.publisher.Mono;
 
-public class A6Config {
+public interface PluginFilter extends Ordered {
 
-    private final Req req;
+    Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain);
 
-    public A6Config(Req req) {
-        this.req = req;
-    }
-
-    public String get(String key) {
-        for (int i = 0; i < this.req.confLength(); i++) {
-            TextEntry conf = this.req.conf(i);
-            if (conf.name().equals(key)) {
-                return conf.value();
-            }
-        }
-        return null;
-    }
 }

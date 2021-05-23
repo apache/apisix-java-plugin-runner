@@ -15,14 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.filter;
+package org.apache.apisix.plugin.runner;
 
-import org.apache.apisix.plugin.runner.HttpRequest;
-import org.apache.apisix.plugin.runner.HttpResponse;
-import org.springframework.core.Ordered;
+import io.github.api7.A6.PrepareConf.Req;
+import io.github.api7.A6.TextEntry;
+import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 
-public interface FilterBean extends Ordered {
-    
-    void doFilter(HttpRequest request, HttpResponse response, FilterChain filterChain);
-    
+public class A6Conf {
+
+    public Req getReq() {
+        return req;
+    }
+
+    private final Req req;
+
+    public PluginFilterChain getChain() {
+        return chain;
+    }
+
+    private final PluginFilterChain chain;
+
+    public A6Conf(Req req, PluginFilterChain chain) {
+        this.req = req;
+        this.chain = chain;
+    }
+
+    public String get(String key) {
+        for (int i = 0; i < this.req.confLength(); i++) {
+            TextEntry conf = this.req.conf(i);
+            if (conf.name().equals(key)) {
+                return conf.value();
+            }
+        }
+        return null;
+    }
 }

@@ -19,22 +19,23 @@ package org.apache.apisix.plugin.runner.handler;
 
 import com.google.common.cache.Cache;
 import io.github.api7.A6.Err.Code;
-import io.github.api7.A6.PrepareConf.Req;
+import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.A6ErrRequest;
 import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.A6Response;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
-import org.apache.apisix.plugin.runner.filter.FilterBean;
-import org.apache.apisix.plugin.runner.filter.FilterChain;
+import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -43,35 +44,18 @@ public class A6HandlerConfiguration {
     private final Logger logger = LoggerFactory.getLogger(A6HandlerConfiguration.class);
 
     @Bean
-    public A6ConfigHandler createConfigHandler(Cache<Long, Req> cache) {
-        return new A6ConfigHandler(cache);
-    }
-
-    @Bean
-    public A6HttpCallHandler createHttpHandler(ObjectProvider<FilterBean> beanProvider, Cache<Long, Req> cache) {
-        List<FilterBean> filterList = beanProvider.orderedStream().collect(Collectors.toList());
-        FilterChain chain = null;
-        if (!filterList.isEmpty()) {
-            for (int i = filterList.size() - 1; i >= 0; i--) {
-                chain = new FilterChain(filterList.get(i), chain);
-            }
+    public A6ConfigHandler createConfigHandler(Cache<Long, A6Conf> cache, ObjectProvider<PluginFilter> beanProvider) {
+        List<PluginFilter> pluginFilterList = beanProvider.orderedStream().collect(Collectors.toList());
+        Map<String, PluginFilter> filterMap = new HashMap<>();
+        for (PluginFilter filter : pluginFilterList) {
+            filterMap.put(filter.getClass().getSimpleName(), filter);
         }
-        return new A6HttpCallHandler(cache, chain);
+        return new A6ConfigHandler(cache, filterMap);
     }
 
     @Bean
-    public FilterBean testFilter() {
-        return new FilterBean() {
-            @Override
-            public void doFilter(HttpRequest request, HttpResponse response, FilterChain chain) {
-
-            }
-
-            @Override
-            public int getOrder() {
-                return 0;
-            }
-        };
+    public A6HttpCallHandler createHttpHandler(Cache<Long, A6Conf> cache) {
+        return new A6HttpCallHandler(cache);
     }
 
     @Bean

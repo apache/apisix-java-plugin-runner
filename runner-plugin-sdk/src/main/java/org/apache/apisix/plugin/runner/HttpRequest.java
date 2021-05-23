@@ -18,18 +18,24 @@
 package org.apache.apisix.plugin.runner;
 
 import io.github.api7.A6.HTTPReqCall.Req;
-import lombok.Setter;
+import io.github.api7.A6.TextEntry;
+import org.apache.apisix.plugin.runner.filter.PluginFilter;
 
 import java.nio.ByteBuffer;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-// @Readable
 public class HttpRequest implements A6Request {
 
     private final Req req;
 
-    private int id;
+    private HttpResponse response;
+
+    private io.github.api7.A6.PrepareConf.Req config;
+
+    private Long requestId;
 
     private String sourceIP;
 
@@ -37,39 +43,90 @@ public class HttpRequest implements A6Request {
 
     private String path;
 
-    private Map<String, String> parameter;
-
     private Map<String, String> headers;
 
-    private long confToken;
-
-    @Setter
-    private A6Config config;
-
-    private Map<String, Object> data;
+    private Map<String, String> args;
 
     public HttpRequest(Req req) {
         this.req = req;
     }
 
+    public String getConfig(PluginFilter filter) {
+        for (int i = 0; i < config.confLength(); i++) {
+            TextEntry conf = config.conf(i);
+            if (conf.name().equals(filter.getClass().getSimpleName())) {
+                return conf.value();
+            }
+        }
+        return null;
+    }
+
     public long getRequestId() {
-        return req.id();
+        if (Objects.isNull(requestId)) {
+            requestId = req.id();
+
+        }
+        return requestId;
     }
 
     public String getSourceIP() {
-        return ""; // TODO
+        if (Objects.isNull(sourceIP)) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < req.srcIpLength(); i++) {
+                builder.append(req.srcIp(i)).append('.');
+            }
+            sourceIP = builder.substring(0, builder.length() - 1);
+        }
+
+        return sourceIP;
     }
 
     public Method getMethod() {
-        return Method.values()[req.method()];
+        if (Objects.isNull(method)) {
+            method = Method.values()[req.method()];
+        }
+        return method;
     }
 
     public String getPath() {
-        return req.path(); // FiXME
+        if (Objects.isNull(path)) {
+            path = req.path();
+        }
+        return path;
     }
 
-    public String getParameter(String name) {
-        return parameter.get(name);
+    public void setPath(String path) {
+        response.setPath(path);
+    }
+
+    public Map<String, String> getHeaders() {
+        if (Objects.isNull(headers)) {
+            headers = new HashMap<>();
+            for (int i = 0; i < req.headersLength(); i++) {
+                TextEntry header = req.headers(i);
+                headers.put(header.name(), header.value());
+            }
+        }
+        return headers;
+    }
+
+    public void setHeader(String headerKey, String headerValue) {
+        response.setReqHeader(headerKey, headerValue);
+    }
+
+    public Map<String, String> getArgs() {
+        if (Objects.isNull(args)) {
+            args = new HashMap<>();
+            for (int i = 0; i < req.argsLength(); i++) {
+                TextEntry arg = req.args(i);
+                args.put(arg.name(), arg.value());
+            }
+        }
+        return args;
+    }
+
+    public void setArg(String argKey, String argValue) {
+        response.setArgs(argKey, argValue);
     }
 
     public Map getParameterMap() {
@@ -91,6 +148,11 @@ public class HttpRequest implements A6Request {
     public static HttpRequest from(ByteBuffer buffer) {
         Req req = Req.getRootAsReq(buffer);
         return new HttpRequest(req);
+    }
+
+    public void initCtx(HttpResponse response, io.github.api7.A6.PrepareConf.Req config) {
+        this.response = response;
+        this.config = config;
     }
 
     @Override
