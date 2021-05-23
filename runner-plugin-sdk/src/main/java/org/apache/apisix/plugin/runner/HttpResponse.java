@@ -124,9 +124,10 @@ public class HttpResponse implements A6Response {
         }
 
         int action = 0;
+
         if (actionType == A6Response.ActionType.Rewrite) {
             action = buildRewriteResp(builder);
-        }else if (actionType == A6Response.ActionType.Stop) {
+        } else if (actionType == A6Response.ActionType.Stop) {
             action = buildStopResp(builder);
         }
 
