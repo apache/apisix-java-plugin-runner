@@ -27,25 +27,26 @@ import org.springframework.stereotype.Component;
 import reactor.netty.DisposableServer;
 import reactor.netty.tcp.TcpServer;
 
+import java.time.Duration;
 import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class ApplicationRunner implements CommandLineRunner {
-    
+
     private final TcpServer tcpServer;
-    
-    @Value("${socket.file:/tmp/runner.socks}")
+
+    @Value("${socket.file:/tmp/runner.sock}")
     private String socketFile;
-    
+
     private final IOHandler handler;
-    
+
     private DisposableServer server;
-    
+
     @Override
     public void run(String... args) throws Exception {
         TcpServer tcpServer = this.tcpServer;
-        
+
         if (Objects.isNull(tcpServer)) {
             tcpServer = TcpServer.create();
         }
@@ -61,10 +62,12 @@ public class ApplicationRunner implements CommandLineRunner {
             tcpServer = tcpServer.handle(handler::handle);
         }
         this.server = tcpServer.bindNow();
-        
-        Thread awaitThread = new Thread(() -> {
-            this.server.onDispose().block();
-        });
+
+        // delete socket file when tcp server shutdown
+        Runtime.getRuntime()
+                .addShutdownHook(new Thread(() -> this.server.disposeNow(Duration.ofSeconds(45))));
+
+        Thread awaitThread = new Thread(() -> this.server.onDispose().block());
         awaitThread.setDaemon(false);
         awaitThread.setName("uds-server");
         awaitThread.start();

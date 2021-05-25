@@ -113,7 +113,7 @@ public class HttpResponse implements A6Response {
 
     @Override
     public ByteBuffer encode() {
-        if (null != errResponse) {
+        if (!Objects.isNull(errResponse)) {
             return errResponse.encode();
         }
 
