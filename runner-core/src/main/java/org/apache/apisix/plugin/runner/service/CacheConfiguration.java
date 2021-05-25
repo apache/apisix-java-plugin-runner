@@ -24,14 +24,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class CacheConfiguration {
 
     @Bean
-    public Cache<Long, A6Conf> configurationCache(@Value("${cache.config.expired:5000}") long expired,
-                                                  @Value("${cache.config.capacity:500}") int capacity) {
-        return CacheBuilder.newBuilder().expireAfterWrite(Duration.ofMillis(expired)).maximumSize(capacity).build();
+    public Cache<Long, A6Conf> configurationCache(@Value("${cache.config.expired:3610}") long expired,
+                                                  @Value("${cache.config.capacity:1000}") int capacity) {
+        return CacheBuilder.newBuilder().expireAfterWrite(expired, TimeUnit.SECONDS).maximumSize(capacity).build();
     }
 }
