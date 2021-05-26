@@ -80,7 +80,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
         return byte3ToInt(bytes);
     }
 
-    private ByteBuffer getBody(ByteBuffer payload) throws BufferUnderflowException, IndexOutOfBoundsException{
+    private ByteBuffer getBody(ByteBuffer payload) throws BufferUnderflowException, IndexOutOfBoundsException {
         int length = getDataLength(payload);
         ByteBuffer buffer = payload.slice();
         byte[] dst = new byte[length];

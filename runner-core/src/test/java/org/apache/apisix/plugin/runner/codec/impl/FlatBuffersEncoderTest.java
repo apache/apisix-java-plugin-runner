@@ -17,8 +17,6 @@
 
 package org.apache.apisix.plugin.runner.codec.impl;
 
-import com.google.flatbuffers.Table;
-import io.github.api7.A6.DataEntry;
 import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.HTTPReqCall.Action;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
@@ -126,7 +124,7 @@ class FlatBuffersEncoderTest {
         Assertions.assertEquals(rewrite.args(0).name(), "foo");
         Assertions.assertEquals(rewrite.args(0).value(), "bar");
         Assertions.assertEquals(rewrite.headers(0).name(), "Server");
-        Assertions.assertEquals(rewrite.headers(0).value(),"APISIX");
+        Assertions.assertEquals(rewrite.headers(0).value(), "APISIX");
     }
 
     @Test
@@ -136,7 +134,7 @@ class FlatBuffersEncoderTest {
         // set status, body, resp header means stop request
         httpResponse.setStatus(HttpResponseStatus.UNAUTHORIZED);
         httpResponse.setRespHeaders("code", "401");
-        httpResponse.setBody("error","HTTP 401 Unauthorized");
+        httpResponse.setBody("Unauthorized");
         ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
@@ -144,10 +142,31 @@ class FlatBuffersEncoderTest {
         Stop stop = (Stop) resp.action(new Stop());
 
         Assertions.assertEquals(stop.status(), 401);
-//        DataEntry body = DataEntry.getRootAsDataEntry(stop.bodyAsByteBuffer());
-//        Assertions.assertEquals(body.name(), "foo");
-//        Assertions.assertEquals(body.value(), "bar");
-        Assertions.assertEquals(stop.headers(0).name(), "Server");
-        Assertions.assertEquals(stop.headers(0).value(),"APISIX");
+        StringBuilder body = new StringBuilder();
+        for (int i = 0; i < stop.bodyLength(); i++) {
+            body.append((char) stop.body(i));
+        }
+        Assertions.assertEquals(body.toString(), "Unauthorized");
+        Assertions.assertEquals(stop.headers(0).name(), "code");
+        Assertions.assertEquals(stop.headers(0).value(), "401");
+    }
+
+    @Test
+    @DisplayName("test mix stop and rewrite response, will use stop response")
+    void testMixStopAndRewriteResponseEncode() {
+        HttpResponse httpResponse = new HttpResponse(0L);
+        // set path, args, req header means rewrite request
+        httpResponse.setPath("/hello");
+        httpResponse.setArgs("foo", "bar");
+        httpResponse.setReqHeader("Server", "APISIX");
+
+        // set status, body, resp header means stop request
+        httpResponse.setStatus(HttpResponseStatus.UNAUTHORIZED);
+        httpResponse.setRespHeaders("code", "401");
+        httpResponse.setBody("Unauthorized");
+        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        result.position(4);
+        io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
+        Assertions.assertEquals(resp.actionType(), Action.Stop);
     }
 }
