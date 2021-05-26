@@ -15,17 +15,17 @@
 #
 
 github:
-    description: APISIX Plugin Runner in Java
-    homepage: https://apisix.apache.org/
-    labels:
-      - apisix
-      - java
-      - gateway
-      - plugin
-    enabled_merge_buttons:
-      squash:  true
-      merge:   false
-      rebase:  false
+  description: APISIX Plugin Runner in Java
+  homepage: https://apisix.apache.org/
+  labels:
+    - apisix
+    - java
+    - gateway
+    - plugin
+  enabled_merge_buttons:
+    squash:  true
+    merge:   false
+    rebase:  false
     features:
       issues: true
     protected_branches:
