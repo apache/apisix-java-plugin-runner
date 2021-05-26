@@ -40,6 +40,7 @@
     </dependencies>
 
     <build>
+        <finalName>apisix-runner-bin</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -57,6 +58,25 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>dist</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="${project.build.directory}/apisix-runner-bin.tar.gz"
+                                      tofile="${project.basedir}/../dist/apache-apisix-runner-bin.tar.gz"
+                                      overwrite="true" />
+                            </target>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
