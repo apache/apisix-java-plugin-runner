@@ -1,21 +1,28 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.apisix.plugin.runner.server;
 
 import io.netty.channel.unix.DomainSocketAddress;
 import io.netty.channel.unix.DomainSocketChannel;
-import org.apache.apisix.plugin.runner.codec.PluginRunnerConfiguration;
-import org.apache.apisix.plugin.runner.handler.A6HandlerConfiguration;
-import org.apache.apisix.plugin.runner.handler.IOHandlerConfiguration;
-import org.apache.apisix.plugin.runner.server.config.TcpServerConfiguration;
-import org.apache.apisix.plugin.runner.service.CacheConfiguration;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.netty.Connection;
 import reactor.netty.tcp.TcpClient;
@@ -27,24 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 class ApplicationRunnerTest {
 
-    protected ConfigurableApplicationContext context;
-
-    @BeforeEach
-    @DisplayName("start java plugin runner")
-    void setup() {
-        context = new SpringApplicationBuilder(ApplicationRunner.class,
-                IOHandlerConfiguration.class,
-                TcpServerConfiguration.class,
-                CacheConfiguration.class,
-                A6HandlerConfiguration.class,
-                PluginRunnerConfiguration.class)
-                .web(WebApplicationType.NONE)
-                .run();
-    }
-
     @Test
     @DisplayName("test listen on socket file success")
-    @Disabled
     void testUDSConnectSuccess() {
         Connection client =
                 TcpClient.create()
@@ -60,18 +51,15 @@ class ApplicationRunnerTest {
 
     @Test
     @DisplayName("test listen on error socket file")
+    @Disabled
     void testUDSConnectFail() {
         Throwable exception = assertThrows(RuntimeException.class, () -> {
-            TcpClient.create()
+            Connection client = TcpClient.create()
                     .remoteAddress(() -> new DomainSocketAddress("/tmp/error.sock"))
                     .connectNow();
+//            client.disposeNow();
         });
         assertThat(exception.getMessage()).isEqualTo("java.io.FileNotFoundException");
-    }
 
-    @AfterEach
-    @DisplayName("shutdown java plugin runner")
-    void down() {
-        context.close();
     }
 }

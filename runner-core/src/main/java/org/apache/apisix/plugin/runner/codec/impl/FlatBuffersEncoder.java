@@ -19,7 +19,6 @@ package org.apache.apisix.plugin.runner.codec.impl;
 
 import org.apache.apisix.plugin.runner.A6Response;
 import org.apache.apisix.plugin.runner.codec.PluginRunnerEncoder;
-import org.apache.apisix.plugin.runner.codec.frame.FrameCodec;
 
 import java.nio.ByteBuffer;
 
@@ -29,8 +28,30 @@ public class FlatBuffersEncoder implements PluginRunnerEncoder {
     public ByteBuffer encode(A6Response response) {
         ByteBuffer buffer = response.encode();
         if (null != response.getErrResponse()) {
-            return FrameCodec.setBody(buffer, (byte) 0);
+            return setBody(buffer, (byte) 0);
         }
-        return FrameCodec.setBody(buffer, response.getType());
+        return setBody(buffer, response.getType());
+    }
+
+    private ByteBuffer setBody(ByteBuffer payload, byte type) {
+        byte[] data = new byte[payload.remaining()];
+        payload.get(data);
+        ByteBuffer buffer = ByteBuffer.allocate(data.length + 4);
+        buffer.put(type);
+        // data length
+        byte[] length = intToByte3(data.length);
+        buffer.put(length);
+        // data
+        buffer.put(data);
+        buffer.flip();
+        return buffer;
+    }
+
+    private byte[] intToByte3(int i) {
+        byte[] targets = new byte[3];
+        targets[2] = (byte) (i & 0xFF);
+        targets[1] = (byte) (i >> 8 & 0xFF);
+        targets[0] = (byte) ((i >> 16 & 0xFF));
+        return targets;
     }
 }

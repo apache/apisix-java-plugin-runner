@@ -156,10 +156,10 @@ public class HttpResponse implements A6Response {
         int bodyIndex = -1;
         if (!CollectionUtils.isEmpty(body)) {
             byte[] bodyTexts = new byte[body.size()];
-            for (Map.Entry<String, String> arg : body.entrySet()) {
+            for (Map.Entry<String, String> body : body.entrySet()) {
                 int i = -1;
-                int key = builder.createString(arg.getKey());
-                int value = builder.createString(arg.getValue());
+                int key = builder.createString(body.getKey());
+                int value = builder.createString(body.getValue());
                 int text = DataEntry.createDataEntry(builder, key, value);
                 bodyTexts[++i] = (byte) text;
             }
@@ -181,7 +181,7 @@ public class HttpResponse implements A6Response {
 
     private int buildRewriteResp(FlatBufferBuilder builder) {
         int pathIndex = -1;
-        if (Objects.isNull(path)) {
+        if (!Objects.isNull(path)) {
             pathIndex = builder.createString(path);
         }
 
