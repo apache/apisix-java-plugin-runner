@@ -15,3 +15,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+RUNNER_HOME=$(dirname "$0")/..
+
+RUNNER_HEAP=${JAVA_HEAP:-4g}
+
+JAVA_OPS="${JAVA_OPS} -Xmx${RUNNER_HEAP} -Xms${RUNNER_HEAP}"
+
+nohup java -jar ${JAVA_OPS} ${RUNNER_HOME}/apisxi-runner-start-*.jar \
+ 1>${RUNNER_HOME}/logs/runner.out \
+ 2>${RUNNER_HOME}/logs/runner.err &
+
+echo $! > ./logs/runner.pid
