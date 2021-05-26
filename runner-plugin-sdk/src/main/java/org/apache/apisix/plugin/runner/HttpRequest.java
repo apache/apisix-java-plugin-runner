@@ -54,7 +54,7 @@ public class HttpRequest implements A6Request {
     public String getConfig(PluginFilter filter) {
         for (int i = 0; i < config.confLength(); i++) {
             TextEntry conf = config.conf(i);
-            if (conf.name().equals(filter.getClass().getSimpleName())) {
+            if (conf.name().equals(filter.name())) {
                 return conf.value();
             }
         }

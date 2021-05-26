@@ -111,6 +111,10 @@ public class HttpResponse implements A6Response {
         this.errResponse = errResponse;
     }
 
+    public A6ErrResponse getErrResponse() {
+        return this.errResponse;
+    }
+
     @Override
     public ByteBuffer encode() {
         if (!Objects.isNull(errResponse)) {

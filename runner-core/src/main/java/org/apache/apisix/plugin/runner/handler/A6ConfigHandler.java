@@ -53,7 +53,6 @@ public class A6ConfigHandler implements Handler {
         PluginFilterChain chain = createFilterChain(req);
         A6Conf config = new A6Conf(req, chain);
         cache.put(token, config);
-
     }
 
     private PluginFilterChain createFilterChain(Req req) {
@@ -63,6 +62,10 @@ public class A6ConfigHandler implements Handler {
             PluginFilter filter = filters.get(conf.name());
             if (Objects.isNull(filter)) {
                 logger.error("receive undefined filter: {}, skip it", conf.name());
+                continue;
+            }
+            if (chainFilters.contains(filter)) {
+                logger.error("skip the same filter: {}", conf.name());
                 continue;
             }
             chainFilters.add(filter);
