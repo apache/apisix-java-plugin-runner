@@ -26,45 +26,57 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>apisix-runner-starter</artifactId>
+    <artifactId>apisix-runner-dist</artifactId>
     <packaging>jar</packaging>
 
-    <name>APISIX Java Plugin Runner Starter</name>
+    <name>APISIX Java Plugin Runner Distribution</name>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.apisix</groupId>
-            <artifactId>apisix-runner-core</artifactId>
+            <artifactId>apisix-runner-starter</artifactId>
             <version>0.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.apisix</groupId>
-            <artifactId>apisix-runner-plugin</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>apisix-java-plugin-runner</finalName>
+        <finalName>apisix-runner-bin</finalName>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <mainClass>org.apache.apisix.plugin.runner.PluginRunnerApplication</mainClass>
-                    <layout>ZIP</layout>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assemble.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>bin</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>single</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>dist</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="${project.build.directory}/apisix-runner-bin.tar.gz"
+                                      tofile="${project.basedir}/../dist/apache-apisix-runner-bin.tar.gz"
+                                      overwrite="true" />
+                            </target>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
