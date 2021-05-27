@@ -23,10 +23,10 @@ import org.apache.apisix.plugin.runner.A6ErrRequest;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.codec.PluginRunnerDecoder;
-import org.apache.apisix.plugin.runner.codec.frame.FrameCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 public class FlatBuffersDecoder implements PluginRunnerDecoder {
@@ -35,18 +35,63 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
 
     @Override
     public A6Request decode(ByteBuffer buffer) {
-        byte type = buffer.get();
-        ByteBuffer body = FrameCodec.getBody(buffer);
+        byte type;
+        try {
+            type = buffer.get();
+        } catch (BufferUnderflowException e) {
+            logger.error("receive empty data");
+            return new A6ErrRequest(Code.BAD_REQUEST);
+        }
+
+        ByteBuffer body;
         switch (type) {
             case 1:
-                return A6ConfigRequest.from(body);
+                A6ConfigRequest a6ConfigRequest;
+                try {
+                    body = getBody(buffer);
+                    a6ConfigRequest = A6ConfigRequest.from(body);
+                } catch (BufferUnderflowException | IndexOutOfBoundsException e) {
+                    logger.error("receive error data length");
+                    return new A6ErrRequest(Code.BAD_REQUEST);
+                }
+                return a6ConfigRequest;
             case 2:
-                return HttpRequest.from(body);
+                HttpRequest httpRequest;
+                try {
+                    body = getBody(buffer);
+                    httpRequest = HttpRequest.from(body);
+                } catch (BufferUnderflowException | IndexOutOfBoundsException e) {
+                    return new A6ErrRequest(Code.BAD_REQUEST);
+                }
+                return httpRequest;
             default:
                 break;
         }
 
         logger.error("receive unsupported type: {}", type);
         return new A6ErrRequest(Code.BAD_REQUEST);
+    }
+
+    private int getDataLength(ByteBuffer payload) {
+        byte[] bytes = new byte[3];
+        for (int i = 0; i < 3; i++) {
+            bytes[i] = payload.get();
+        }
+        return byte3ToInt(bytes);
+    }
+
+    private ByteBuffer getBody(ByteBuffer payload) throws BufferUnderflowException, IndexOutOfBoundsException {
+        int length = getDataLength(payload);
+        ByteBuffer buffer = payload.slice();
+        byte[] dst = new byte[length];
+        buffer.get(dst, 0, length);
+        buffer.flip();
+        return buffer;
+    }
+
+    private int byte3ToInt(byte[] bytes) {
+        return bytes[2] & 0xFF |
+                (bytes[1] & 0xFF << 8) |
+                (bytes[0] & 0xFF << 16);
     }
 }

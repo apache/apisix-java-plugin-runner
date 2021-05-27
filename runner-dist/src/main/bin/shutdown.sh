@@ -15,3 +15,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+RUNNER_HOME=$(dirname "$0")/..
+
+PID=$(cat $RUNNER_HOME/logs/runner.pid)
+MATCH=$(jps |grep -E "${PID}\s+apisix-runner-starter-.*\.jar" |wc -l)
+
+if [[ $MATCH == 1 ]]; then
+  kill ${PID}
+else
+  echo -e "APISIX Plugin Runner not found!"
+fi

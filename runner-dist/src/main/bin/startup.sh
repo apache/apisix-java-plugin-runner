@@ -15,3 +15,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+RUNNER_HOME=$(dirname "$0")/..
+
+RUNNER_LOGS_DIR=${RUNNER_LOGS_DIR:-${RUNNER_HOME}/logs}
+RUNNER_HEAP=${JAVA_HEAP:-4g}
+
+JAVA_OPS="${JAVA_OPS} -Xmx${RUNNER_HEAP} -Xms${RUNNER_HEAP}"
+
+[[ -d ${RUNNER_LOGS_DIR} ]] || mkdir -p ${RUNNER_LOGS_DIR}
+
+nohup java -jar ${JAVA_OPS} ${RUNNER_HOME}/apisxi-runner-start-*.jar \
+ 1>${RUNNER_LOGS_DIR}/runner.out \
+ 2>${RUNNER_LOGS_DIR}/runner.err &
+
+echo $! > ./logs/runner.pid
