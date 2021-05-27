@@ -18,15 +18,16 @@
 package org.apache.apisix.plugin.runner;
 
 import com.google.flatbuffers.FlatBufferBuilder;
-import io.github.api7.A6.DataEntry;
 import io.github.api7.A6.HTTPReqCall.Resp;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
 import io.github.api7.A6.HTTPReqCall.Stop;
 import io.github.api7.A6.TextEntry;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -51,7 +52,7 @@ public class HttpResponse implements A6Response {
 
     private String path;
 
-    private Map<String, String> body;
+    private String body;
 
     private HttpResponseStatus status;
 
@@ -94,12 +95,9 @@ public class HttpResponse implements A6Response {
         respHeaders.put(headerKey, headerValue);
     }
 
-    public void setBody(String bodyKey, String bodyValue) {
+    public void setBody(String body) {
         actionType = ActionType.Stop;
-        if (Objects.isNull(body)) {
-            body = new HashMap<>();
-        }
-        body.put(bodyKey, bodyValue);
+        this.body = body;
     }
 
     public void setStatus(HttpResponseStatus status) {
@@ -154,16 +152,9 @@ public class HttpResponse implements A6Response {
         }
 
         int bodyIndex = -1;
-        if (!CollectionUtils.isEmpty(body)) {
-            byte[] bodyTexts = new byte[body.size()];
-            for (Map.Entry<String, String> arg : body.entrySet()) {
-                int i = -1;
-                int key = builder.createString(arg.getKey());
-                int value = builder.createString(arg.getValue());
-                int text = DataEntry.createDataEntry(builder, key, value);
-                bodyTexts[++i] = (byte) text;
-            }
-            bodyIndex = Stop.createBodyVector(builder, bodyTexts);
+        if (StringUtils.hasText(body)) {
+            byte[] bodyBytes = body.getBytes(StandardCharsets.US_ASCII);
+            bodyIndex = Stop.createBodyVector(builder, bodyBytes);
         }
 
         Stop.startStop(builder);
@@ -181,7 +172,7 @@ public class HttpResponse implements A6Response {
 
     private int buildRewriteResp(FlatBufferBuilder builder) {
         int pathIndex = -1;
-        if (Objects.isNull(path)) {
+        if (!Objects.isNull(path)) {
             pathIndex = builder.createString(path);
         }
 
