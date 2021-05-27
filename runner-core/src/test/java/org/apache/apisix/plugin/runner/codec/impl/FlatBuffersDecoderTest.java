@@ -17,6 +17,7 @@
 
 package org.apache.apisix.plugin.runner.codec.impl;
 
+import com.google.flatbuffers.FlatBufferBuilder;
 import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.TextEntry;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
@@ -104,8 +105,24 @@ class FlatBuffersDecoderTest {
     @Test
     @DisplayName("test get body")
     void testGetBody() {
-        // {"name":"foo", "value":"bar"}
-        byte[] bytes = new byte[]{1, 0, 0, 64, 12, 0, 0, 0, 0, 0, 6, 0, 8, 0, 4, 0, 6, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0, 12, 0, 0, 0, 8, 0, 12, 0, 8, 0, 4, 0, 8, 0, 0, 0, 8, 0, 0, 0, 12, 0, 0, 0, 3, 0, 0, 0, 98, 97, 114, 0, 3, 0, 0, 0, 102, 111, 111, 0};
+        // mock client assembly data
+        FlatBufferBuilder builder = new FlatBufferBuilder();
+        int foo = builder.createString("foo");
+        int bar = builder.createString("bar");
+        int confIndex = TextEntry.createTextEntry(builder, foo, bar);
+        int vector = io.github.api7.A6.PrepareConf.Req.createConfVector(builder, new int[]{confIndex});
+        io.github.api7.A6.PrepareConf.Req.startReq(builder);
+        io.github.api7.A6.PrepareConf.Req.addConf(builder, vector);
+        builder.finish(io.github.api7.A6.PrepareConf.Req.endReq(builder));
+        byte[] data = new byte[builder.dataBuffer().remaining()];
+        builder.dataBuffer().get(data, 0, data.length);
+        // use the correct data length
+        byte[] header = new byte[]{1, 0, 0, (byte) data.length};
+        byte[] bytes = new byte[header.length + data.length];
+        // assembly data format
+        System.arraycopy(header, 0, bytes, 0, header.length);
+        System.arraycopy(data, 0, bytes, header.length, data.length);
+
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6ConfigRequest configReq = (A6ConfigRequest) flatBuffersDecoder.decode(buffer);
         for (int i = 0; i < configReq.getReq().confLength(); i++) {
@@ -119,7 +136,24 @@ class FlatBuffersDecoderTest {
     @DisplayName("test get body with error data length")
     void testGetBody2() {
         // {"name":"foo", "value":"bar"}
-        byte[] bytes = new byte[]{1, 0, 0, 32, 12, 0, 0, 0, 0, 0, 6, 0, 8, 0, 4, 0, 6, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 0, 12, 0, 0, 0, 8, 0, 12, 0, 8, 0, 4, 0, 8, 0, 0, 0, 8, 0, 0, 0, 12, 0, 0, 0, 3, 0, 0, 0, 98, 97, 114, 0, 3, 0, 0, 0, 102, 111, 111, 0};
+        FlatBufferBuilder builder = new FlatBufferBuilder();
+        int foo = builder.createString("foo");
+        int bar = builder.createString("bar");
+        int confIndex = TextEntry.createTextEntry(builder, foo, bar);
+        int vector = io.github.api7.A6.PrepareConf.Req.createConfVector(builder, new int[]{confIndex});
+        io.github.api7.A6.PrepareConf.Req.startReq(builder);
+        io.github.api7.A6.PrepareConf.Req.addConf(builder, vector);
+        builder.finish(io.github.api7.A6.PrepareConf.Req.endReq(builder));
+        byte[] data = new byte[builder.dataBuffer().remaining()];
+        builder.dataBuffer().get(data, 0, data.length);
+        // se the error data length
+        byte errDateLength = (byte) (data.length / 2);
+        byte[] header = new byte[]{1, 0, 0, errDateLength};
+        byte[] bytes = new byte[header.length + data.length];
+        // assembly data format
+        System.arraycopy(header, 0, bytes, 0, header.length);
+        System.arraycopy(data, 0, bytes, header.length, data.length);
+
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6ConfigRequest configReq = (A6ConfigRequest) flatBuffersDecoder.decode(buffer);
         assertThrows(IndexOutOfBoundsException.class, () -> configReq.getReq().conf(0));
