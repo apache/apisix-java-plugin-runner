@@ -48,7 +48,7 @@ public class A6HandlerConfiguration {
         List<PluginFilter> pluginFilterList = beanProvider.orderedStream().collect(Collectors.toList());
         Map<String, PluginFilter> filterMap = new HashMap<>();
         for (PluginFilter filter : pluginFilterList) {
-            filterMap.put(filter.getClass().getSimpleName(), filter);
+            filterMap.put(filter.name(), filter);
         }
         return new A6ConfigHandler(cache, filterMap);
     }
@@ -76,7 +76,7 @@ public class A6HandlerConfiguration {
                     httpCallHandler.handle(request, response);
                     return response;
                 default:
-                    logger.error("can not dispatch type: {}", request.getType());
+                    logger.warn("can not dispatch type: {}", request.getType());
                     response = new A6ErrResponse(Code.SERVICE_UNAVAILABLE);
                     return response;
             }

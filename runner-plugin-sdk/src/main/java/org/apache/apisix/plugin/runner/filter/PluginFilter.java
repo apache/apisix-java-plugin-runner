@@ -24,6 +24,8 @@ import reactor.core.publisher.Mono;
 
 public interface PluginFilter extends Ordered {
 
+    String name();
+
     Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain);
 
 }

@@ -46,7 +46,7 @@ public class A6HttpCallHandler implements Handler {
         long confToken = ((HttpRequest) request).getConfToken();
         A6Conf conf = cache.getIfPresent(confToken);
         if (Objects.isNull(conf)) {
-            logger.error("cannot find conf-token: {}", confToken);
+            logger.warn("cannot find conf token: {}", confToken);
             A6ErrResponse errResponse = new A6ErrResponse(Code.CONF_TOKEN_NOT_FOUND);
             rsp.setErrResponse(errResponse);
             return;
