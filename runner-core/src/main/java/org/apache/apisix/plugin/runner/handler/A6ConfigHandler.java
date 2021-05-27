@@ -65,7 +65,7 @@ public class A6ConfigHandler implements Handler {
                 continue;
             }
             if (chainFilters.contains(filter)) {
-                logger.error("skip the same filter: {}", conf.name());
+                logger.warn("skip the same filter: {}", conf.name());
                 continue;
             }
             chainFilters.add(filter);
