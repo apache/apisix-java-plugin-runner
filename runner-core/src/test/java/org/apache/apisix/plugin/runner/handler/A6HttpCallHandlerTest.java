@@ -232,7 +232,7 @@ class A6HttpCallHandlerTest {
 
     @Test
     @DisplayName("test stop the request")
-    void testDoFilter3(CapturedOutput capturedOutput) {
+    void testDoFilter3() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
         io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
