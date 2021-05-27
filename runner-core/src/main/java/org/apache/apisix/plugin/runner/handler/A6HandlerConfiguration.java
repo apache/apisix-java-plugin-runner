@@ -76,7 +76,7 @@ public class A6HandlerConfiguration {
                     httpCallHandler.handle(request, response);
                     return response;
                 default:
-                    logger.error("can not dispatch type: {}", request.getType());
+                    logger.warn("can not dispatch type: {}", request.getType());
                     response = new A6ErrResponse(Code.SERVICE_UNAVAILABLE);
                     return response;
             }

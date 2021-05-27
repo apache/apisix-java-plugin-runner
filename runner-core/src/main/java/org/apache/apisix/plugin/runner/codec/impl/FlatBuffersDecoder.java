@@ -39,7 +39,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
         try {
             type = buffer.get();
         } catch (BufferUnderflowException e) {
-            logger.error("receive empty data");
+            logger.warn("receive empty data");
             return new A6ErrRequest(Code.BAD_REQUEST);
         }
 
@@ -51,7 +51,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
                     body = getBody(buffer);
                     a6ConfigRequest = A6ConfigRequest.from(body);
                 } catch (BufferUnderflowException | IndexOutOfBoundsException e) {
-                    logger.error("receive error data length");
+                    logger.warn("receive error data length");
                     return new A6ErrRequest(Code.BAD_REQUEST);
                 }
                 return a6ConfigRequest;
@@ -68,7 +68,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
                 break;
         }
 
-        logger.error("receive unsupported type: {}", type);
+        logger.warn("receive unsupported type: {}", type);
         return new A6ErrRequest(Code.BAD_REQUEST);
     }
 

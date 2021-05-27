@@ -61,7 +61,7 @@ public class A6ConfigHandler implements Handler {
             TextEntry conf = req.conf(i);
             PluginFilter filter = filters.get(conf.name());
             if (Objects.isNull(filter)) {
-                logger.error("receive undefined filter: {}, skip it", conf.name());
+                logger.warn("receive undefined filter: {}, skip it", conf.name());
                 continue;
             }
             if (chainFilters.contains(filter)) {
