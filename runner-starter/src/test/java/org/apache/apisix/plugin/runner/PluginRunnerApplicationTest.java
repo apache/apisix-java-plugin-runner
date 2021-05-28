@@ -17,6 +17,7 @@ class PluginRunnerApplicationTest {
     @BeforeEach
     void setUp() {
         System.setProperty("APISIX_LISTEN_ADDRESS", "unix:/tmp/runner.sock");
+        System.setProperty("APISIX_CONF_EXPIRE_TIME", String.valueOf(3600));
     }
 
     @Test

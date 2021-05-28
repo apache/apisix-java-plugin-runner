@@ -14,7 +14,7 @@
 # limitations under the License.
 
 cache.config:
-  expired: 3610
+  expired: ${APISIX_CONF_EXPIRE_TIME}
   capacity: 1000
 
 socket:
