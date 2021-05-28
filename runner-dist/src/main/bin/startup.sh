@@ -17,16 +17,13 @@
 # limitations under the License.
 
 RUNNER_HOME=$(dirname "$0")/..
-
-RUNNER_LOGS_DIR=${RUNNER_LOGS_DIR:-${RUNNER_HOME}/logs}
+RUNNER_DIR=${RUNNER_HOME%/bin*}
 RUNNER_HEAP=${JAVA_HEAP:-4g}
 
 JAVA_OPS="${JAVA_OPS} -Xmx${RUNNER_HEAP} -Xms${RUNNER_HEAP}"
 
-[[ -d ${RUNNER_LOGS_DIR} ]] || mkdir -p ${RUNNER_LOGS_DIR}
+nohup java -jar ${JAVA_OPS} ${RUNNER_DIR}/apisix-java-plugin-*.jar \
+ 1>${PWD}/logs/runner.out \
+ 2>${PWD}/logs/runner.err &
 
-nohup java -jar ${JAVA_OPS} ${RUNNER_HOME}/apisxi-runner-start-*.jar \
- 1>${RUNNER_LOGS_DIR}/runner.out \
- 2>${RUNNER_LOGS_DIR}/runner.err &
-
-echo $! > ./logs/runner.pid
+echo $! > ${PWD}/logs/runner.pid
