@@ -22,8 +22,12 @@ RUNNER_HEAP=${JAVA_HEAP:-4g}
 
 JAVA_OPS="${JAVA_OPS} -Xmx${RUNNER_HEAP} -Xms${RUNNER_HEAP}"
 
-nohup java -jar ${JAVA_OPS} ${RUNNER_DIR}/apisix-java-plugin-*.jar \
- 1>${PWD}/logs/runner.out \
- 2>${PWD}/logs/runner.err &
+APISIX_LISTEN_ADDRESS=${APISIX_LISTEN_ADDRESS}
+APISIX_LISTEN_ADDRESS=${APISIX_LISTEN_ADDRESS#*:}
+APISIX_HOME=${APISIX_LISTEN_ADDRESS%/conf*}
 
-echo $! > ${PWD}/logs/runner.pid
+nohup java -jar ${JAVA_OPS} ${RUNNER_DIR}/apisix-java-plugin-*.jar \
+ 1>${APISIX_HOME}/logs/runner-out.log \
+ 2>${APISIX_HOME}/logs/runner-err.log &
+
+echo $! > ${APISIX_HOME}/logs/runner.pid
