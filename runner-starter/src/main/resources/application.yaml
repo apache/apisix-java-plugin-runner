@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-logging:
-  level:
-    root: debug
-
 cache.config:
   expired: 3610
   capacity: 1000
+
+socket:
+  file: ${APISIX_LISTEN_ADDRESS}

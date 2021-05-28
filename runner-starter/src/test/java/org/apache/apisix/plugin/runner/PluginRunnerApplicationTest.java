@@ -2,6 +2,7 @@ package org.apache.apisix.plugin.runner;
 
 import io.netty.channel.unix.DomainSocketAddress;
 import io.netty.channel.unix.DomainSocketChannel;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import reactor.netty.Connection;
@@ -12,6 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Unix Domain Socket Listen Test")
 class PluginRunnerApplicationTest {
+
+    @BeforeEach
+    void setUp() {
+        System.setProperty("APISIX_LISTEN_ADDRESS", "unix:/tmp/runner.sock");
+    }
 
     @Test
     void testMain() {

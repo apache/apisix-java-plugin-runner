@@ -21,6 +21,8 @@ import io.netty.channel.unix.DomainSocketAddress;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.apisix.plugin.runner.handler.IOHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -34,9 +36,11 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ApplicationRunner implements CommandLineRunner {
 
+    private final Logger logger = LoggerFactory.getLogger(ApplicationRunner.class);
+
     private final TcpServer tcpServer;
 
-    @Value("${socket.file:/tmp/runner.sock}")
+    @Value("${socket.file}")
     private String socketFile;
 
     private final IOHandler handler;
@@ -50,6 +54,11 @@ public class ApplicationRunner implements CommandLineRunner {
         if (Objects.isNull(tcpServer)) {
             tcpServer = TcpServer.create();
         }
+
+        if (socketFile.startsWith("unix:")) {
+            socketFile = socketFile.substring("unix:".length());
+        }
+
         tcpServer = tcpServer.bindAddress(() -> new DomainSocketAddress(socketFile));
         tcpServer = tcpServer.doOnChannelInit((observer, channel, addr) -> {
 //            if (Objects.nonNull(channelHandlers)) {
@@ -62,6 +71,7 @@ public class ApplicationRunner implements CommandLineRunner {
             tcpServer = tcpServer.handle(handler::handle);
         }
         this.server = tcpServer.bindNow();
+        logger.warn("java runner is listening on the socket file: {}", socketFile);
 
         // delete socket file when tcp server shutdown
         Runtime.getRuntime()
