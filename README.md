@@ -2,14 +2,14 @@ apisix-java-plugin-runner
 =================
 
 Runs [Apache APISIX](http://apisix.apache.org/) plugins written in Java.
-Implemented as a Sidecar that accompanies APISIX.
+Implemented as a sidecar that accompanies APISIX.
 
 ![apisix-java-plugin-runner-overview](./docs/images/apisix-java-plugin-runner-overview.png)
 
 Status
 ------
 
-This project is currently considered as experimental.
+This project is currently considered experimental.
 
 Why apisix-java-plugin-runner
 ---------------------
@@ -17,7 +17,7 @@ Why apisix-java-plugin-runner
 APISIX offers many full-featured plugins covering areas such as authentication,
 security, traffic control, serverless, analytics & monitoring, transformations, logging.
 
-It also provides highly extensible api, allowing common phases to be mounted,
+It also provides highly extensible API, allowing common phases to be mounted,
 and users can use these api to develop their own plugins.
 
 APISIX supports writing plugins in multiple languages in version [2.6.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#260),
@@ -33,11 +33,11 @@ with APISIX to run plugins written in java.
 The Internal of apisix-java-plugin-runner
 ---------------------------------
 
-If you're interested in the internal of apisix-java-plugin-runner, we recommand you
+If you're interested in the internal of apisix-java-plugin-runner, we recommend you
 to read the [the-internal-of-apisix-java-plugin-runner](./docs/the-internal-of-apisix-java-plugin-runner.md),
 it explains the details of communication and protocol conversion with APISIX.
 
-Get Involved to Development
+Get Involved in Development
 ---------------------------
 
 Welcome to make contributions, but before you start, please check out
