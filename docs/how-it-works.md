@@ -82,5 +82,5 @@ then add the following configure in the `config.yaml` file of APISIX
 
 ```yaml
 ext-plugin:
-  cmd: ['sh', '/path/to/apisix-runner-bin/bin/startup.sh]
+  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/path/to/apisix-runner-bin/apisix-java-plugin-runner.jar']
 ```
