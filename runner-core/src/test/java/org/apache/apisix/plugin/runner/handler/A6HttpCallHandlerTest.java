@@ -23,7 +23,6 @@ import com.google.flatbuffers.FlatBufferBuilder;
 import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.HTTPReqCall.Action;
 import io.github.api7.A6.TextEntry;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
@@ -114,7 +113,7 @@ class A6HttpCallHandlerTest {
                 logger.info("do filter: CatFilter, order: {}", getOrder());
                 logger.info("do filter: CatFilter, config: {}", request.getConfig(this));
 
-                response.setStatus(HttpResponseStatus.UNAUTHORIZED);
+                response.setStatusCode(401);
                 return chain.filter(request, response);
             }
 

@@ -21,7 +21,6 @@ import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.HTTPReqCall.Action;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
 import io.github.api7.A6.HTTPReqCall.Stop;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.HttpResponse;
@@ -132,8 +131,8 @@ class FlatBuffersEncoderTest {
     void testStopResponseEncode() {
         HttpResponse httpResponse = new HttpResponse(0L);
         // set status, body, resp header means stop request
-        httpResponse.setStatus(HttpResponseStatus.UNAUTHORIZED);
-        httpResponse.setRespHeaders("code", "401");
+        httpResponse.setStatusCode(401);
+        httpResponse.setHeader("code", "401");
         httpResponse.setBody("Unauthorized");
         ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
         result.position(4);
@@ -161,8 +160,8 @@ class FlatBuffersEncoderTest {
         httpResponse.setReqHeader("Server", "APISIX");
 
         // set status, body, resp header means stop request
-        httpResponse.setStatus(HttpResponseStatus.UNAUTHORIZED);
-        httpResponse.setRespHeaders("code", "401");
+        httpResponse.setStatusCode(401);
+        httpResponse.setHeader("code", "401");
         httpResponse.setBody("Unauthorized");
         ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
         result.position(4);

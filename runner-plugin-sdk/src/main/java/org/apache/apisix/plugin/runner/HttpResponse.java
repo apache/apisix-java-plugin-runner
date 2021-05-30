@@ -22,7 +22,6 @@ import io.github.api7.A6.HTTPReqCall.Resp;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
 import io.github.api7.A6.HTTPReqCall.Stop;
 import io.github.api7.A6.TextEntry;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -54,7 +53,7 @@ public class HttpResponse implements A6Response {
 
     private String body;
 
-    private HttpResponseStatus status;
+    private Integer statusCode;
 
     private A6ErrResponse errResponse;
 
@@ -87,7 +86,7 @@ public class HttpResponse implements A6Response {
         this.path = path;
     }
 
-    public void setRespHeaders(String headerKey, String headerValue) {
+    public void setHeader(String headerKey, String headerValue) {
         actionType = ActionType.Stop;
         if (Objects.isNull(respHeaders)) {
             respHeaders = new HashMap<>();
@@ -100,15 +99,16 @@ public class HttpResponse implements A6Response {
         this.body = body;
     }
 
-    public void setStatus(HttpResponseStatus status) {
+    public void setStatusCode(int statusCode) {
         actionType = ActionType.Stop;
-        this.status = status;
+        this.statusCode = statusCode;
     }
 
     public void setErrResponse(A6ErrResponse errResponse) {
         this.errResponse = errResponse;
     }
 
+    @Override
     public A6ErrResponse getErrResponse() {
         return this.errResponse;
     }
@@ -162,8 +162,8 @@ public class HttpResponse implements A6Response {
         }
 
         Stop.startStop(builder);
-        if (!Objects.isNull(status)) {
-            Stop.addStatus(builder, status.code());
+        if (!Objects.isNull(statusCode)) {
+            Stop.addStatus(builder, statusCode);
         }
         if (-1 != headerIndex) {
             Stop.addHeaders(builder, headerIndex);

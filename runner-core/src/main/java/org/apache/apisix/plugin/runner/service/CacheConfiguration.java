@@ -32,6 +32,6 @@ public class CacheConfiguration {
     @Bean
     public Cache<Long, A6Conf> configurationCache(@Value("${cache.config.expired:3610}") long expired,
                                                   @Value("${cache.config.capacity:1000}") int capacity) {
-        return CacheBuilder.newBuilder().expireAfterWrite(expired, TimeUnit.SECONDS).maximumSize(capacity).build();
+        return CacheBuilder.newBuilder().expireAfterWrite(expired + 10, TimeUnit.SECONDS).maximumSize(capacity).build();
     }
 }
