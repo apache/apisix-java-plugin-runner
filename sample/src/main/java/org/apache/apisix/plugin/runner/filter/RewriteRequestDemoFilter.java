@@ -17,10 +17,14 @@
 
 package org.apache.apisix.plugin.runner.filter;
 
+import com.google.gson.Gson;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class RewriteRequestDemoFilter implements PluginFilter {
@@ -56,9 +60,22 @@ public class RewriteRequestDemoFilter implements PluginFilter {
 
     @Override
     public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+        /*
+         * If the conf you configured is of type json, you can convert it to Map or json.
+         */
+
+        String configStr = request.getConfig(this);
+        Gson gson = new Gson();
+        Map<String, Object> conf = new HashMap<>();
+        conf = gson.fromJson(configStr, conf.getClass());
+
+        /*
+         * You can use the parameters in the configuration.
+         */
+
         // note: the path to the rewrite must start with '/'
-        request.setPath("/get");
-        request.setHeader("new-header", "header_by_runner");
+        request.setPath((String) conf.get("rewrite_path"));
+        request.setHeader((String) conf.get("conf_header_name"), (String) conf.get("conf_header_value"));
         /* note: The value of the parameter is currently a string type.
                  If you need the json type, you need the upstream service to parse the string value to json.
                  For example, if the arg is set as follows
@@ -67,7 +84,7 @@ public class RewriteRequestDemoFilter implements PluginFilter {
                  The arg received by the upstream service will be as follows
                  "new arg": "{\"key1\":\"value1\",\"key2\":2}"
          */
-        request.setArg("new arg", "{\"key1\":\"value1\",\"key2\":2}");
+        request.setArg((String) conf.get("conf_arg_name"), (String) conf.get("conf_arg_value"));
 
         return chain.filter(request, response);
     }

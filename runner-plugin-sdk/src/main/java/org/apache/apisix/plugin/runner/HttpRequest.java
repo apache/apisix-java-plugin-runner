@@ -20,9 +20,9 @@ package org.apache.apisix.plugin.runner;
 import io.github.api7.A6.HTTPReqCall.Req;
 import io.github.api7.A6.TextEntry;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
+import org.springframework.util.CollectionUtils;
 
 import java.nio.ByteBuffer;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +51,12 @@ public class HttpRequest implements A6Request {
         this.req = req;
     }
 
+    /**
+     * Gets current filter config.
+     *
+     * @param filter the filter
+     * @return the config
+     */
     public String getConfig(PluginFilter filter) {
         for (int i = 0; i < config.confLength(); i++) {
             TextEntry conf = config.conf(i);
@@ -69,6 +75,11 @@ public class HttpRequest implements A6Request {
         return requestId;
     }
 
+    /**
+     * Gets source ip.
+     *
+     * @return the source ip
+     */
     public String getSourceIP() {
         if (Objects.isNull(sourceIP)) {
             StringBuilder builder = new StringBuilder();
@@ -81,6 +92,11 @@ public class HttpRequest implements A6Request {
         return sourceIP;
     }
 
+    /**
+     * Gets method.
+     *
+     * @return the method
+     */
     public Method getMethod() {
         if (Objects.isNull(method)) {
             method = Method.values()[req.method()];
@@ -88,6 +104,11 @@ public class HttpRequest implements A6Request {
         return method;
     }
 
+    /**
+     * Gets path.
+     *
+     * @return the path
+     */
     public String getPath() {
         if (Objects.isNull(path)) {
             path = req.path();
@@ -95,11 +116,27 @@ public class HttpRequest implements A6Request {
         return path;
     }
 
+    /**
+     * Rewrite path.
+     *
+     * @param path the path
+     */
     public void setPath(String path) {
         response.setPath(path);
     }
 
-    public Map<String, String> getHeaders() {
+    /**
+     * Gets all headers.
+     * <p>Examples:</p>
+     *
+     * <pre>
+     * {@code
+     * request.getHeaders()
+     * }
+     * </pre>
+     * @return the all headers
+     */
+    public Map<String, String> getHeader() {
         if (Objects.isNull(headers)) {
             headers = new HashMap<>();
             for (int i = 0; i < req.headersLength(); i++) {
@@ -110,10 +147,61 @@ public class HttpRequest implements A6Request {
         return headers;
     }
 
+    /**
+     * Gets the specified header
+     *
+     * <p>Examples:</p>
+     *
+     * <pre>
+     * {@code
+     * request.getHeader("Content-Type");
+     * }
+     * </pre>
+     *
+     * @param headerName the header name
+     * @return the header value or null
+     */
+    public String getHeader(String headerName) {
+        Map<String, String> headers = getHeader();
+        if (!CollectionUtils.isEmpty(headers)) {
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                if (header.getKey().equals(headerName)) {
+                    return header.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add, rewrite or delete the specified header
+     * <p>Examples:</p>
+     *
+     * <pre>
+     * {@code
+     *
+     * add new header
+     * request.setHeader("New-Header", "new header value");
+     *
+     * overwrite existing header
+     * request.setHeader("Accept", "application/json");
+     *
+     * delete existing header
+     * request.setHeader("Accept", null);
+     * }
+     * </pre>
+     * @param headerKey   the header key
+     * @param headerValue the header value
+     */
     public void setHeader(String headerKey, String headerValue) {
         response.setReqHeader(headerKey, headerValue);
     }
 
+    /**
+     * Gets all args.
+     *
+     * @return the args
+     */
     public Map<String, String> getArgs() {
         if (Objects.isNull(args)) {
             args = new HashMap<>();
@@ -125,20 +213,56 @@ public class HttpRequest implements A6Request {
         return args;
     }
 
+
+    /**
+     * Gets the specified  arg.
+     *
+     * <p>Examples:</p>
+     *
+     * <pre>
+     * {@code
+     * request.getArg("foo");
+     * }
+     * </pre>
+     *
+     * @param argName the arg name
+     * @return the arg
+     */
+    public String getArg(String argName) {
+        Map<String, String> args = getArgs();
+        if (!CollectionUtils.isEmpty(args)) {
+            for (Map.Entry<String, String> arg : args.entrySet()) {
+                if (arg.getKey().equals(argName)) {
+                    return arg.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add, rewrite or delete the specified header
+     * <p>Examples:</p>
+     *
+     *
+     * <pre>
+     * {@code
+     *
+     * add new arg
+     * request.setArg("foo", "bar");
+     *
+     * overwrite existing arg
+     * request.setArg("foo", "bar");
+     *
+     * delete existing header
+     * request.setArg("foo", null);
+     * }
+     * </pre>
+     * @param argKey the arg key
+     * @param argValue the arg value
+     */
     public void setArg(String argKey, String argValue) {
-        response.setArgs(argKey, argValue);
-    }
-
-    public Map getParameterMap() {
-        return null;
-    }
-
-    public Enumeration getParameters() {
-        return null;
-    }
-
-    public String[] getParameterValues(String name) {
-        return null; // todo
+        response.setArg(argKey, argValue);
     }
 
     public long getConfToken() {

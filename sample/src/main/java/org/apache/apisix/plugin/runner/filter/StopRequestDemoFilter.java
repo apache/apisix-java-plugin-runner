@@ -17,10 +17,14 @@
 
 package org.apache.apisix.plugin.runner.filter;
 
+import com.google.gson.Gson;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class StopRequestDemoFilter implements PluginFilter {
@@ -31,8 +35,20 @@ public class StopRequestDemoFilter implements PluginFilter {
 
     @Override
     public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-        response.setStatusCode(401);
-        response.setHeader("new-header", "header_by_runner");
+        /*
+         * If the conf you configured is of type json, you can convert it to Map or json.
+         */
+
+        String configStr = request.getConfig(this);
+        Gson gson = new Gson();
+        Map<String, Object> conf = new HashMap<>();
+        conf = gson.fromJson(configStr, conf.getClass());
+
+        /*
+         * You can use the parameters in the configuration.
+         */
+        response.setStatusCode((Integer) conf.get("stop_response_code"));
+        response.setHeader((String) conf.get("stop_response_header_name"), (String) conf.get("stop_response_header_value"));
         /* note: The body is currently a string type.
                  If you need the json type, you need to escape the json content here.
                  For example, if the body is set as follows
@@ -41,7 +57,7 @@ public class StopRequestDemoFilter implements PluginFilter {
                  The body received by the client will be as follows
                  {"key1":"value1","key2":2}
          */
-        response.setBody("{\"key1\":\"value1\",\"key2\":2}");
+        response.setBody((String) conf.get("stop_response_body"));
 
         /*  Using the above code, the client side receives the following
 

@@ -73,7 +73,13 @@ public class HttpResponse implements A6Response {
         reqHeaders.put(headerKey, headerValue);
     }
 
-    public void setArgs(String argKey, String argValue) {
+    /**
+     * Sets arg.
+     *
+     * @param argKey   the arg key
+     * @param argValue the arg value
+     */
+    public void setArg(String argKey, String argValue) {
         actionType = ActionType.Rewrite;
         if (Objects.isNull(args)) {
             args = new HashMap<>();
@@ -81,11 +87,22 @@ public class HttpResponse implements A6Response {
         args.put(argKey, argValue);
     }
 
+    /**
+     * Sets path.
+     *
+     * @param path the path
+     */
     public void setPath(String path) {
         actionType = ActionType.Rewrite;
         this.path = path;
     }
 
+    /**
+     * Sets header.
+     *
+     * @param headerKey   the header key
+     * @param headerValue the header value
+     */
     public void setHeader(String headerKey, String headerValue) {
         actionType = ActionType.Stop;
         if (Objects.isNull(respHeaders)) {
@@ -94,11 +111,21 @@ public class HttpResponse implements A6Response {
         respHeaders.put(headerKey, headerValue);
     }
 
+    /**
+     * Sets body.
+     *
+     * @param body the body(string)
+     */
     public void setBody(String body) {
         actionType = ActionType.Stop;
         this.body = body;
     }
 
+    /**
+     * Sets status code.
+     *
+     * @param statusCode the status code
+     */
     public void setStatusCode(int statusCode) {
         actionType = ActionType.Stop;
         this.statusCode = statusCode;
@@ -186,8 +213,16 @@ public class HttpResponse implements A6Response {
             for (Map.Entry<String, String> header : reqHeaders.entrySet()) {
                 int i = -1;
                 int key = builder.createString(header.getKey());
-                int value = builder.createString(header.getValue());
-                int text = TextEntry.createTextEntry(builder, key, value);
+                int value = 0;
+                if (!Objects.isNull(header.getValue())) {
+                    value = builder.createString(header.getValue());
+                }
+                TextEntry.startTextEntry(builder);
+                TextEntry.addName(builder, key);
+                if (!Objects.isNull(header.getValue())) {
+                    TextEntry.addValue(builder, value);
+                }
+                int text = TextEntry.endTextEntry(builder);
                 headerTexts[++i] = text;
             }
             headerIndex = Rewrite.createHeadersVector(builder, headerTexts);
@@ -199,8 +234,16 @@ public class HttpResponse implements A6Response {
             for (Map.Entry<String, String> arg : args.entrySet()) {
                 int i = -1;
                 int key = builder.createString(arg.getKey());
-                int value = builder.createString(arg.getValue());
-                int text = TextEntry.createTextEntry(builder, key, value);
+                int value = 0;
+                if (!Objects.isNull(arg.getValue())) {
+                    value = builder.createString(arg.getValue());
+                }
+                TextEntry.startTextEntry(builder);
+                TextEntry.addName(builder, key);
+                if (!Objects.isNull(arg.getValue())) {
+                    TextEntry.addValue(builder, value);
+                }
+                int text = TextEntry.endTextEntry(builder);
                 argTexts[++i] = text;
             }
             argsIndex = Rewrite.createArgsVector(builder, argTexts);
