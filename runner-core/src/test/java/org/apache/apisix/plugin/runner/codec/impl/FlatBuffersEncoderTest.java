@@ -111,7 +111,7 @@ class FlatBuffersEncoderTest {
         HttpResponse httpResponse = new HttpResponse(0L);
         // set path, args, req header means rewrite request
         httpResponse.setPath("/hello");
-        httpResponse.setArgs("foo", "bar");
+        httpResponse.setArg("foo", "bar");
         httpResponse.setReqHeader("Server", "APISIX");
         ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
         result.position(4);
@@ -156,7 +156,7 @@ class FlatBuffersEncoderTest {
         HttpResponse httpResponse = new HttpResponse(0L);
         // set path, args, req header means rewrite request
         httpResponse.setPath("/hello");
-        httpResponse.setArgs("foo", "bar");
+        httpResponse.setArg("foo", "bar");
         httpResponse.setReqHeader("Server", "APISIX");
 
         // set status, body, resp header means stop request
