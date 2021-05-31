@@ -23,6 +23,8 @@ For example, if you start apisix-java-plugin-runner as a jar package, pass the e
 java -jar -DAPISIX_LISTEN_ADDRESS=unix:/tmp/runner.sock -DAPISIX_CONF_EXPIRE_TIME=3600 /path/to/apisix-java-plugin-runner.jar
 ```
 
+Note: Refer to [apisix-java-plugin-runner.jar](#run) to get it.
+
 and add the following configure in the `config.yaml` file of APISIX
 
 ```yaml
@@ -30,7 +32,7 @@ ext-plugin:
   path_for_test: /tmp/runner.sock
 ```
 
-The `/tmp/runner.sock` is the address of the file where apisix-java-plugin-runner  
+The `/tmp/runner.sock` is the address of the file where apisix-java-plugin-runner
 and APISIX communicate between processes and must be consistent.
 
 Note: If you see some error logs like
@@ -61,7 +63,7 @@ cd dist
 tar -zxvf apache-apisix-runner-bin.tar.gz
 ```
 
-then the files in the `dist` directory are laid out as follows
+file's layout in the `dist` directory are as follows
 
 ```
 dist
