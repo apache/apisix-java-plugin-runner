@@ -78,10 +78,10 @@ public class RewriteRequestDemoFilter implements PluginFilter {
         request.setHeader((String) conf.get("conf_header_name"), (String) conf.get("conf_header_value"));
         /* note: The value of the parameter is currently a string type.
                  If you need the json type, you need the upstream service to parse the string value to json.
-                 For example, if the arg is set as follows
+                 For example, if the arg is set as below
                  request.setArg("new arg", "{\"key1\":\"value1\",\"key2\":2}");
 
-                 The arg received by the upstream service will be as follows
+                 The arg received by the upstream service will be as below
                  "new arg": "{\"key1\":\"value1\",\"key2\":2}"
          */
         request.setArg((String) conf.get("conf_arg_name"), (String) conf.get("conf_arg_value"));

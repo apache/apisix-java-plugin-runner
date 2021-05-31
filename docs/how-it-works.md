@@ -17,7 +17,7 @@ and before start, you need to set the following two environment variables:
   And do not need to actively create this file, apisix-java-plugin-runner will automatically create this file when it starts.
 - APISIX_CONF_EXPIRE_TIME: the time that APISIX's configuration is cached in the apisix-java-plugin-runner process.
 
-For example, if you start apisix-java-plugin-runner as a jar package, pass the environment variables as follows
+For example, if you start apisix-java-plugin-runner as a jar package, pass the environment variables as below
 
 ```shell
 java -jar -DAPISIX_LISTEN_ADDRESS=unix:/tmp/runner.sock -DAPISIX_CONF_EXPIRE_TIME=3600 /path/to/apisix-java-plugin-runner.jar
@@ -63,7 +63,7 @@ cd dist
 tar -zxvf apache-apisix-runner-bin.tar.gz
 ```
 
-file's layout in the `dist` directory are as follows
+the layout of files in the `dist` directory is as below
 
 ```
 dist

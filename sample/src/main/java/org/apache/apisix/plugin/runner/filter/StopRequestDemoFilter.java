@@ -51,10 +51,10 @@ public class StopRequestDemoFilter implements PluginFilter {
         response.setHeader((String) conf.get("stop_response_header_name"), (String) conf.get("stop_response_header_value"));
         /* note: The body is currently a string type.
                  If you need the json type, you need to escape the json content here.
-                 For example, if the body is set as follows
+                 For example, if the body is set as below
                  "{\"key1\":\"value1\",\"key2\":2}"
 
-                 The body received by the client will be as follows
+                 The body received by the client will be as below
                  {"key1":"value1","key2":2}
          */
         response.setBody((String) conf.get("stop_response_body"));
