@@ -1,4 +1,4 @@
-The Internal of apisix java plugin runner
+# The Internal of apisix java plugin runner
 
 This article explains the internal design of apisix-java-plugin-runner.
 
