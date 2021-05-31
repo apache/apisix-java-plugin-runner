@@ -31,8 +31,7 @@ so that the `apisix-java-plugin-runner.jar` will contain the filter implementati
 
 ####  The order of filter execution
 
-The order of execution of the filter in the runner is determined by the value returned by the `public int getOrder()`
-function in the implementation class; the smaller the order number, the higher the order of execution.
+The order of execution of the filter in the runner is determined by the index of the `conf` array in the `ext-plugin-pre-req` or `ext-plugin-post-req` configuration.
 
 ####  The name of filter execution
 

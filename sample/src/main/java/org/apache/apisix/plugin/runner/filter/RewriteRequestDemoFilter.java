@@ -71,10 +71,4 @@ public class RewriteRequestDemoFilter implements PluginFilter {
 
         return chain.filter(request, response);
     }
-
-    @Override
-    public int getOrder() {
-        //The order of filter execution in runner is determined by the order here, the smaller the order number, the higher the execution order.
-        return 0;
-    }
 }

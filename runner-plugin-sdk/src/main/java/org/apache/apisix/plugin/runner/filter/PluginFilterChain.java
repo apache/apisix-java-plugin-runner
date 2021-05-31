@@ -19,7 +19,6 @@ package org.apache.apisix.plugin.runner.filter;
 
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
-import org.springframework.core.OrderComparator;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -29,9 +28,11 @@ public class PluginFilterChain {
 
     private final List<PluginFilter> filters;
 
+    public int getIndex() {
+        return index;
+    }
+
     public PluginFilterChain(List<PluginFilter> filters) {
-        // sort filters in order
-        OrderComparator.sort(filters);
         this.filters = filters;
         this.index = 0;
     }

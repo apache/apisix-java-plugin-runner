@@ -65,11 +65,6 @@ class A6ConfigHandlerTest {
             public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
                 return chain.filter(request, response);
             }
-
-            @Override
-            public int getOrder() {
-                return 0;
-            }
         });
 
         filters.put("CatFilter", new PluginFilter() {
@@ -81,11 +76,6 @@ class A6ConfigHandlerTest {
             @Override
             public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
                 return chain.filter(request, response);
-            }
-
-            @Override
-            public int getOrder() {
-                return 1;
             }
         });
         cache = CacheBuilder.newBuilder().expireAfterWrite(3600, TimeUnit.SECONDS).maximumSize(1000).build();
@@ -112,7 +102,7 @@ class A6ConfigHandlerTest {
         A6Conf config = cache.getIfPresent(0L);
         Assertions.assertNotNull(config.getChain());
         Assertions.assertEquals(config.getChain().getFilters().size(), 1);
-        Assertions.assertEquals(config.getChain().getFilters().get(0).getOrder(), 0);
+        Assertions.assertEquals(config.getChain().getIndex(), 0);
         Assertions.assertEquals(config.get("FooFilter"), "Bar");
 
     }
@@ -141,8 +131,6 @@ class A6ConfigHandlerTest {
 
         A6Conf config = cache.getIfPresent(0L);
         Assertions.assertEquals(config.getChain().getFilters().size(), 2);
-        Assertions.assertEquals(config.getChain().getFilters().get(0).getOrder(), 0);
-        Assertions.assertEquals(config.getChain().getFilters().get(1).getOrder(), 1);
     }
 
     @Test

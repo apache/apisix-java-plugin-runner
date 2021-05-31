@@ -68,7 +68,7 @@ class A6HttpCallHandlerTest {
 
             @Override
             public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                logger.info("do filter: FooFilter, order: {}", getOrder());
+                logger.info("do filter: FooFilter, order: {}", chain.getIndex());
                 logger.info("do filter: FooFilter, config: {}", request.getConfig(this));
 
                 if (!Objects.isNull(request.getPath())) {
@@ -96,10 +96,6 @@ class A6HttpCallHandlerTest {
                 return chain.filter(request, response);
             }
 
-            @Override
-            public int getOrder() {
-                return 0;
-            }
         });
 
         filters.put("CatFilter", new PluginFilter() {
@@ -110,27 +106,24 @@ class A6HttpCallHandlerTest {
 
             @Override
             public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                logger.info("do filter: CatFilter, order: {}", getOrder());
+                logger.info("do filter: CatFilter, order: {}", chain.getIndex());
                 logger.info("do filter: CatFilter, config: {}", request.getConfig(this));
 
                 response.setStatusCode(401);
                 return chain.filter(request, response);
             }
 
-            @Override
-            public int getOrder() {
-                return 1;
-            }
         });
         cache = CacheBuilder.newBuilder().expireAfterWrite(3600, TimeUnit.SECONDS).maximumSize(1000).build();
         FlatBufferBuilder builder = new FlatBufferBuilder();
-        int cat = builder.createString("CatFilter");
-        int dog = builder.createString("Dog");
-        int filter2 = TextEntry.createTextEntry(builder, cat, dog);
 
         int foo = builder.createString("FooFilter");
         int bar = builder.createString("Bar");
         int filter1 = TextEntry.createTextEntry(builder, foo, bar);
+
+        int cat = builder.createString("CatFilter");
+        int dog = builder.createString("Dog");
+        int filter2 = TextEntry.createTextEntry(builder, cat, dog);
 
         int confVector = io.github.api7.A6.PrepareConf.Req.createConfVector(builder, new int[]{filter1, filter2});
         io.github.api7.A6.PrepareConf.Req.startReq(builder);
@@ -178,9 +171,9 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         HttpResponse response = new HttpResponse(1L);
         a6HttpCallHandler.handle(request, response);
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, order: 0"));
+        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, order: 1"));
         Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, config: Bar"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, order: 1"));
+        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, order: 2"));
         Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, config: Dog"));
     }
 
@@ -215,7 +208,7 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         HttpResponse response = new HttpResponse(1L);
         a6HttpCallHandler.handle(request, response);
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, order: 0"));
+        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, order: 1"));
         Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, config: Bar"));
 
         Assertions.assertTrue(capturedOutput.getOut().contains("do filter: path: /path"));
@@ -225,7 +218,7 @@ class A6HttpCallHandlerTest {
         Assertions.assertTrue(capturedOutput.getOut().contains("do filter: header value: headerValue"));
         Assertions.assertTrue(capturedOutput.getOut().contains("do filter: method: GET"));
 
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, order: 1"));
+        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, order: 2"));
         Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, config: Dog"));
     }
 

@@ -57,9 +57,4 @@ public class StopRequestDemoFilter implements PluginFilter {
          */
         return chain.filter(request, response);
     }
-
-    @Override
-    public int getOrder() {
-        return 1;
-    }
 }

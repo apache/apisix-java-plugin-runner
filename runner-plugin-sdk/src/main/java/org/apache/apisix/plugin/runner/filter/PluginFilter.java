@@ -19,10 +19,9 @@ package org.apache.apisix.plugin.runner.filter;
 
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
-import org.springframework.core.Ordered;
 import reactor.core.publisher.Mono;
 
-public interface PluginFilter extends Ordered {
+public interface PluginFilter {
 
     String name();
 
