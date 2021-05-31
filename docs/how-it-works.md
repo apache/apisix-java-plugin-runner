@@ -20,7 +20,7 @@ and before start, you need to set the following two environment variables:
 For example, if you start apisix-java-plugin-runner as a jar package, pass the environment variables as follows
 
 ```shell
-java -jar -DAPISIX_LISTEN_ADDRESS=/tmp/runner.sock -DAPISIX_CONF_EXPIRE_TIME=3600 /path/to/apisix-java-plugin-runner.jar
+java -jar -DAPISIX_LISTEN_ADDRESS=unix:/tmp/runner.sock -DAPISIX_CONF_EXPIRE_TIME=3600 /path/to/apisix-java-plugin-runner.jar
 ```
 
 and add the following configure in the `config.yaml` file of APISIX
@@ -28,7 +28,6 @@ and add the following configure in the `config.yaml` file of APISIX
 ```yaml
 ext-plugin:
   path_for_test: /tmp/runner.sock
-  cmd: ['echo', 'call runner']
 ```
 
 The `/tmp/runner.sock` is the address of the file where apisix-java-plugin-runner  

@@ -11,7 +11,7 @@ This article explains the internal design of apisix-java-plugin-runner.
 
 ## Overview
 
-The apisix-java-plugin-runner designed as a tcp server built using [reactor-netty](https://github.com/reactor/reactor-netty),
+The apisix-java-plugin-runner designed as a TCP server built using [reactor-netty](https://github.com/reactor/reactor-netty),
 it provides a `PluginFilter` interface for users to implement.
 
 Users only need to focus on their business logic, not on the details of how the apisix java plugin runner communicates with APISIX.
@@ -23,7 +23,7 @@ The inter-process communication between them is depicted by the following diagra
 ## Communication
 
 apisix-java-plugin-runner and APISIX use the Unix Domain Socket for inter-process communication,
-so they need to be deployed in the same runtime environment.
+so they need to be deployed in the same instance.
 
 apisix-java-plugin-runner is managed by APISIX. APISIX starts the apisix-java-plugin-runner when it starts and ends it when it
 ends. if the apisix-java-plugin-runner quits in the middle, APISIX will restart it automatically.
@@ -33,10 +33,10 @@ ends. if the apisix-java-plugin-runner quits in the middle, APISIX will restart 
 Refer to [flatbuffers](https://github.com/google/flatbuffers)
 
 FlatBuffers is a cross platform serialization library architected for maximum memory efficiency.
-It allows you to directly access serialized data without parsing/unpacking it first, while still having great forwards/backwards compatibility.
+It allows you to directly access serialized data without parsing/unpacking it first, while still having great forward/backward compatibility.
 
 You can refer to the [ext-plugin.fbs](https://github.com/api7/ext-plugin-proto/blob/main/ext-plugin.fbs)
- schema file to see how lua and java lay out the serialized objects.
+ schema file to see how Lua and Java layout the serialized objects.
 
 ## Codec
 
@@ -47,7 +47,7 @@ The protocol format is
 1 byte of type + 3 bytes of length + data
 ```
 
-The type can be 0 ~ 7, and the length can be [0, 8M). data length is determined by length.
+The type can be 0 ~ 7, and the length can be [0, 8M). The length of data is determined by length.
 
 The current type takes the following values
 

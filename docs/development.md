@@ -103,7 +103,7 @@ cd /path/to/apisix-java-plugin-runner
 If you want to mimic the practical environment, you need to configure the route on APISIX
 by having the request go through the filter you want to test, for example
 
-```yaml
+```json
 "plugins":{
     "ext-plugin-pre-req":{
         "conf":[
@@ -116,4 +116,4 @@ by having the request go through the filter you want to test, for example
 }
 ```
 
-and then by making a request to APISIX to trigger the route.
+and then make a request to APISIX to trigger the route.
