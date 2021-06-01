@@ -47,6 +47,15 @@ in the `error.log` of APISIX, you can change the permissions of this file for de
 chmod 777 /tmp/runner.sock
 ```
 
+To get more detailed debugging information, you can modify the output level of the log.
+Configure the log level in `runner-starter/src/main/resources/application.yaml`, as below
+
+```yaml
+logging:
+  level:
+    root: debug
+```
+
 ### Run
 
 No environment variables need to be set in Run mode, execute
