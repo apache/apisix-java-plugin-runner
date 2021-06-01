@@ -49,6 +49,7 @@ chmod 777 /tmp/runner.sock
 
 To get more detailed debugging information, you can modify the output level of the log.
 Configure the log level in `runner-starter/src/main/resources/application.yaml`, as below
+(any changes to the project files need to be re-executed `./mvnw package package`)
 
 ```yaml
 logging:
