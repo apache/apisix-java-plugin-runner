@@ -20,6 +20,7 @@ package org.apache.apisix.plugin.runner.server;
 import io.netty.channel.unix.DomainSocketAddress;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.RequiredArgsConstructor;
+import org.apache.apisix.plugin.runner.codec.DelayedDecoder;
 import org.apache.apisix.plugin.runner.handler.IOHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,8 @@ public class ApplicationRunner implements CommandLineRunner {
 //            if (Objects.nonNull(channelHandlers)) {
 //                channel.pipeline().addLast(channelHandlers);
 //            }
-            channel.pipeline().addFirst("logger", new LoggingHandler());
+            channel.pipeline().addFirst("logger", new LoggingHandler())
+                    .addAfter("logger", "delayedDecoder", new DelayedDecoder());
         });
 
         if (Objects.nonNull(handler)) {
