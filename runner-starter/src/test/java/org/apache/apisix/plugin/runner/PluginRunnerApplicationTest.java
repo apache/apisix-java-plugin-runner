@@ -17,6 +17,7 @@
  * under the License.
  *
  */
+
 package org.apache.apisix.plugin.runner;
 
 import io.netty.channel.unix.DomainSocketAddress;
@@ -71,3 +72,4 @@ class PluginRunnerApplicationTest {
         assertThat(exception.getMessage()).isEqualTo("java.io.FileNotFoundException");
     }
 }
+
