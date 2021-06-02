@@ -27,5 +27,6 @@ header:
     - 'NOTICE'
     - '.mvn'
     - '**/target/**'
+    - '**/*.iml'
 
   comment: on-failure
