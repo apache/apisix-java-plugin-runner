@@ -35,6 +35,10 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 8
+      - name: Check License Header
+        uses: apache/skywalking-eyes@main
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Install & Test'
         run: mvn clean install
 
