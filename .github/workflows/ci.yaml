@@ -41,6 +41,14 @@ jobs:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Install & Test'
         run: mvn clean install
+  finish:
+    needs: CI
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
 
   CI-on-MacOS:
     runs-on: macos-latest
