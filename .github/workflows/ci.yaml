@@ -35,26 +35,9 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 8
-      - name: Check License Header
-        uses: apache/skywalking-eyes@main
-        env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Install & Test'
-        run: mvn clean install
+        run: mvn clean install jacoco:report coveralls:report
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  CI-on-MacOS:
-    runs-on: macos-latest
-    timeout-minutes: 180
-    strategy:
-      fail-fast: true
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 8
-      - name: 'Install & Test'
-        run: ./mvnw clean install
