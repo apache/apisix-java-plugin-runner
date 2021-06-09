@@ -40,7 +40,10 @@ jobs:
         env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Install & Test'
-        run: mvn clean install
+        run: |
+          mvn -B clean install cobertura:cobertura
+          bash <(curl -s https://codecov.io/bash)
+    - uses: codecov/codecov-action@v1
 
   CI-on-MacOS:
     runs-on: macos-latest
