@@ -168,4 +168,83 @@ class FlatBuffersEncoderTest {
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Stop);
     }
+
+    @Test
+    @DisplayName("test rewrite more headers and args")
+    void testRewriteMoreHeadersAndArgs() {
+        HttpResponse httpResponse = new HttpResponse(0L);
+        // set path, args, req header means rewrite request
+        httpResponse.setPath("/hello");
+        httpResponse.setArg("foo", "bar");
+        httpResponse.setArg("dog", "cat");
+        httpResponse.setArg("abc", "edf");
+        httpResponse.setReqHeader("Server", "APISIX");
+        httpResponse.setReqHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+        httpResponse.setReqHeader("Timestamp", "1623408133");
+
+        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        result.position(4);
+        io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
+        Assertions.assertEquals(resp.actionType(), Action.Rewrite);
+        Rewrite rewrite = (Rewrite) resp.action(new Rewrite());
+
+        Assertions.assertEquals(rewrite.path(), "/hello");
+        Assertions.assertEquals(rewrite.argsLength(), 3);
+        for (int i = 0; i < rewrite.argsLength(); i++) {
+            if (rewrite.args(i).name().equals("foo")) {
+                Assertions.assertEquals(rewrite.args(i).value(), "bar");
+            }
+            if (rewrite.args(i).name().equals("dog")) {
+                Assertions.assertEquals(rewrite.args(i).value(), "cat");
+            }
+            if (rewrite.args(i).name().equals("abc")) {
+                Assertions.assertEquals(rewrite.args(i).value(), "edf");
+            }
+        }
+
+        Assertions.assertEquals(rewrite.headersLength(), 3);
+        for (int i = 0; i < rewrite.headersLength(); i++) {
+            if (rewrite.headers(i).name().equals("Server")) {
+                Assertions.assertEquals(rewrite.headers(i).value(), "APISIX");
+            }
+        }
+        for (int i = 0; i < rewrite.headersLength(); i++) {
+            if (rewrite.headers(i).name().equals("Authorization")) {
+                Assertions.assertEquals(rewrite.headers(i).value(), "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+            }
+        }
+        for (int i = 0; i < rewrite.headersLength(); i++) {
+            if (rewrite.headers(i).name().equals("Timestamp")) {
+                Assertions.assertEquals(rewrite.headers(i).value(), "1623408133");
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("test set more stop headers")
+    void testSetMoreStopHeaders() {
+        HttpResponse httpResponse = new HttpResponse(0L);
+        // set status, body, resp header means stop request
+        httpResponse.setHeader("Server", "APISIX");
+        httpResponse.setHeader("Error", "Unauthorized");
+        httpResponse.setHeader("Timestamp", "1623408133");
+        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        result.position(4);
+        io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
+        Assertions.assertEquals(resp.actionType(), Action.Stop);
+        Stop stop = (Stop) resp.action(new Stop());
+
+        Assertions.assertEquals(stop.headersLength(), 3);
+        for (int i = 0; i < stop.headersLength(); i++) {
+            if (stop.headers(i).name().equals("Server")) {
+                Assertions.assertEquals(stop.headers(i).value(), "APISIX");
+            }
+            if (stop.headers(i).name().equals("Error")) {
+                Assertions.assertEquals(stop.headers(i).value(), "Unauthorized");
+            }
+            if (stop.headers(i).name().equals("Timestamp")) {
+                Assertions.assertEquals(stop.headers(i).value(), "1623408133");
+            }
+        }
+    }
 }

@@ -172,10 +172,13 @@ public class HttpResponse implements A6Response {
         int headerIndex = -1;
         if (!CollectionUtils.isEmpty(respHeaders)) {
             int[] headerTexts = new int[respHeaders.size()];
+            int i = -1;
             for (Map.Entry<String, String> header : respHeaders.entrySet()) {
-                int i = -1;
                 int key = builder.createString(header.getKey());
-                int value = builder.createString(header.getValue());
+                int value = 0;
+                if (!Objects.isNull(header.getValue())) {
+                    value = builder.createString(header.getValue());
+                }
                 int text = TextEntry.createTextEntry(builder, key, value);
                 headerTexts[++i] = text;
             }
@@ -210,19 +213,14 @@ public class HttpResponse implements A6Response {
         int headerIndex = -1;
         if (!CollectionUtils.isEmpty(reqHeaders)) {
             int[] headerTexts = new int[reqHeaders.size()];
+            int i = -1;
             for (Map.Entry<String, String> header : reqHeaders.entrySet()) {
-                int i = -1;
                 int key = builder.createString(header.getKey());
                 int value = 0;
                 if (!Objects.isNull(header.getValue())) {
                     value = builder.createString(header.getValue());
                 }
-                TextEntry.startTextEntry(builder);
-                TextEntry.addName(builder, key);
-                if (!Objects.isNull(header.getValue())) {
-                    TextEntry.addValue(builder, value);
-                }
-                int text = TextEntry.endTextEntry(builder);
+                int text = TextEntry.createTextEntry(builder, key, value);
                 headerTexts[++i] = text;
             }
             headerIndex = Rewrite.createHeadersVector(builder, headerTexts);
@@ -231,19 +229,14 @@ public class HttpResponse implements A6Response {
         int argsIndex = -1;
         if (!CollectionUtils.isEmpty(args)) {
             int[] argTexts = new int[args.size()];
+            int i = -1;
             for (Map.Entry<String, String> arg : args.entrySet()) {
-                int i = -1;
                 int key = builder.createString(arg.getKey());
                 int value = 0;
                 if (!Objects.isNull(arg.getValue())) {
                     value = builder.createString(arg.getValue());
                 }
-                TextEntry.startTextEntry(builder);
-                TextEntry.addName(builder, key);
-                if (!Objects.isNull(arg.getValue())) {
-                    TextEntry.addValue(builder, value);
-                }
-                int text = TextEntry.endTextEntry(builder);
+                int text = TextEntry.createTextEntry(builder, key, value);
                 argTexts[++i] = text;
             }
             argsIndex = Rewrite.createArgsVector(builder, argTexts);
