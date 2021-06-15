@@ -21,6 +21,8 @@ import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.HTTPReqCall.Action;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
 import io.github.api7.A6.HTTPReqCall.Stop;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.HttpResponse;
@@ -246,5 +248,21 @@ class FlatBuffersEncoderTest {
                 Assertions.assertEquals(stop.headers(i).value(), "1623408133");
             }
         }
+    }
+
+    @Test
+    @DisplayName("test encode data length greater then 256")
+    void testEncodeDataGreaterLargeThen256() {
+        byte[] bytes = flatBuffersEncoder.int2Bytes(260, 3);
+
+        // use Bytebuf getInt function (default 4 bytes) to verify
+        ByteBuf buf = Unpooled.buffer(4);
+        buf.setInt(0, 260);
+        byte[] array = buf.array();
+
+        Assertions.assertEquals(bytes[0], array[1]);
+        Assertions.assertEquals(bytes[1], array[2]);
+        Assertions.assertEquals(bytes[2], array[3]);
+
     }
 }

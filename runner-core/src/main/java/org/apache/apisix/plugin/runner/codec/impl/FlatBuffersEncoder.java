@@ -39,7 +39,7 @@ public class FlatBuffersEncoder implements PluginRunnerEncoder {
         ByteBuffer buffer = ByteBuffer.allocate(data.length + 4);
         buffer.put(type);
         // data length
-        byte[] length = intToByte3(data.length);
+        byte[] length = int2Bytes(data.length, 3);
         buffer.put(length);
         // data
         buffer.put(data);
@@ -47,11 +47,11 @@ public class FlatBuffersEncoder implements PluginRunnerEncoder {
         return buffer;
     }
 
-    private byte[] intToByte3(int i) {
-        byte[] targets = new byte[3];
-        targets[2] = (byte) (i & 0xFF);
-        targets[1] = (byte) (i >> 8 & 0xFF);
-        targets[0] = (byte) ((i >> 16 & 0xFF));
-        return targets;
+    byte[] int2Bytes(int value, int len) {
+        byte[] b = new byte[len];
+        for (int i = 0; i < len; i++) {
+            b[len - i - 1] = (byte) ((value >> 8 * i) & 0xff);
+        }
+        return b;
     }
 }

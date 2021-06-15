@@ -77,7 +77,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
         for (int i = 0; i < 3; i++) {
             bytes[i] = payload.get();
         }
-        return byte3ToInt(bytes);
+        return bytes2Int(bytes, 0, 3);
     }
 
     private ByteBuffer getBody(ByteBuffer payload) throws BufferUnderflowException, IndexOutOfBoundsException {
@@ -89,9 +89,14 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
         return buffer;
     }
 
-    private int byte3ToInt(byte[] bytes) {
-        return bytes[2] & 0xFF |
-                (bytes[1] & 0xFF << 8) |
-                (bytes[0] & 0xFF << 16);
+    int bytes2Int(byte[] b, int start, int len) {
+        int sum = 0;
+        int end = start + len;
+        for (int i = start; i < end; i++) {
+            int n = b[i] & 0xff;
+            n <<= (--len) * 8;
+            sum += n;
+        }
+        return sum;
     }
 }

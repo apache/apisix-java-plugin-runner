@@ -20,6 +20,8 @@ package org.apache.apisix.plugin.runner.codec.impl;
 import com.google.flatbuffers.FlatBufferBuilder;
 import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.TextEntry;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ErrRequest;
 import org.apache.apisix.plugin.runner.A6Request;
@@ -157,5 +159,20 @@ class FlatBuffersDecoderTest {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6ConfigRequest configReq = (A6ConfigRequest) flatBuffersDecoder.decode(buffer);
         assertThrows(IndexOutOfBoundsException.class, () -> configReq.getReq().conf(0));
+    }
+
+    @Test
+    @DisplayName("test decode data length greater then 256")
+    void testDecodeDataGreaterLargeThen256() {
+        byte[] bytes = new byte[]{0, 1, 4};
+        int length = flatBuffersDecoder.bytes2Int(bytes, 0, 3);
+
+        // use Bytebuf getInt function (default 4 bytes) to verify
+        ByteBuf buf = Unpooled.buffer(4);
+        byte[] bufBytes = {0, 0, 1, 4};
+        buf.writeBytes(bufBytes);
+        int bufLength = buf.getInt(0);
+
+        Assertions.assertEquals(length, bufLength);
     }
 }
