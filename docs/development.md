@@ -26,7 +26,7 @@ to learn how to extend `PluginFilter`, define the order, rewrite requests and st
 
 ####  Code Location
 
-You need to put the code in [runner-plugin-sdk](https://github.com/apache/apisix-java-plugin-runner/tree/main/runner-plugin-sdk/src/main/java/org/apache/apisix/plugin/runner)
+You need to put the code in [runner-plugin](https://github.com/apache/apisix-java-plugin-runner/tree/main/runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter)
 so that the `apisix-java-plugin-runner.jar` will contain the filter implementation class you wrote when you package it.
 
 ####  The order of filter execution
