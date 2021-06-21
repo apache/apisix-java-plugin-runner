@@ -32,7 +32,7 @@ This release mainly improve basic features, bugfix and adds test cases.
 ### Core
 
 - complete project skeleton and available features.
-- complete joint debug with [APISIX](https://github.com/apache/apisix)
+- complete joint debug with [APISIX](https://github.com/apache/apisix).
 - mecessary documentation. [#19](https://github.com/apache/apisix-java-plugin-runner/pull/19)
 - the test cases cover the codec. [#14](https://github.com/apache/apisix-java-plugin-runner/pull/14)
 - the test cases cover the filter. [#15](https://github.com/apache/apisix-java-plugin-runner/pull/15)
