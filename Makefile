@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-#SHELL := /bin/bash -o pipefail
+SHELL := /bin/bash -o pipefail
 
 VERSION ?= latest
 RELEASE_SRC = apache-apisix-java-plugin-runner-${VERSION}-src
