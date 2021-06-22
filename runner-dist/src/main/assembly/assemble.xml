@@ -35,13 +35,6 @@
                 <include>NOTICE*</include>
             </includes>
         </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/bin</directory>
-            <outputDirectory>/bin</outputDirectory>
-            <includes>
-                <include>*.sh</include>
-            </includes>
-        </fileSet>
     </fileSets>
     <moduleSets>
         <moduleSet>

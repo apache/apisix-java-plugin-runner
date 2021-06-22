@@ -33,9 +33,13 @@ release-src: compress-tar
 .PHONY: compress-tar
 compress-tar:
 	./mvnw package
-	tar -zxvf ./dist/apache-apisix-runner-bin.tar.gz -C ./dist
-	tar -zcvf $(RELEASE_SRC).tgz \
-	./dist/apisix-runner-bin/apisix-java-plugin-runner.jar \
-	./dist/apisix-runner-bin/LICENSE \
-	./dist/apisix-runner-bin/NOTICE \
+	rm -f ./$(RELEASE_SRC).zip
+	wget https://github.com/apache/apisix-java-plugin-runner/archive/refs/tags/$(RELEASE_SRC).zip
+	tar -zxvf ./dist/apache-apisix-runner-bin.tar.gz
+	tar -zcvf $(RELEASE_SRC).tar.gz \
+	./apisix-runner-bin/apisix-java-plugin-runner.jar \
+	LICENSE \
+	Makefile \
+	NOTICE \
+	./$(RELEASE_SRC).zip \
 	*.md
