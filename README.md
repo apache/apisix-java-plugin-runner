@@ -4,7 +4,7 @@ apisix-java-plugin-runner
 Runs [Apache APISIX](http://apisix.apache.org/) plugins written in Java.
 Implemented as a sidecar that accompanies APISIX.
 
-![apisix-java-plugin-runner-overview](./docs/images/apisix-java-plugin-runner-overview.png)
+![apisix-java-plugin-runner-overview](./docs/assets/images/apisix-java-plugin-runner-overview.png)
 
 Status
 ------
