@@ -6,7 +6,7 @@ Prerequisites
 -------------
 
 * JDK 8
-* APISIX 2.6.0
+* APISIX 2.7.0
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project.
 * Refer to [Debug](how-it-works.md#debug)  to build the debug environment.
 

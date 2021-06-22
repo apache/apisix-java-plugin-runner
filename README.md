@@ -20,7 +20,7 @@ security, traffic control, serverless, analytics & monitoring, transformations, 
 It also provides highly extensible API, allowing common phases to be mounted,
 and users can use these api to develop their own plugins.
 
-APISIX supports writing plugins in multiple languages in version [2.6.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#260),
+APISIX supports writing plugins in multiple languages in version [2.7.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#270),
 this project is APISIX Java side implementation that supports writing plugins in java.
 
 
