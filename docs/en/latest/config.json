@@ -1,10 +1,20 @@
 {
-    "version": 1.0,
+    "version": 0.1,
     "sidebar": [
       {
         "type": "category",
-        "label": "Installation",
-        "items": [ "development", "how-it-works", "the-internal-of-apisix-java-plugin-runner" ]
+        "label": "Development",
+        "id": "development"
+      },
+      {
+        "type": "category",
+        "label": "Working",
+        "id": "how-it-works"
+      },
+      {
+        "type": "category",
+        "label": "The internal of apisix java plugin runner",
+        "id": "the-internal-of-apisix-java-plugin-runner"
       }
     ]
   }
