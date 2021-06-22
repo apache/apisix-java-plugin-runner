@@ -2,18 +2,15 @@
     "version": 0.1,
     "sidebar": [
       {
-        "type": "category",
-        "label": "Development",
+        "type": "doc",
         "id": "development"
       },
       {
-        "type": "category",
-        "label": "Working",
+        "type": "doc",
         "id": "how-it-works"
       },
       {
-        "type": "category",
-        "label": "The internal of apisix java plugin runner",
+        "type": "doc",
         "id": "the-internal-of-apisix-java-plugin-runner"
       }
     ]
