@@ -1,3 +1,7 @@
+---
+title: How it works
+---
+
 <!--
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -17,7 +21,7 @@
 #
 -->
 
-# How It Works
+## Overview
 
 This article explains how apisix-java-plugin-runner collaborate with [Apache APISIX](https://apisix.apache.org) to run plugins written in java.
 
