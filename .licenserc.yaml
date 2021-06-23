@@ -28,6 +28,6 @@ header:
     - '.mvn'
     - '**/target/**'
     - '**/*.iml'
-    - 'docs/**/**/config.json '
+    - 'docs/**/**/config.json'
 
   comment: on-failure
