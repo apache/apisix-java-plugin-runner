@@ -11,4 +11,4 @@ assignees: ''
 
 ### Environment
 
-* your apisix-java-plugin-runner version;
+* your apisix-java-plugin-runner version
