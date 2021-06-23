@@ -28,5 +28,6 @@ header:
     - '.mvn'
     - '**/target/**'
     - '**/*.iml'
+    - '/docs/**/*.json'
 
   comment: on-failure
