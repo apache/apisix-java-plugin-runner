@@ -1,0 +1,17 @@
+{
+    "version": 0.1,
+    "sidebar": [
+      {
+        "type": "doc",
+        "id": "development"
+      },
+      {
+        "type": "doc",
+        "id": "how-it-works"
+      },
+      {
+        "type": "doc",
+        "id": "the-internal-of-apisix-java-plugin-runner"
+      }
+    ]
+  }
