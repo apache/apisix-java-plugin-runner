@@ -11,7 +11,7 @@ assignees: ''
 
 ### Environment
 
-* your apisix-java-plugin-runner version;
+* your apisix-java-plugin-runner version
 
 ### Minimal test code / Steps to reproduce the issue
 
