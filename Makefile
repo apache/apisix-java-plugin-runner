@@ -22,24 +22,15 @@ RELEASE_SRC = apache-apisix-java-plugin-runner-${VERSION}-src
 
 .PHONY: release-src
 release-src: compress-tar
-	gpg --batch --yes --armor --detach-sig $(RELEASE_SRC).tgz
-	shasum -a 512 $(RELEASE_SRC).tgz > $(RELEASE_SRC).tgz.sha512
+	gpg --batch --yes --armor --detach-sig ./dist/$(RELEASE_SRC).tgz
+	shasum -a 512 ./dist/$(RELEASE_SRC).tgz > ./dist/$(RELEASE_SRC).tgz.sha512
 
 	mkdir -p release
-	mv $(RELEASE_SRC).tgz release/$(RELEASE_SRC).tgz
-	mv $(RELEASE_SRC).tgz.asc release/$(RELEASE_SRC).tgz.asc
-	mv $(RELEASE_SRC).tgz.sha512 release/$(RELEASE_SRC).tgz.sha512
+	mv ./dist/$(RELEASE_SRC).tgz release/$(RELEASE_SRC).tgz
+	mv ./dist/$(RELEASE_SRC).tgz.asc release/$(RELEASE_SRC).tgz.asc
+	mv ./dist/$(RELEASE_SRC).tgz.sha512 release/$(RELEASE_SRC).tgz.sha512
 
 .PHONY: compress-tar
 compress-tar:
 	./mvnw package
-	rm -f ./$(RELEASE_SRC).zip
-	wget https://github.com/apache/apisix-java-plugin-runner/archive/refs/tags/$(RELEASE_SRC).zip
-	tar -zxvf ./dist/apache-apisix-runner-bin.tar.gz
-	tar -zcvf $(RELEASE_SRC).tar.gz \
-	./apisix-runner-bin/apisix-java-plugin-runner.jar \
-	LICENSE \
-	Makefile \
-	NOTICE \
-	./$(RELEASE_SRC).zip \
-	*.md
+

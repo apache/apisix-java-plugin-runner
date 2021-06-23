@@ -30,7 +30,7 @@
             <directory>${project.basedir}/..</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>README*</include>
+                <include>*.md</include>
                 <include>LICENSE*</include>
                 <include>NOTICE*</include>
             </includes>

@@ -27,7 +27,7 @@
     </parent>
 
     <artifactId>apisix-runner-dist</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>APISIX Java Plugin Runner Distribution</name>
 
@@ -38,48 +38,8 @@
             <version>0.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>apisix-runner-bin</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assemble.xml</descriptor>
-                    </descriptors>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>bin</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>dist</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <copy file="${project.build.directory}/apisix-runner-bin.tar.gz"
-                                      tofile="${project.basedir}/../dist/apache-apisix-runner-bin.tar.gz"
-                                      overwrite="true" />
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>apisix-runner-bin-dist</module>
+        <module>apisix-runner-src-dist</module>
+    </modules>
 </project>
