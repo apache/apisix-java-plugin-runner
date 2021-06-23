@@ -79,7 +79,7 @@
 
                 <!-- modules ignore -->
                 <exclude>sample/**</exclude>
-                <exclude>dist/**</exclude>
+                <exclude>runner-dist/**</exclude>
                 <exclude>docs/**</exclude>
             </excludes>
         </fileSet>
