@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.apisix</groupId>
         <artifactId>apisix-runner-dist</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0-RELEASE</version>
     </parent>
 
     <artifactId>apisix-runner-src-dist</artifactId>
@@ -31,7 +31,7 @@
 
     <name>${project.artifactId}</name>
     <build>
-        <finalName>apisix-runner-src</finalName>
+        <finalName>apisix-java-plugin-runner</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -63,8 +63,8 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="${project.build.directory}/apisix-runner-src.tgz"
-                                      tofile="${project.basedir}/../../dist/apache-apisix-java-plugin-runner-${project.version}-src.tgz"
+                                <copy file="${project.build.directory}/apisix-java-plugin-runner.tgz"
+                                      tofile="${project.basedir}/../../apisix-java-plugin-runner-0.1.0.tgz"
                                       overwrite="true" />
                             </target>
                         </configuration>

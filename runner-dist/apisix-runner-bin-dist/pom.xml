@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.apisix</groupId>
         <artifactId>apisix-runner-dist</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0-RELEASE</version>
     </parent>
 
     <artifactId>apisix-runner-bin-dist</artifactId>

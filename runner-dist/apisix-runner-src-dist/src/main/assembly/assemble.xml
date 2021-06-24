@@ -26,7 +26,7 @@
         <format>tgz</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>${project.build.finalName}-src-release</baseDirectory>
+    <baseDirectory>${project.build.finalName}</baseDirectory>
     <fileSets>
         <fileSet>
             <directory>../../</directory>
@@ -78,8 +78,6 @@
                 <exclude>**/Thumbs.db</exclude>
 
                 <!-- modules ignore -->
-                <exclude>sample/**</exclude>
-                <exclude>runner-dist/**</exclude>
                 <exclude>docs/**</exclude>
             </excludes>
         </fileSet>
