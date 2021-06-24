@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.apisix</groupId>
         <artifactId>apisix-runner-dist</artifactId>
-        <version>0.1.0-RELEASE</version>
+        <version>0.1.0</version>
     </parent>
 
     <artifactId>apisix-runner-src-dist</artifactId>
@@ -56,7 +56,7 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>dist</id>
+                        <id>dist-src</id>
                         <phase>package</phase>
                         <goals>
                             <goal>run</goal>
@@ -64,7 +64,7 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/apisix-java-plugin-runner.tgz"
-                                      tofile="${project.basedir}/../../apisix-java-plugin-runner-0.1.0.tgz"
+                                      tofile="${project.basedir}/../../apisix-java-plugin-runner-${project.version}.tgz"
                                       overwrite="true" />
                             </target>
                         </configuration>
