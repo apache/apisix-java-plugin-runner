@@ -46,6 +46,7 @@
                 <exclude>**/*.zip</exclude>
                 <exclude>**/*.tar</exclude>
                 <exclude>**/*.tar.gz</exclude>
+                <exclude>**/*.tgz</exclude>
 
                 <!-- maven plugin ignore -->
                 <exclude>release.properties</exclude>
@@ -75,10 +76,10 @@
 
                 <!-- system ignore -->
                 <exclude>**/.DS_Store</exclude>
-                <exclude>**/Thumbs.db</exclude>
 
                 <!-- modules ignore -->
                 <exclude>docs/**</exclude>
+                <exclude>release/**</exclude>
             </excludes>
         </fileSet>
     </fileSets>
