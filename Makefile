@@ -17,7 +17,7 @@
 
 SHELL := /bin/bash -o pipefail
 
-VERSION ?= latest
+VERSION ?= 0.1.0-SNAPSHOT
 RELEASE_SRC = apache-apisix-java-plugin-runner-${VERSION}-src
 
 .PHONY: release-src
