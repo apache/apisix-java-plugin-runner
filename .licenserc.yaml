@@ -28,5 +28,7 @@ header:
     - '.mvn'
     - '**/target/**'
     - '**/*.iml'
+    - '.github/ISSUE_TEMPLATE'
+    - '.github/PULL_REQUEST_TEMPLATE'
 
   comment: on-failure
