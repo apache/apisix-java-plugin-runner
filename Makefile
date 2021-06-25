@@ -18,7 +18,7 @@
 SHELL := /bin/bash -o pipefail
 
 VERSION ?= 0.1.0
-RELEASE_SRC = apisix-java-plugin-runner-${VERSION}
+RELEASE_SRC = apisix-java-plugin-runner-${VERSION}-src
 
 .PHONY: release-src
 release-src: compress-tar
