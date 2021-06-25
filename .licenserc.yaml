@@ -29,5 +29,7 @@ header:
     - '**/target/**'
     - '**/*.iml'
     - 'docs/**/**/config.json'
+    - '.github/ISSUE_TEMPLATE'
+    - '.github/PULL_REQUEST_TEMPLATE'
 
   comment: on-failure
