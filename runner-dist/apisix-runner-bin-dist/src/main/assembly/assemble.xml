@@ -30,16 +30,9 @@
             <directory>${project.basedir}/..</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>README*</include>
+                <include>*.md</include>
                 <include>LICENSE*</include>
                 <include>NOTICE*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/src/main/bin</directory>
-            <outputDirectory>/bin</outputDirectory>
-            <includes>
-                <include>*.sh</include>
             </includes>
         </fileSet>
     </fileSets>
