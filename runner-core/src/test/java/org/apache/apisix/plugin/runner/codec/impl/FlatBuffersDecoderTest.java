@@ -27,6 +27,7 @@ import org.apache.apisix.plugin.runner.A6ErrRequest;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,6 +53,7 @@ class FlatBuffersDecoderTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test empty data")
     void testEmptyData(CapturedOutput capturedOutput) {
         byte[] bytes = new byte[]{};
@@ -62,6 +64,7 @@ class FlatBuffersDecoderTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test unsupported type")
     void testUnsupportedType(CapturedOutput capturedOutput) {
         byte[] bytes = new byte[]{4};
@@ -72,6 +75,7 @@ class FlatBuffersDecoderTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test error data length(1)")
     void testErrorDataLength1(CapturedOutput capturedOutput) {
         // data length is greater than actual length
@@ -83,6 +87,7 @@ class FlatBuffersDecoderTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test error data length(2)")
     void testErrorDataLength2(CapturedOutput capturedOutput) {
         // data length equal to 0
@@ -94,6 +99,7 @@ class FlatBuffersDecoderTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test error data length(3)")
     void testErrorDataLength3(CapturedOutput capturedOutput) {
         // wrong data content
@@ -105,6 +111,7 @@ class FlatBuffersDecoderTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test get body")
     void testGetBody() {
         // mock client assembly data

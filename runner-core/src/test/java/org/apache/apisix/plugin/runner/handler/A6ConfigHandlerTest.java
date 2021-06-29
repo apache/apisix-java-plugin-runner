@@ -31,6 +31,7 @@ import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -134,6 +135,7 @@ class A6ConfigHandlerTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test skip the same name filter")
     void testAddFilter3(CapturedOutput capturedOutput) {
         FlatBufferBuilder builder = new FlatBufferBuilder();
@@ -161,6 +163,7 @@ class A6ConfigHandlerTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("test receive undefined filter")
     void testAddFilter4(CapturedOutput capturedOutput) {
         FlatBufferBuilder builder = new FlatBufferBuilder();
