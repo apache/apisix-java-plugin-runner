@@ -17,18 +17,18 @@
 
 SHELL := /bin/bash -o pipefail
 
-VERSION ?= 0.1.0-SNAPSHOT
-RELEASE_SRC = apache-apisix-java-plugin-runner-${VERSION}-src
+VERSION ?= 0.1.0
+RELEASE_SRC = apisix-java-plugin-runner-${VERSION}-src
 
 .PHONY: release-src
 release-src: compress-tar
-	gpg --batch --yes --armor --detach-sig ./dist/$(RELEASE_SRC).tgz
-	shasum -a 512 ./dist/$(RELEASE_SRC).tgz > ./dist/$(RELEASE_SRC).tgz.sha512
+	gpg --batch --yes --armor --detach-sig ./$(RELEASE_SRC).tgz
+	shasum -a 512 ./$(RELEASE_SRC).tgz > ./$(RELEASE_SRC).tgz.sha512
 
 	mkdir -p release
-	mv ./dist/$(RELEASE_SRC).tgz release/$(RELEASE_SRC).tgz
-	mv ./dist/$(RELEASE_SRC).tgz.asc release/$(RELEASE_SRC).tgz.asc
-	mv ./dist/$(RELEASE_SRC).tgz.sha512 release/$(RELEASE_SRC).tgz.sha512
+	mv ./$(RELEASE_SRC).tgz release/$(RELEASE_SRC).tgz
+	mv ./$(RELEASE_SRC).tgz.asc release/$(RELEASE_SRC).tgz.asc
+	mv ./$(RELEASE_SRC).tgz.sha512 release/$(RELEASE_SRC).tgz.sha512
 
 .PHONY: compress-tar
 compress-tar:

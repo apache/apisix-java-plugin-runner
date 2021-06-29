@@ -28,6 +28,8 @@ header:
     - '.mvn'
     - '**/target/**'
     - '**/*.iml'
+    - '.github/ISSUE_TEMPLATE'
+    - '.github/PULL_REQUEST_TEMPLATE'
     - 'docs/**/**/config.json'
 
   comment: on-failure
