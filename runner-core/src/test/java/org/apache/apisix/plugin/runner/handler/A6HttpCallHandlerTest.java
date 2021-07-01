@@ -34,7 +34,6 @@ import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -156,7 +155,6 @@ class A6HttpCallHandlerTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("test cannot find conf token")
     void testCannotFindConfToken() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
@@ -174,7 +172,6 @@ class A6HttpCallHandlerTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("test do filter and get config")
     void testDoFilter1() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
@@ -197,7 +194,6 @@ class A6HttpCallHandlerTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("test get request params")
     void testDoFilter2() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
