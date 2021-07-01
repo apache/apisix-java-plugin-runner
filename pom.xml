@@ -112,6 +112,7 @@
                 <configuration>
                     <skip>false</skip>
                     <configLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/checkstyle.xml</configLocation>
+                    <suppressionsLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
                     <headerLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/HEADER</headerLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>

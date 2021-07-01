@@ -27,20 +27,15 @@ import org.apache.apisix.plugin.runner.A6ErrRequest;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import java.nio.ByteBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(OutputCaptureExtension.class)
 @DisplayName("test decode data")
 class FlatBuffersDecoderTest {
 
@@ -53,65 +48,54 @@ class FlatBuffersDecoderTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("test empty data")
-    void testEmptyData(CapturedOutput capturedOutput) {
+    void testEmptyData() {
         byte[] bytes = new byte[]{};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6Request result = flatBuffersDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
-        Assertions.assertTrue(capturedOutput.getOut().contains("receive empty data"));
     }
 
     @Test
-    @Disabled
     @DisplayName("test unsupported type")
-    void testUnsupportedType(CapturedOutput capturedOutput) {
+    void testUnsupportedType() {
         byte[] bytes = new byte[]{4};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6Request result = flatBuffersDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
-        Assertions.assertTrue(capturedOutput.getOut().contains("receive unsupported type: 4"));
     }
 
     @Test
-    @Disabled
     @DisplayName("test error data length(1)")
-    void testErrorDataLength1(CapturedOutput capturedOutput) {
+    void testErrorDataLength1() {
         // data length is greater than actual length
         byte[] bytes = new byte[]{1, 0, 0, 3, 0};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6Request result = flatBuffersDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
-        Assertions.assertTrue(capturedOutput.getOut().contains("receive error data length"));
     }
 
     @Test
-    @Disabled
     @DisplayName("test error data length(2)")
-    void testErrorDataLength2(CapturedOutput capturedOutput) {
+    void testErrorDataLength2() {
         // data length equal to 0
         byte[] bytes = new byte[]{1, 0, 0, 0, 0};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6Request result = flatBuffersDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
-        Assertions.assertTrue(capturedOutput.getOut().contains("receive error data length"));
     }
 
     @Test
-    @Disabled
     @DisplayName("test error data length(3)")
-    void testErrorDataLength3(CapturedOutput capturedOutput) {
+    void testErrorDataLength3() {
         // wrong data content
         byte[] bytes = new byte[]{1, 0, 0, 1, 0, 1};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         A6Request result = flatBuffersDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
-        Assertions.assertTrue(capturedOutput.getOut().contains("receive error data length"));
     }
 
     @Test
-    @Disabled
     @DisplayName("test get body")
     void testGetBody() {
         // mock client assembly data

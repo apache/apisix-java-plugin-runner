@@ -31,27 +31,24 @@ import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
 import reactor.core.publisher.Mono;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-@ExtendWith(OutputCaptureExtension.class)
 @DisplayName("test filter handle")
 class A6HttpCallHandlerTest {
-    private final Logger logger = LoggerFactory.getLogger(A6HttpCallHandlerTest.class);
+    private PrintStream console = null;
+    private ByteArrayOutputStream bytes = null;
 
     A6HttpCallHandler a6HttpCallHandler;
 
@@ -61,6 +58,11 @@ class A6HttpCallHandlerTest {
 
     @BeforeEach
     void setUp() {
+
+        bytes = new ByteArrayOutputStream();
+        console = System.out;
+        System.setOut(new PrintStream(bytes));
+
         filters = new HashMap<>();
         filters.put("FooFilter", new PluginFilter() {
             @Override
@@ -71,33 +73,33 @@ class A6HttpCallHandlerTest {
             @Override
             @SuppressWarnings("unchecked")
             public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                logger.info("do filter: FooFilter, order: {}", chain.getIndex());
-                logger.info("do filter: FooFilter, config: {}", request.getConfig(this));
+                System.out.println("do filter: FooFilter, order: " + chain.getIndex());
+                System.out.println("do filter: FooFilter, config: " + request.getConfig(this));
                 Gson gson = new Gson();
                 Map<String, Object> conf = new HashMap<>();
                 conf = gson.fromJson(request.getConfig(this), conf.getClass());
-                logger.info("do filter: FooFilter, conf_key1 value: {}", conf.get("conf_key1"));
-                logger.info("do filter: FooFilter, conf_key2 value: {}", conf.get("conf_key2"));
+                System.out.println("do filter: FooFilter, conf_key1 value: " + conf.get("conf_key1"));
+                System.out.println("do filter: FooFilter, conf_key2 value: " + conf.get("conf_key2"));
                 if (!Objects.isNull(request.getPath())) {
-                    logger.info("do filter: path: {}", request.getPath());
+                    System.out.println("do filter: path: " + request.getPath());
                 }
 
                 if (!Objects.isNull(request.getArgs())) {
                     for (Map.Entry<String, String> arg : request.getArgs().entrySet()) {
-                        logger.info("do filter: arg key: {}", arg.getKey());
-                        logger.info("do filter: arg value: {}", arg.getValue());
+                        System.out.println("do filter: arg key: " + arg.getKey());
+                        System.out.println("do filter: arg value: " + arg.getValue());
                     }
                 }
 
                 if (!Objects.isNull(request.getHeader())) {
                     for (Map.Entry<String, String> header : request.getHeader().entrySet()) {
-                        logger.info("do filter: header key: {}", header.getKey());
-                        logger.info("do filter: header value: {}", header.getValue());
+                        System.out.println("do filter: header key: " + header.getKey());
+                        System.out.println("do filter: header value: " + header.getValue());
                     }
                 }
 
                 if (!Objects.isNull(request.getMethod())) {
-                    logger.info("do filter: method: {}", request.getMethod());
+                    System.out.println("do filter: method: " + request.getMethod());
                 }
 
                 return chain.filter(request, response);
@@ -113,8 +115,8 @@ class A6HttpCallHandlerTest {
 
             @Override
             public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                logger.info("do filter: CatFilter, order: {}", chain.getIndex());
-                logger.info("do filter: CatFilter, config: {}", request.getConfig(this));
+                System.out.println("do filter: CatFilter, order: " + chain.getIndex());
+                System.out.println("do filter: CatFilter, config: " + request.getConfig(this));
 
                 response.setStatusCode(401);
                 return chain.filter(request, response);
@@ -147,10 +149,14 @@ class A6HttpCallHandlerTest {
         a6HttpCallHandler = new A6HttpCallHandler(cache);
     }
 
+    @AfterEach
+    void setDown() {
+        System.setOut(console);
+    }
+
     @Test
-    @Disabled
     @DisplayName("test cannot find conf token")
-    void testCannotFindConfToken(CapturedOutput capturedOutput) {
+    void testCannotFindConfToken() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
         io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
@@ -161,15 +167,13 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         HttpResponse response = new HttpResponse(1L);
         a6HttpCallHandler.handle(request, response);
-        Assertions.assertTrue(capturedOutput.getOut().contains("cannot find conf token: 9999"));
         io.github.api7.A6.Err.Resp err = io.github.api7.A6.Err.Resp.getRootAsResp(response.getErrResponse().encode());
         Assertions.assertEquals(err.code(), Code.CONF_TOKEN_NOT_FOUND);
     }
 
     @Test
-    @Disabled
     @DisplayName("test do filter and get config")
-    void testDoFilter1(CapturedOutput capturedOutput) {
+    void testDoFilter1() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
         io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
@@ -180,18 +184,18 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         HttpResponse response = new HttpResponse(1L);
         a6HttpCallHandler.handle(request, response);
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, order: 1"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, config: {\"conf_key1\":\"conf_value1\",\"conf_key2\":2}"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, conf_key1 value: conf_value1"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, conf_key2 value: 2.0"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, order: 2"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, config: Dog"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, order: 1"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, order: 1"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, config: {\"conf_key1\":\"conf_value1\",\"conf_key2\":2}"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, conf_key1 value: conf_value1"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, conf_key2 value: 2.0"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, order: 2"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, config: Dog"));
     }
 
     @Test
-    @Disabled
     @DisplayName("test get request params")
-    void testDoFilter2(CapturedOutput capturedOutput) {
+    void testDoFilter2() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
         int argKey = builder.createString("argKey");
         int argValue = builder.createString("argValue");
@@ -220,18 +224,18 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         HttpResponse response = new HttpResponse(1L);
         a6HttpCallHandler.handle(request, response);
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, order: 1"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: FooFilter, config: {\"conf_key1\":\"conf_value1\",\"conf_key2\":2}"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, order: 1"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, config: {\"conf_key1\":\"conf_value1\",\"conf_key2\":2}"));
 
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: path: /path"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: arg key: argKey"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: arg value: argValue"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: header key: headerKey"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: header value: headerValue"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: method: GET"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: path: /path"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: arg key: argKey"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: arg value: argValue"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: header key: headerKey"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: header value: headerValue"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: method: GET"));
 
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, order: 2"));
-        Assertions.assertTrue(capturedOutput.getOut().contains("do filter: CatFilter, config: Dog"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, order: 2"));
+        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, config: Dog"));
     }
 
     @Test
