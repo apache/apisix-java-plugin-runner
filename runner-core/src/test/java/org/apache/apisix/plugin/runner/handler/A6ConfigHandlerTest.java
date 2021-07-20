@@ -33,16 +33,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@ExtendWith(OutputCaptureExtension.class)
 @DisplayName("test add filter")
 class A6ConfigHandlerTest {
 
@@ -135,7 +131,7 @@ class A6ConfigHandlerTest {
 
     @Test
     @DisplayName("test skip the same name filter")
-    void testAddFilter3(CapturedOutput capturedOutput) {
+    void testAddFilter3() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
         int foo1 = builder.createString("FooFilter");
         int bar1 = builder.createString("Bar1");
@@ -157,12 +153,11 @@ class A6ConfigHandlerTest {
 
         A6Conf config = cache.getIfPresent(0L);
         Assertions.assertEquals(config.getChain().getFilters().size(), 1);
-        Assertions.assertTrue(capturedOutput.getOut().contains("skip the same filter: FooFilter"));
     }
 
     @Test
     @DisplayName("test receive undefined filter")
-    void testAddFilter4(CapturedOutput capturedOutput) {
+    void testAddFilter4() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
         int foo = builder.createString("UndefinedFilter");
         int bar = builder.createString("Bar");
@@ -180,6 +175,5 @@ class A6ConfigHandlerTest {
 
         A6Conf config = cache.getIfPresent(0L);
         Assertions.assertEquals(config.getChain().getFilters().size(), 0);
-        Assertions.assertTrue(capturedOutput.getOut().contains("receive undefined filter: UndefinedFilter, skip it"));
     }
 }

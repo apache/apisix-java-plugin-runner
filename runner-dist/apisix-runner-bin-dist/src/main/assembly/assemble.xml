@@ -31,8 +31,15 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>*.md</include>
-                <include>LICENSE*</include>
-                <include>NOTICE*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/main/release-docs</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>LICENSE</include>
+                <include>NOTICE</include>
+                <include>*/LICENSE-*.txt</include>
             </includes>
         </fileSet>
     </fileSets>
