@@ -67,7 +67,7 @@ phase_func(): failed to connect to the unix socket unix:/tmp/runner.sock: permis
 in the `error.log` of APISIX, you can change the permissions of this file for debug, execute commands like
 
 ```shell
-chmod 755 /tmp/runner.sock
+chmod 766 /tmp/runner.sock
 ```
 
 To get more detailed debugging information, you can modify the output level of the log.
