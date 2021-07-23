@@ -187,7 +187,7 @@ public class HttpResponse implements A6Response {
 
         int bodyIndex = -1;
         if (StringUtils.hasText(body)) {
-            byte[] bodyBytes = body.getBytes(StandardCharsets.US_ASCII);
+            byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
             bodyIndex = Stop.createBodyVector(builder, bodyBytes);
         }
 
