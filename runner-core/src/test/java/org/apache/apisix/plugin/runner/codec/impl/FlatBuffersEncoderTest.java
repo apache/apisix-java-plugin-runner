@@ -263,6 +263,24 @@ class FlatBuffersEncoderTest {
         Assertions.assertEquals(bytes[0], array[1]);
         Assertions.assertEquals(bytes[1], array[2]);
         Assertions.assertEquals(bytes[2], array[3]);
+    }
 
+    @Test
+    @DisplayName("test stop the request without setStatusCode")
+    void testDoFilterWithoutSetStatusCode() {
+        HttpResponse httpResponse = new HttpResponse(0L);
+        // only set header, without setStatusCode, use 500 as default
+        httpResponse.setHeader("Foo", "Bar");
+        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        result.position(4);
+        io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
+        Assertions.assertEquals(resp.actionType(), Action.Stop);
+        Stop stop = (Stop) resp.action(new Stop());
+        Assertions.assertEquals(stop.status(), 500);
+        for (int i = 0; i < stop.headersLength(); i++) {
+            if (stop.headers(i).name().equals("Foo")) {
+                Assertions.assertEquals(stop.headers(i).value(), "Bar");
+            }
+        }
     }
 }

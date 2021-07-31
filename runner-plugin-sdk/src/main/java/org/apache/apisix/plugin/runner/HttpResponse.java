@@ -22,6 +22,8 @@ import io.github.api7.A6.HTTPReqCall.Resp;
 import io.github.api7.A6.HTTPReqCall.Rewrite;
 import io.github.api7.A6.HTTPReqCall.Stop;
 import io.github.api7.A6.TextEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -38,6 +40,7 @@ import java.util.Objects;
  * }
  */
 public class HttpResponse implements A6Response {
+    private final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
     private final long requestId;
 
@@ -194,6 +197,14 @@ public class HttpResponse implements A6Response {
         Stop.startStop(builder);
         if (!Objects.isNull(statusCode)) {
             Stop.addStatus(builder, statusCode);
+        } else {
+            /**
+             * Avoid APISIX using 0 as the default HTTP Status Code
+             * {@link org.apache.apisix.plugin.runner.HttpResponse#setStatusCode(int statusCode)}
+             * @see https://github.com/apache/apisix-java-plugin-runner/issues/55
+            */
+            Stop.addStatus(builder, 500);
+            logger.info("Use 500 as the default HTTP Status Code when setStatusCode is not called");
         }
         if (-1 != headerIndex) {
             Stop.addHeaders(builder, headerIndex);
