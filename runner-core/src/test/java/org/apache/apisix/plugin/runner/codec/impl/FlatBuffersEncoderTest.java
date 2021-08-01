@@ -276,7 +276,7 @@ class FlatBuffersEncoderTest {
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Stop);
         Stop stop = (Stop) resp.action(new Stop());
-        Assertions.assertEquals(stop.status(), 500);
+        Assertions.assertEquals(stop.status(), 200);
         for (int i = 0; i < stop.headersLength(); i++) {
             if (stop.headers(i).name().equals("Foo")) {
                 Assertions.assertEquals(stop.headers(i).value(), "Bar");
