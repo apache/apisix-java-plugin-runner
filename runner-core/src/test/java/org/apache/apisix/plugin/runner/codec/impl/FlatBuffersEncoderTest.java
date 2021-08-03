@@ -269,7 +269,7 @@ class FlatBuffersEncoderTest {
     @DisplayName("test stop the request without setStatusCode")
     void testDoFilterWithoutSetStatusCode() {
         HttpResponse httpResponse = new HttpResponse(0L);
-        // only set header, without setStatusCode, use 500 as default
+        // only set header, without setStatusCode, use 200 as default
         httpResponse.setHeader("Foo", "Bar");
         ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
         result.position(4);
