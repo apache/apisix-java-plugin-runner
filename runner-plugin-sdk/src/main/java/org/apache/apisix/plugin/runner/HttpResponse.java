@@ -204,7 +204,7 @@ public class HttpResponse implements A6Response {
              * @see https://github.com/apache/apisix-java-plugin-runner/issues/55
             */
             Stop.addStatus(builder, 200);
-            logger.info("Use 500 as the default HTTP Status Code when setStatusCode is not called");
+            logger.info("Use 200 as the default HTTP Status Code when setStatusCode is not called");
         }
         if (-1 != headerIndex) {
             Stop.addHeaders(builder, headerIndex);
