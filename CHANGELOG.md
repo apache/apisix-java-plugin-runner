@@ -35,7 +35,7 @@ This release mainly provides basic features and adds test cases.
 - complete united test with [APISIX](https://github.com/apache/apisix).
 - supported debug mode.
 
-## Bugfix
+### Bugfix
 
 - set more headers and args. [#30](https://github.com/apache/apisix-java-plugin-runner/pull/30)
 - ensure correct encoding and decoding when data length is greater than 256. [#32](https://github.com/apache/apisix-java-plugin-runner/pull/32)
