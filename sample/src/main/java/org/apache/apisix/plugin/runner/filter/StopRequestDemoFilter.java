@@ -47,7 +47,7 @@ public class StopRequestDemoFilter implements PluginFilter {
         /*
          * You can use the parameters in the configuration.
          */
-        response.setStatusCode((Integer) conf.get("stop_response_code"));
+        response.setStatusCode(Double.valueOf(conf.get("stop_response_code").toString()).intValue()); 
         response.setHeader((String) conf.get("stop_response_header_name"), (String) conf.get("stop_response_header_value"));
         /* note: The body is currently a string type.
                  If you need the json type, you need to escape the json content here.
