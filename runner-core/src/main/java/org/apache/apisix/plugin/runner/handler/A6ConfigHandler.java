@@ -31,6 +31,7 @@ import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,15 @@ public class A6ConfigHandler implements Handler {
         Req req = ((A6ConfigRequest) request).getReq();
         long token = ((A6ConfigResponse) response).getConfToken();
         PluginFilterChain chain = createFilterChain(req);
+        ByteBuffer bb = req.getByteBuffer();
+
+        /**
+        * to reset vtable_start and vtable_size of req,
+        * so that req can be reused after being got from the cache.
+        * {@link org.apache.apisix.plugin.runner.handler.A6HttpCallHandler#handle cache.getIfPresent()}
+        * @see <a href="Issues63"> https://github.com/apache/apisix-java-plugin-runner/issues/63</a>
+        * */
+        req.__init(bb.getInt(bb.position()) + bb.position(), bb);
         A6Conf config = new A6Conf(req, chain);
         cache.put(token, config);
     }
