@@ -100,7 +100,6 @@ class A6ConfigHandlerTest {
         Assertions.assertEquals(config.getChain().getFilters().size(), 1);
         Assertions.assertEquals(config.getChain().getIndex(), 0);
         Assertions.assertEquals(config.get("FooFilter"), "Bar");
-
     }
 
     @Test
@@ -175,5 +174,29 @@ class A6ConfigHandlerTest {
 
         A6Conf config = cache.getIfPresent(0L);
         Assertions.assertEquals(config.getChain().getFilters().size(), 0);
+    }
+
+    @Test
+    @DisplayName("test fetch conf more times")
+    void testAddFilter5() {
+        FlatBufferBuilder builder = new FlatBufferBuilder();
+        int name = builder.createString("FooFilter");
+        int value = builder.createString("Bar");
+        int conf = TextEntry.createTextEntry(builder, name, value);
+        int confVector = Req.createConfVector(builder, new int[]{conf});
+        Req.startReq(builder);
+        Req.addConf(builder, confVector);
+        builder.finish(Req.endReq(builder));
+        Req req = Req.getRootAsReq(builder.dataBuffer());
+
+        A6ConfigRequest request = new A6ConfigRequest(req);
+        A6ConfigResponse response = new A6ConfigResponse(0L);
+        a6ConfigHandler.handle(request, response);
+
+        A6Conf a6Conf = cache.getIfPresent(0L);
+        Assertions.assertTrue(a6Conf.getConfig() instanceof HashMap);
+        for (int i = 0; i < 100; i++) {
+            Assertions.assertEquals(a6Conf.get("FooFilter"), "Bar");
+        }
     }
 }

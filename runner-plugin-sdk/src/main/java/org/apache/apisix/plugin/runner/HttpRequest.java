@@ -33,7 +33,7 @@ public class HttpRequest implements A6Request {
 
     private HttpResponse response;
 
-    private io.github.api7.A6.PrepareConf.Req config;
+    private Map<String, String> config;
 
     private Long requestId;
 
@@ -58,13 +58,7 @@ public class HttpRequest implements A6Request {
      * @return the config
      */
     public String getConfig(PluginFilter filter) {
-        for (int i = 0; i < config.confLength(); i++) {
-            TextEntry conf = config.conf(i);
-            if (conf.name().equals(filter.name())) {
-                return conf.value();
-            }
-        }
-        return null;
+        return config.getOrDefault(filter.name(), null);
     }
 
     public long getRequestId() {
@@ -274,7 +268,7 @@ public class HttpRequest implements A6Request {
         return new HttpRequest(req);
     }
 
-    public void initCtx(HttpResponse response, io.github.api7.A6.PrepareConf.Req config) {
+    public void initCtx(HttpResponse response, Map<String, String> config) {
         this.response = response;
         this.config = config;
     }
