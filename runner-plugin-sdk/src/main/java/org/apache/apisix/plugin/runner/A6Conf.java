@@ -17,17 +17,17 @@
 
 package org.apache.apisix.plugin.runner;
 
-import io.github.api7.A6.PrepareConf.Req;
-import io.github.api7.A6.TextEntry;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
+
+import java.util.Map;
 
 public class A6Conf {
 
-    public Req getReq() {
-        return req;
+    public Map<String, String> getConfig() {
+        return config;
     }
 
-    private final Req req;
+    private final Map<String, String> config;
 
     public PluginFilterChain getChain() {
         return chain;
@@ -35,18 +35,12 @@ public class A6Conf {
 
     private final PluginFilterChain chain;
 
-    public A6Conf(Req req, PluginFilterChain chain) {
-        this.req = req;
+    public A6Conf(Map<String, String> config, PluginFilterChain chain) {
+        this.config = config;
         this.chain = chain;
     }
 
     public String get(String key) {
-        for (int i = 0; i < this.req.confLength(); i++) {
-            TextEntry conf = this.req.conf(i);
-            if (conf.name().equals(key)) {
-                return conf.value();
-            }
-        }
-        return null;
+        return config.getOrDefault(key, null);
     }
 }
