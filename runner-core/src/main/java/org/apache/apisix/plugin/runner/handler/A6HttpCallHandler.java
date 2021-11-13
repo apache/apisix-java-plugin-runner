@@ -52,7 +52,7 @@ public class A6HttpCallHandler implements Handler {
             return;
         }
 
-        req.initCtx(rsp, conf.getReq());
+        req.initCtx(rsp, conf.getConfig());
         PluginFilterChain chain = conf.getChain();
         chain.filter(req, rsp);
     }
