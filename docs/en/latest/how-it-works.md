@@ -93,14 +93,14 @@ to built apisix-java-plugin-runner as a jar package, then you will see the `dist
 
 ```
 cd dist
-tar -zxvf apache-apisix-runner-bin.tar.gz
+tar -zxvf apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz
 ```
 
 the layout of files in the `dist` directory is as below
 
 ```
 dist
-├── apache-apisix-runner-bin.tar.gz
+├── apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz
 └── apisix-runner-bin
     ├── apisix-java-plugin-runner.jar
     ├── bin
