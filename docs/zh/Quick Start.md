@@ -15,7 +15,7 @@
 public class CheckTokenFilter implements PluginFilter {
     @Override
     public String name() {
-        return "StopRequestDemoFilter";
+        return "CheckTokenFilter";
     }
 
     @Override
