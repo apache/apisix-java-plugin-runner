@@ -67,7 +67,7 @@ ADD aapache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
  docker build -t apache/apisix:2.10.0-alpine-with-java-plugin .
 ```
 
-最后添加配置到APISIX的 `config.yaml` 文件
+最后添加扩展插件配置到APISIX的 `config.yaml` 文件
 
 ```yaml
 ext-plugin:
