@@ -74,7 +74,7 @@ ext-plugin:
   cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/path/to/apisix-runner-bin/apisix-java-plugin-runner.jar']
 ```
 
-这样直接用新生成apache/apisix:2.10.0-alpine-with-java-plugin docker image替换原来的apache/apisix:2.10.0-alpine 部署就可以了。
+这样直接用新生成`apache/apisix:2.10.0-alpine-with-java-plugin` docker image替换原来的`apache/apisix:2.10.0-alpine` 部署就可以了。
 
 #### 四、使用插件
 
