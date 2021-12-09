@@ -8,7 +8,7 @@
 
 #### 二、开发扩展插件过滤器
 
-在runner-plugin 模块 org.apache.apisix.plugin.runner.filter 包下编写过滤器处理请求，过滤器要实现PluginFilter 接口，可以参考 apisix-runner-sample 模块下的样例，官方提供了两个样例还是很全面的，一个是请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)，一个是请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
+在`runner-plugin` 模块 `org.apache.apisix.plugin.runner.filter` 包下编写过滤器处理请求，过滤器要实现`PluginFilter` 接口，可以参考 `apisix-runner-sample` 模块下的样例，官方提供了两个样例还是很全面的，一个是请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)，一个是请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
 
 ```java
 @Component
