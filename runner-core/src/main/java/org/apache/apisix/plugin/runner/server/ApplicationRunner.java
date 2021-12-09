@@ -83,5 +83,6 @@ public class ApplicationRunner implements CommandLineRunner {
         awaitThread.setDaemon(false);
         awaitThread.setName("uds-server");
         awaitThread.start();
+        Runtime.getRuntime().exec("chmod 777 " + socketFile);
     }
 }
