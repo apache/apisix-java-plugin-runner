@@ -1,14 +1,18 @@
-### Quick Start
+## 快速开始
 
-#### 一、准备工作
+### 准备工作
 
 * JDK 8
-
+* APISIX 2.10.0
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project.
 
-#### 二、开发扩展插件过滤器
+### 开发扩展插件过滤器
 
 在`runner-plugin` 模块 `org.apache.apisix.plugin.runner.filter` 包下编写过滤器处理请求，过滤器要实现`PluginFilter` 接口，可以参考 `apisix-runner-sample` 模块下的样例，官方提供了两个样例还是很全面的，一个是请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)，一个是请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
+在 [runner-plugin](https://github.com/apache/apisix-java-plugin-runner/tree/main/runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter) 模块的 `org.apache.apisix.plugin.runner.filter` 包下编写过滤器处理请求，过滤器要实现 `PluginFilter` 接口，参考 `apisix-runner-sample` 模块下的样例：
+* 请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)
+* 请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
+
 
 ```java
 @Component
@@ -30,26 +34,26 @@ public class CheckTokenFilter implements PluginFilter {
 }
 ```
 
-#### 三、部署
+### 部署
 
-插件写好后怎么部署是关键，apisix-java-plugin-runner 与 APISIX 用 Unix Domain Socket 进行进程内通讯，
-所以他们要部署在一个服务实例，并且APISIX启动的过程中会带着apisix-java-plugin-runner一起启动，如果是容器化部署就必须在一个容器里运行。
+apisix-java-plugin-runner 与 APISIX 用 `Unix Domain Socket` 进行进程间通讯，需要部署在同一个宿主环境。apisix-java-plugin-runner 的生命周期由 APISIX 管理，如果是容器化部署，apisix-java-plugin-runner 与 APISIX 必须部署在同一个容器中。
 
 所以如果是容器部署就需要把apisix-java-plugin-runner 与 APISIX 生成在一个docker image里。
+下面是如何构建包含 apisix-java-plugin-runner 与 APISIX 的容器镜像的步骤。
 
-先打包`apisix-java-plugin-runner`
+先构建 `apisix-java-plugin-runner` 的可执行 jar
 
 ```bash
-mvn package
+./mvnw package
 ```
 
-打包完成，你会在`dist`目录看见打包文件
+构建完成，你会在 `dist` 目录看见构建产物
 
 ```
 apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz
 ```
 
-在`dist`目录添加`dockerfile`文件
+在`dist`目录添加`Dockerfile`文件
 
 ```dockerfile
 FROM apache/apisix:2.10.0-alpine
@@ -60,23 +64,24 @@ ADD aapache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
 
 ```
 
-然后运行`docker build`构建镜像
+然后构建容器镜像
 
 ```shell
  cd dist
  docker build -t apache/apisix:2.10.0-alpine-with-java-plugin .
 ```
 
-最后添加扩展插件配置到APISIX的 `config.yaml` 文件
+最后在 APISIX 的 `config.yaml` 文件中增加配置，如下
 
 ```yaml
 ext-plugin:
-  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/path/to/apisix-runner-bin/apisix-java-plugin-runner.jar']
+  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/usr/local/apisix-runner-bin/apisix-java-plugin-runner.jar']
 ```
 
-这样直接用新生成`apache/apisix:2.10.0-alpine-with-java-plugin` docker image替换原来的`apache/apisix:2.10.0-alpine` 部署就可以了。
+构建完成的 `apache/apisix:2.10.0-alpine-with-java-plugin` 镜像内即包含 APISIX 与 apisix-java-plugun-runner，
+用新构建的镜像 `apache/apisix:2.10.0-alpine-with-java-plugin` 直接部署就可以了。
 
-#### 四、使用插件
+### 使用插件
 
 配置路由
 
