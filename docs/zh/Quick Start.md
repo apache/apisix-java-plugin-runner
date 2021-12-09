@@ -1,12 +1,12 @@
 ### Quick Start
 
-##### 一、准备工作
+#### 一、准备工作
 
 * JDK 8
 
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project.
 
-##### 二、开发扩展插件过滤器
+#### 二、开发扩展插件过滤器
 
 在runner-plugin 模块 org.apache.apisix.plugin.runner.filter 包下编写过滤器处理请求，过滤器要实现PluginFilter 接口，可以参考 apisix-runner-sample 模块下的样例，官方提供了两个样例还是很全面的，一个是请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)，一个是请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
 
@@ -30,7 +30,7 @@ public class CheckTokenFilter implements PluginFilter {
 }
 ```
 
-##### 三、部署
+#### 三、部署
 
 插件写好后怎么部署是关键，apisix-java-plugin-runner 与 APISIX 用 Unix Domain Socket 进行进程内通讯，
 所以他们要部署在一个服务实例，并且APISIX启动的过程中会带着apisix-java-plugin-runner一起启动，如果是容器化部署就必须在一个容器里运行。
@@ -75,7 +75,7 @@ ext-plugin:
 
 这样直接用新生成apache/apisix:2.10.0-alpine-with-java-plugin docker image替换原来的apache/apisix:2.10.0-alpine 部署就可以了。
 
-##### 四、使用插件
+#### 四、使用插件
 
 配置路由
 
