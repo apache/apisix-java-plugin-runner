@@ -63,6 +63,7 @@ ADD aapache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
 然后运行docker build构建镜像
 
 ```shell
+ cd dist
  docker build -t apache/apisix:2.10.0-alpine-with-java-plugin .
 ```
 
