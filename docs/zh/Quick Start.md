@@ -8,7 +8,6 @@
 
 ### 开发扩展插件过滤器
 
-在`runner-plugin` 模块 `org.apache.apisix.plugin.runner.filter` 包下编写过滤器处理请求，过滤器要实现`PluginFilter` 接口，可以参考 `apisix-runner-sample` 模块下的样例，官方提供了两个样例还是很全面的，一个是请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)，一个是请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
 在 [runner-plugin](https://github.com/apache/apisix-java-plugin-runner/tree/main/runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter) 模块的 `org.apache.apisix.plugin.runner.filter` 包下编写过滤器处理请求，过滤器要实现 `PluginFilter` 接口，参考 `apisix-runner-sample` 模块下的样例：
 * 请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)
 * 请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
@@ -39,7 +38,7 @@ public class CheckTokenFilter implements PluginFilter {
 apisix-java-plugin-runner 与 APISIX 用 `Unix Domain Socket` 进行进程间通讯，需要部署在同一个宿主环境。apisix-java-plugin-runner 的生命周期由 APISIX 管理，如果是容器化部署，apisix-java-plugin-runner 与 APISIX 必须部署在同一个容器中。
 
 所以如果是容器部署就需要把apisix-java-plugin-runner 与 APISIX 生成在一个docker image里。
-下面是如何构建包含 apisix-java-plugin-runner 与 APISIX 的容器镜像的步骤。
+下面是如何构建包含 apisix-java-plugin-runner 与 APISIX 的容器镜像的步骤：
 
 先构建 `apisix-java-plugin-runner` 的可执行 jar
 
