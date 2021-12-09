@@ -37,19 +37,19 @@ public class CheckTokenFilter implements PluginFilter {
 
 所以如果是容器部署就需要把apisix-java-plugin-runner 与 APISIX 生成在一个docker image里。
 
-先打包apisix-java-plugin-runner
+先打包`apisix-java-plugin-runner`
 
 ```bash
 mvn package
 ```
 
-打包完成，你会在dist目录看见打包文件
+打包完成，你会在`dist`目录看见打包文件
 
 ```
 apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz
 ```
 
-在dist 目录添加dockerfile文件
+在`dist`目录添加`dockerfile`文件
 
 ```dockerfile
 FROM apache/apisix:2.10.0-alpine
@@ -60,7 +60,7 @@ ADD aapache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
 
 ```
 
-然后运行docker build构建镜像
+然后运行`docker build`构建镜像
 
 ```shell
  cd dist
