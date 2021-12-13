@@ -37,8 +37,7 @@ public class CheckTokenFilter implements PluginFilter {
 
 apisix-java-plugin-runner 与 APISIX 用 `Unix Domain Socket` 进行进程间通讯，需要部署在同一个宿主环境。apisix-java-plugin-runner 的生命周期由 APISIX 管理，如果是容器化部署，apisix-java-plugin-runner 与 APISIX 必须部署在同一个容器中。
 
-所以如果是容器部署就需要把apisix-java-plugin-runner 与 APISIX 生成在一个docker image里。
-下面是如何构建包含 apisix-java-plugin-runner 与 APISIX 的容器镜像的步骤：
+下面展示如何构建包含 apisix-java-plugin-runner 与 APISIX 的容器镜像。
 
 先构建 `apisix-java-plugin-runner` 的可执行 jar
 
