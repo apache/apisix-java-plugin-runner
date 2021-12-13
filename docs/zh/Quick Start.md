@@ -4,13 +4,13 @@
 
 * JDK 8
 * APISIX 2.10.0
-* Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project.
+* Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project。
 
 ### 开发扩展插件过滤器
 
 在 [runner-plugin](https://github.com/apache/apisix-java-plugin-runner/tree/main/runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter) 模块的 `org.apache.apisix.plugin.runner.filter` 包下编写过滤器处理请求，过滤器要实现 `PluginFilter` 接口，参考 `apisix-runner-sample` 模块下的样例：
 * 请求重写[RewriteRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.java)
-* 请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)。
+* 请求拦截[StopRequestDemoFilter](https://github.com/apache/apisix-java-plugin-runner/blob/main/sample/src/main/java/org/apache/apisix/plugin/runner/filter/StopRequestDemoFilter.java)
 
 
 ```java
@@ -59,7 +59,7 @@ FROM apache/apisix:2.10.0-alpine
 
 RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories && apk add --no-cache openjdk8-jre
 
-ADD aapache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
+ADD apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
 
 ```
 
@@ -74,11 +74,10 @@ ADD aapache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
 
 ```yaml
 ext-plugin:
-  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/usr/local/apisix-runner-bin/apisix-java-plugin-runner.jar']
+  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/path/to/apisix-runner-bin/apisix-java-plugin-runner.jar']
 ```
 
-构建完成的 `apache/apisix:2.10.0-alpine-with-java-plugin` 镜像内即包含 APISIX 与 apisix-java-plugun-runner，
-用新构建的镜像 `apache/apisix:2.10.0-alpine-with-java-plugin` 直接部署就可以了。
+构建完成的 `apache/apisix:2.10.0-alpine-with-java-plugin` 镜像内即包含 APISIX 与 apisix-java-plugun-runner。
 
 ### 使用插件
 
