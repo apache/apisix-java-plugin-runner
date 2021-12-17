@@ -1,39 +1,25 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package org.apache.apisix.plugin.runner.codec.impl;
+package org.apache.apisix.plugin.runner.handler;
 
 import io.github.api7.A6.Err.Code;
-import org.apache.apisix.plugin.runner.A6ConfigRequest;
-import org.apache.apisix.plugin.runner.A6ErrRequest;
-import org.apache.apisix.plugin.runner.A6Request;
-import org.apache.apisix.plugin.runner.HttpRequest;
-import org.apache.apisix.plugin.runner.codec.PluginRunnerDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.apisix.plugin.runner.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
-public class FlatBuffersDecoder implements PluginRunnerDecoder {
-
-    private final Logger logger = LoggerFactory.getLogger(FlatBuffersDecoder.class);
-
+public class PayloadDecoder extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(PayloadDecoder.class);
     @Override
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) {
+        ByteBuffer buffer = byteBuf.nioBuffer();
+        A6Request request = decode(buffer);
+        ctx.fireChannelRead(request);
+    }
+
     public A6Request decode(ByteBuffer buffer) {
         byte type;
         try {
@@ -64,6 +50,16 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
                     return new A6ErrRequest(Code.BAD_REQUEST);
                 }
                 return httpRequest;
+
+            case 3:
+                ExtraInfoResponse extraInfoResponse;
+                try {
+                    body = getBody(buffer);
+                    extraInfoResponse = ExtraInfoResponse.from(body);
+                } catch (BufferUnderflowException | IndexOutOfBoundsException e) {
+                    return new A6ErrRequest(Code.BAD_REQUEST);
+                }
+                return extraInfoResponse;
             default:
                 break;
         }
@@ -89,7 +85,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
         return buffer;
     }
 
-    int bytes2Int(byte[] b, int start, int len) {
+    private int bytes2Int(byte[] b, int start, int len) {
         int sum = 0;
         int end = start + len;
         for (int i = start; i < end; i++) {

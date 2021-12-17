@@ -1,37 +1,27 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.apache.apisix.plugin.runner.server;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerDomainSocketChannel;
 import io.netty.channel.unix.DomainSocketAddress;
+import io.netty.channel.unix.DomainSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.RequiredArgsConstructor;
-import org.apache.apisix.plugin.runner.codec.DelayedDecoder;
-import org.apache.apisix.plugin.runner.handler.IOHandler;
+import org.apache.apisix.plugin.runner.handler.BinaryProtocolDecoder;
+import org.apache.apisix.plugin.runner.handler.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import reactor.netty.DisposableServer;
-import reactor.netty.tcp.TcpServer;
 
-import java.time.Duration;
-import java.util.Objects;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 @RequiredArgsConstructor
@@ -39,50 +29,59 @@ public class ApplicationRunner implements CommandLineRunner {
 
     private final Logger logger = LoggerFactory.getLogger(ApplicationRunner.class);
 
-    private final TcpServer tcpServer;
-
     @Value("${socket.file}")
     private String socketFile;
 
-    private final IOHandler handler;
+    private PrepareConfHandler prepareConfHandler;
 
-    private DisposableServer server;
+    private HTTPReqCallHandler hTTPReqCallHandler;
+
+    @Autowired
+    public ApplicationRunner(PrepareConfHandler prepareConfHandler, HTTPReqCallHandler hTTPReqCallHandler) {
+        this.prepareConfHandler = prepareConfHandler;
+        this.hTTPReqCallHandler = hTTPReqCallHandler;
+    }
+
+    public void start(String path) throws Exception {
+        EventLoopGroup group = new EpollEventLoopGroup();
+        try {
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            initServerBootstrap(group, bootstrap);
+            ChannelFuture future = bootstrap.bind(new DomainSocketAddress(path)).sync();
+            Runtime.getRuntime().exec("chmod 777 " + socketFile);
+            logger.warn("java runner is listening on the socket file: {}", socketFile);
+
+            future.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully().sync();
+        }
+    }
+
+    private ServerBootstrap initServerBootstrap(EventLoopGroup group, ServerBootstrap bootstrap) {
+        return bootstrap.group(group)
+                .channel(EpollServerDomainSocketChannel.class)
+                .childHandler(new ChannelInitializer<DomainSocketChannel>() {
+                    @Override
+                    protected void initChannel(DomainSocketChannel channel) {
+                        channel.pipeline().addFirst(new LoggingHandler());
+                        channel.pipeline().addFirst("logger", new LoggingHandler())
+                                .addAfter("logger","payloadEncoder",new PayloadEncoder())
+                                .addAfter("payloadEncoder", "delayedDecoder", new BinaryProtocolDecoder())
+                                .addLast("payloadDecoder", new PayloadDecoder())
+                                .addAfter("payloadDecoder", "prepareConfHandler", prepareConfHandler)
+                                .addAfter("prepareConfHandler", "hTTPReqCallHandler", hTTPReqCallHandler);
+
+                    }
+                });
+    }
 
     @Override
     public void run(String... args) throws Exception {
-        TcpServer tcpServer = this.tcpServer;
-
-        if (Objects.isNull(tcpServer)) {
-            tcpServer = TcpServer.create();
-        }
-
         if (socketFile.startsWith("unix:")) {
             socketFile = socketFile.substring("unix:".length());
         }
-
-        tcpServer = tcpServer.bindAddress(() -> new DomainSocketAddress(socketFile));
-        tcpServer = tcpServer.doOnChannelInit((observer, channel, addr) -> {
-//            if (Objects.nonNull(channelHandlers)) {
-//                channel.pipeline().addLast(channelHandlers);
-//            }
-            channel.pipeline().addFirst("logger", new LoggingHandler())
-                    .addAfter("logger", "delayedDecoder", new DelayedDecoder());
-        });
-
-        if (Objects.nonNull(handler)) {
-            tcpServer = tcpServer.handle(handler::handle);
-        }
-        this.server = tcpServer.bindNow();
-        logger.warn("java runner is listening on the socket file: {}", socketFile);
-
-        // delete socket file when tcp server shutdown
-        Runtime.getRuntime()
-                .addShutdownHook(new Thread(() -> this.server.disposeNow(Duration.ofSeconds(45))));
-
-        Thread awaitThread = new Thread(() -> this.server.onDispose().block());
-        awaitThread.setDaemon(false);
-        awaitThread.setName("uds-server");
-        awaitThread.start();
-        Runtime.getRuntime().exec("chmod 777 " + socketFile);
+        Path socketPath = Paths.get(socketFile);
+        Files.deleteIfExists(socketPath);
+        start(socketPath.toString());
     }
 }

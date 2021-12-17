@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec;
+package org.apache.apisix.plugin.runner.handler;
 
-import org.apache.apisix.plugin.runner.A6Request;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
-import java.nio.ByteBuffer;
+public class BinaryProtocolDecoder extends LengthFieldBasedFrameDecoder {
 
-@FunctionalInterface
-public interface PluginRunnerDecoder {
-
-    A6Request decode(ByteBuffer buffer);
+    public BinaryProtocolDecoder() {
+        super(16777215, 1, 3, 0, 0);
+    }
 }

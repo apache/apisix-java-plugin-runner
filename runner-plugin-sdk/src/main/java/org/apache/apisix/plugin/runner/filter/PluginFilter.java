@@ -19,12 +19,36 @@ package org.apache.apisix.plugin.runner.filter;
 
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
-import reactor.core.publisher.Mono;
+import java.util.Collection;
+import java.util.List;
 
 public interface PluginFilter {
 
+    /**
+     * @return the name of plugin filter
+     */
     String name();
 
-    Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain);
+    /**
+     * do the plugin filter chain
+     *
+     * @param request the request form APISIX
+     * @param response the response for APISIX
+     * @param chain the chain of filters
+     */
+    void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain);
 
+    /**
+     * declare in advance the nginx variables that you want to use in the plugin
+     * @return the nginx variables as list
+     */
+    List<String> requiredVars();
+
+    /**
+     * need request body in plugins or not
+     *
+     * @return true if need request body
+     */
+    Boolean requiredBody();
 }
+
