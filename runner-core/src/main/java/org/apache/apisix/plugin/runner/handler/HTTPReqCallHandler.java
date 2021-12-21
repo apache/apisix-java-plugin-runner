@@ -63,10 +63,9 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             return;
         }
 
-
         if (varsKey.equals(extraInfoReqBodyKey)) {
             currReq.setBody(result);
-        }else {
+        } else {
             nginxVars.put(varsKey, result);
         }
         if (queue.isEmpty()) {
@@ -91,6 +90,7 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
     private void handleHttpReqCall(ChannelHandlerContext ctx, HttpRequest request) {
         cleanCtx();
 
+        // save HttpCallRequest
         currReq = request;
         currResp = new HttpResponse(currReq.getRequestId());
 
@@ -104,7 +104,11 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
         PluginFilterChain chain = conf.getChain();
 
-        //TODO if the filter chain is empty, then return the response directly
+        // if the filter chain is empty, then return the response directly
+        if (Objects.isNull(chain) || 0 == chain.getFilters().size()) {
+            ctx.writeAndFlush(currResp);
+            return;
+        }
 
         // fetch the nginx variables
         Set<String> varKeys = new HashSet<>();
@@ -121,33 +125,29 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         }
 
-        // TODO handle no required vars or body
-        for (String varKey : varKeys) {
-            boolean offer = queue.offer(varKey);
-            if (!offer) {
-                logger.error("queue is full");
-                errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
-                return;
+        if (varKeys.size() > 0) {
+            for (String varKey : varKeys) {
+                boolean offer = queue.offer(varKey);
+                if (!offer) {
+                    logger.error("queue is full");
+                    errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
+                    return;
+                }
+                ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(varKey, null);
+                ctx.writeAndFlush(extraInfoRequest);
             }
-            ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(varKey, null);
-            ctx.writeAndFlush(extraInfoRequest);
         }
 
-        //fetch request body
-        fetchBody(ctx, requiredBody);
-    }
-
-    private void errorHandle(ChannelHandlerContext ctx, int code) {
-        A6ErrResponse errResponse = new A6ErrResponse(code);
-        ctx.writeAndFlush(errResponse);
-    }
-
-    private void fetchBody(ChannelHandlerContext ctx, boolean requiredBody) {
         if (requiredBody) {
             queue.offer(extraInfoReqBodyKey);
             ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true);
             ctx.writeAndFlush(extraInfoRequest);
         }
+    }
+
+    private void errorHandle(ChannelHandlerContext ctx, int code) {
+        A6ErrResponse errResponse = new A6ErrResponse(code);
+        ctx.writeAndFlush(errResponse);
     }
 
     private void cleanCtx() {
