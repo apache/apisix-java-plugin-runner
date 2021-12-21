@@ -3,7 +3,6 @@ package org.apache.apisix.plugin.runner.handler;
 import com.google.common.cache.Cache;
 import io.github.api7.A6.PrepareConf.Req;
 import io.github.api7.A6.TextEntry;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @RequiredArgsConstructor
-@ChannelHandler.Sharable
 public class PrepareConfHandler extends SimpleChannelInboundHandler<A6Request> {
 
     private final Logger logger = LoggerFactory.getLogger(PrepareConfHandler.class);

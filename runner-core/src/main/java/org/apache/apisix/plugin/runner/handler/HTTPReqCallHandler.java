@@ -2,7 +2,6 @@ package org.apache.apisix.plugin.runner.handler;
 
 import com.google.common.cache.Cache;
 import io.github.api7.A6.Err.Code;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 @RequiredArgsConstructor
-@ChannelHandler.Sharable
 public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
     private final Logger logger = LoggerFactory.getLogger(HTTPReqCallHandler.class);
@@ -51,15 +49,19 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         } catch (Exception e) {
             logger.error("handle request error: ", e);
-            A6ErrResponse errResponse = new A6ErrResponse(Code.SERVICE_UNAVAILABLE);
-            ctx.writeAndFlush(errResponse);
+            errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
         }
 
     }
 
     private void handleExtraInfo(ChannelHandlerContext ctx, ExtraInfoResponse request) {
         String result = request.getResult();
-        String varsKey = queue.remove();
+        String varsKey = queue.poll();
+        if (Objects.isNull(varsKey)) {
+            logger.error("queue is empty");
+            errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
+            return;
+        }
 
 
         if (varsKey.equals(extraInfoReqBodyKey)) {
@@ -71,8 +73,7 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             A6Conf conf = cache.getIfPresent(confToken);
             if (Objects.isNull(conf)) {
                 logger.warn("cannot find conf token: {}", confToken);
-                A6ErrResponse errResponse = new A6ErrResponse(Code.CONF_TOKEN_NOT_FOUND);
-                ctx.writeAndFlush(errResponse);
+                errorHandle(ctx, Code.CONF_TOKEN_NOT_FOUND);
                 return;
             }
 
@@ -97,8 +98,7 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
         A6Conf conf = cache.getIfPresent(confToken);
         if (Objects.isNull(conf)) {
             logger.warn("cannot find conf token: {}", confToken);
-            A6ErrResponse errResponse = new A6ErrResponse(Code.CONF_TOKEN_NOT_FOUND);
-            ctx.writeAndFlush(errResponse);
+            errorHandle(ctx, Code.CONF_TOKEN_NOT_FOUND);
             return;
         }
 
@@ -121,8 +121,14 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         }
 
+        // TODO handle no required vars or body
         for (String varKey : varKeys) {
-            queue.add(varKey);
+            boolean offer = queue.offer(varKey);
+            if (!offer) {
+                logger.error("queue is full");
+                errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
+                return;
+            }
             ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(varKey, null);
             ctx.writeAndFlush(extraInfoRequest);
         }
@@ -131,9 +137,14 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
         fetchBody(ctx, requiredBody);
     }
 
+    private void errorHandle(ChannelHandlerContext ctx, int code) {
+        A6ErrResponse errResponse = new A6ErrResponse(code);
+        ctx.writeAndFlush(errResponse);
+    }
+
     private void fetchBody(ChannelHandlerContext ctx, boolean requiredBody) {
         if (requiredBody) {
-            queue.add(extraInfoReqBodyKey);
+            queue.offer(extraInfoReqBodyKey);
             ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true);
             ctx.writeAndFlush(extraInfoRequest);
         }
