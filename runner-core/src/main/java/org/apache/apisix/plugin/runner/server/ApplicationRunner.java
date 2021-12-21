@@ -13,8 +13,11 @@ import io.netty.handler.logging.LoggingHandler;
 import lombok.RequiredArgsConstructor;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
+import org.apache.apisix.plugin.runner.handler.PrepareConfHandler;
+import org.apache.apisix.plugin.runner.handler.HTTPReqCallHandler;
+import org.apache.apisix.plugin.runner.handler.PayloadDecoder;
 import org.apache.apisix.plugin.runner.handler.BinaryProtocolDecoder;
-import org.apache.apisix.plugin.runner.handler.*;
+import org.apache.apisix.plugin.runner.handler.PayloadEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -85,7 +88,7 @@ public class ApplicationRunner implements CommandLineRunner {
                     @Override
                     protected void initChannel(DomainSocketChannel channel) {
                         channel.pipeline().addFirst("logger", new LoggingHandler())
-                                .addAfter("logger","payloadEncoder",new PayloadEncoder())
+                                .addAfter("logger", "payloadEncoder", new PayloadEncoder())
                                 .addAfter("payloadEncoder", "delayedDecoder", new BinaryProtocolDecoder())
                                 .addLast("payloadDecoder", new PayloadDecoder())
                                 .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, beanProvider))

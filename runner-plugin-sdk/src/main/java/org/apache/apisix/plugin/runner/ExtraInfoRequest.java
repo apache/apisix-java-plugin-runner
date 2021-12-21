@@ -7,7 +7,7 @@ import io.github.api7.A6.PrepareConf.Req;
 
 import java.nio.ByteBuffer;
 
-public class ExtraInfoRequest implements A6Response{
+public class ExtraInfoRequest implements A6Response {
 
     private final String var;
 
@@ -17,7 +17,6 @@ public class ExtraInfoRequest implements A6Response{
         this.var = var;
         this.reqBody = reqBody;
     }
-
 
     @Override
     public ByteBuffer encode() {
@@ -31,7 +30,7 @@ public class ExtraInfoRequest implements A6Response{
             buildExtraInfo(endVar, Info.Var, builder);
         }
 
-        if(this.reqBody != null && this.reqBody) {
+        if (this.reqBody != null && this.reqBody) {
             io.github.api7.A6.ExtraInfo.ReqBody.startReqBody(builder);
             int reqBodyReq = ReqBody.endReqBody(builder);
             buildExtraInfo(reqBodyReq, Info.ReqBody, builder);

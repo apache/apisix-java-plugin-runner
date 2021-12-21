@@ -19,7 +19,6 @@ package org.apache.apisix.plugin.runner.filter;
 
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
-import java.util.Collection;
 import java.util.List;
 
 public interface PluginFilter {
@@ -31,8 +30,7 @@ public interface PluginFilter {
 
     /**
      * do the plugin filter chain
-     *
-     * @param request the request form APISIX
+     *  @param request the request form APISIX
      * @param response the response for APISIX
      * @param chain the chain of filters
      */

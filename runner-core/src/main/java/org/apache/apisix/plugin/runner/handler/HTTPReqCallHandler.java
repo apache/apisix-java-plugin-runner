@@ -5,21 +5,34 @@ import io.github.api7.A6.Err.Code;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.RequiredArgsConstructor;
-import org.apache.apisix.plugin.runner.*;
+import org.apache.apisix.plugin.runner.HttpResponse;
+import org.apache.apisix.plugin.runner.A6Conf;
+import org.apache.apisix.plugin.runner.A6Request;
+import org.apache.apisix.plugin.runner.HttpRequest;
+import org.apache.apisix.plugin.runner.ExtraInfoResponse;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
+import org.apache.apisix.plugin.runner.A6ErrResponse;
+import org.apache.apisix.plugin.runner.ExtraInfoRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
     private final Logger logger = LoggerFactory.getLogger(HTTPReqCallHandler.class);
 
-    private final static String extraInfoReqBodyKey = "request_body";
+    private final static String EXTRA_INFO_REQ_BODY_KEY = "request_body";
 
     private final Cache<Long, A6Conf> cache;
 
@@ -63,29 +76,32 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             return;
         }
 
-        if (varsKey.equals(extraInfoReqBodyKey)) {
+        if (varsKey.equals(EXTRA_INFO_REQ_BODY_KEY)) {
             currReq.setBody(result);
         } else {
             nginxVars.put(varsKey, result);
         }
         if (queue.isEmpty()) {
-            A6Conf conf = cache.getIfPresent(confToken);
-            if (Objects.isNull(conf)) {
-                logger.warn("cannot find conf token: {}", confToken);
-                errorHandle(ctx, Code.CONF_TOKEN_NOT_FOUND);
-                return;
-            }
-
-            currReq.initCtx(currResp, conf.getConfig());
-            currReq.setVars(nginxVars);
-
-            PluginFilterChain chain = conf.getChain();
-            chain.filter(currReq, currResp);
-
-            ctx.writeAndFlush(currResp);
+            doFilter(ctx);
         }
     }
 
+    private void doFilter(ChannelHandlerContext ctx) {
+        A6Conf conf = cache.getIfPresent(confToken);
+        if (Objects.isNull(conf)) {
+            logger.warn("cannot find conf token: {}", confToken);
+            errorHandle(ctx, Code.CONF_TOKEN_NOT_FOUND);
+            return;
+        }
+
+        currReq.initCtx(currResp, conf.getConfig());
+        currReq.setVars(nginxVars);
+
+        PluginFilterChain chain = conf.getChain();
+        chain.filter(currReq, currResp);
+
+        ctx.writeAndFlush(currResp);
+    }
 
     private void handleHttpReqCall(ChannelHandlerContext ctx, HttpRequest request) {
         cleanCtx();
@@ -113,14 +129,16 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
         // fetch the nginx variables
         Set<String> varKeys = new HashSet<>();
         boolean requiredBody = false;
+        boolean requiredVars = false;
 
         for (PluginFilter filter : chain.getFilters()) {
             Collection<String> vars = filter.requiredVars();
             if (!CollectionUtils.isEmpty(vars)) {
                 varKeys.addAll(vars);
+                requiredVars = true;
             }
 
-            if (filter.requiredBody()) {
+            if (filter.requiredBody() != null && filter.requiredBody()) {
                 requiredBody = true;
             }
         }
@@ -138,10 +156,16 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         }
 
+        // fetch the request body
         if (requiredBody) {
-            queue.offer(extraInfoReqBodyKey);
+            queue.offer(EXTRA_INFO_REQ_BODY_KEY);
             ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true);
             ctx.writeAndFlush(extraInfoRequest);
+        }
+
+        // no need to fetch the nginx variables or request body, just do filter
+        if (!requiredBody && !requiredVars) {
+            doFilter(ctx);
         }
     }
 

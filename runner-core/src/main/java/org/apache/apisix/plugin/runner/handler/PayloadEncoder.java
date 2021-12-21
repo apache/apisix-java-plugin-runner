@@ -20,7 +20,6 @@ public class PayloadEncoder extends ChannelOutboundHandlerAdapter {
         }
     }
 
-
     public ByteBuffer encode(A6Response response) {
         ByteBuffer buffer = response.encode();
         return setBody(buffer, response.getType());
