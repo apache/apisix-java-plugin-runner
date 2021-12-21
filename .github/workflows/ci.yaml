@@ -32,9 +32,9 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: '11'
       - name: Check License Header
         uses: apache/skywalking-eyes@main
         env:
@@ -49,8 +49,8 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: '11'
       - name: 'Install & Test'
         run: ./mvnw clean install
