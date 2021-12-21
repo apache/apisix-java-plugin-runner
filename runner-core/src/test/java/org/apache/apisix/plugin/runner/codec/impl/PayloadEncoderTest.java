@@ -35,7 +35,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.nio.ByteBuffer;
 
 @DisplayName("test encode data")
-class FlatBuffersEncoderTest {
+class PayloadEncoderTest {
     PayloadEncoder payloadEncoder = new PayloadEncoder();
 
     @Test
