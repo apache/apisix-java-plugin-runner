@@ -86,16 +86,30 @@ public class RewriteRequestDemoFilter implements PluginFilter {
          */
         request.setArg((String) conf.get("conf_arg_name"), (String) conf.get("conf_arg_value"));
 
+        /*
+         * You can fetch the Nginx variables, and the request body
+         */
+        String remote_addr = request.getVars("remote_addr");
+        String server_port = request.getVars("server_port");
+        String body = request.getBody();
+
         chain.filter(request, response);
     }
 
+    /**
+     * If you need to fetch some Nginx variables in the current plugin, you will need to declare them in this function.
+     * @return a list of Nginx variables that need to be called in this plugin
+     */
     @Override
     public List<String> requiredVars() {
-        return null;
+        return List.of("remote_addr", "server_port");
     }
 
+    /**
+     * If you need to fetch request body in the current plugin, you will need to return true in this function.
+     */
     @Override
     public Boolean requiredBody() {
-        return null;
+        return true;
     }
 }
