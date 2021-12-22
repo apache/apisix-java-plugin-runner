@@ -89,8 +89,8 @@ public class RewriteRequestDemoFilter implements PluginFilter {
         /*
          * You can fetch the Nginx variables, and the request body
          */
-        String remote_addr = request.getVars("remote_addr");
-        String server_port = request.getVars("server_port");
+        String remoteAddr = request.getVars("remote_addr");
+        String serverPort = request.getVars("server_port");
         String body = request.getBody();
 
         chain.filter(request, response);
