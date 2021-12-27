@@ -28,6 +28,7 @@ import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.A6Response;
+import org.apache.apisix.plugin.runner.constants.Constants;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class PrepareConfHandler extends SimpleChannelInboundHandler<A6Request> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, A6Request request) {
-        if (request.getType() != 1) {
+        if (request.getType() != Constants.RPC_PREPARE_CONF) {
             ctx.fireChannelRead(request);
             return;
         }

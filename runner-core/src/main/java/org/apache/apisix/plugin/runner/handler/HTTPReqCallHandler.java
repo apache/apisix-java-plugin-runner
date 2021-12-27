@@ -17,24 +17,6 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
-import com.google.common.cache.Cache;
-import io.github.api7.A6.Err.Code;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import lombok.RequiredArgsConstructor;
-import org.apache.apisix.plugin.runner.HttpResponse;
-import org.apache.apisix.plugin.runner.A6Conf;
-import org.apache.apisix.plugin.runner.A6Request;
-import org.apache.apisix.plugin.runner.HttpRequest;
-import org.apache.apisix.plugin.runner.ExtraInfoResponse;
-import org.apache.apisix.plugin.runner.filter.PluginFilter;
-import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
-import org.apache.apisix.plugin.runner.A6ErrResponse;
-import org.apache.apisix.plugin.runner.ExtraInfoRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +25,26 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+
+import com.google.common.cache.Cache;
+import io.github.api7.A6.Err.Code;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+import lombok.RequiredArgsConstructor;
+
+import org.apache.apisix.plugin.runner.A6Conf;
+import org.apache.apisix.plugin.runner.A6ErrResponse;
+import org.apache.apisix.plugin.runner.A6Request;
+import org.apache.apisix.plugin.runner.ExtraInfoRequest;
+import org.apache.apisix.plugin.runner.ExtraInfoResponse;
+import org.apache.apisix.plugin.runner.HttpRequest;
+import org.apache.apisix.plugin.runner.HttpResponse;
+import org.apache.apisix.plugin.runner.constants.Constants;
+import org.apache.apisix.plugin.runner.filter.PluginFilter;
+import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 
 @RequiredArgsConstructor
 public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
@@ -70,18 +72,17 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, A6Request request) {
         try {
-            if (request.getType() == 3) {
+            if (request.getType() == Constants.RPC_EXTRA_INFO) {
                 handleExtraInfo(ctx, (ExtraInfoResponse) request);
             }
 
-            if (request.getType() == 2) {
+            if (request.getType() == Constants.RPC_HTTP_REQ_CALL) {
                 handleHttpReqCall(ctx, (HttpRequest) request);
             }
         } catch (Exception e) {
             logger.error("handle request error: ", e);
             errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
         }
-
     }
 
     private void handleExtraInfo(ChannelHandlerContext ctx, ExtraInfoResponse request) {
@@ -93,7 +94,7 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
             return;
         }
 
-        if (varsKey.equals(EXTRA_INFO_REQ_BODY_KEY)) {
+        if (EXTRA_INFO_REQ_BODY_KEY.equals(varsKey)) {
             currReq.setBody(result);
         } else {
             nginxVars.put(varsKey, result);
