@@ -22,6 +22,7 @@ import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +103,10 @@ public class RewriteRequestDemoFilter implements PluginFilter {
      */
     @Override
     public List<String> requiredVars() {
-        return List.of("remote_addr", "server_port");
+        List<String> vars = new ArrayList<>();
+        vars.add("remote_addr");
+        vars.add("server_port");
+        return vars;
     }
 
     /**
