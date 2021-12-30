@@ -15,24 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec;
+package org.apache.apisix.plugin.runner.constants;
 
-import org.apache.apisix.plugin.runner.codec.impl.FlatBuffersDecoder;
-import org.apache.apisix.plugin.runner.codec.impl.FlatBuffersEncoder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+public class Constants {
 
-@Configuration
-public class PluginRunnerConfiguration {
+    public static final byte RPC_ERROR = 0;
 
-    @Bean
-    public PluginRunnerDecoder createDecoder() {
-        return new FlatBuffersDecoder();
-    }
+    public static final byte RPC_PREPARE_CONF = 1;
 
-    @Bean
-    public PluginRunnerEncoder createEncoder() {
-        return new FlatBuffersEncoder();
-    }
+    public static final byte RPC_HTTP_REQ_CALL = 2;
 
+    public static final byte RPC_EXTRA_INFO = 3;
 }

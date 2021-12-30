@@ -28,8 +28,8 @@ This document explains how to get started to develop the apisix-java-plugin-runn
 Prerequisites
 -------------
 
-* JDK 8
-* APISIX 2.7.0
+* JDK 11
+* APISIX 2.10.x
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project.
 * Refer to [Debug](how-it-works.md#debug)  to build the debug environment.
 

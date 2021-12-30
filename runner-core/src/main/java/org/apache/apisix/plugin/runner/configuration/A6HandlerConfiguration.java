@@ -15,14 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec;
+package org.apache.apisix.plugin.runner.configuration;
 
-import org.apache.apisix.plugin.runner.A6Request;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.apache.apisix.plugin.runner.A6Conf;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 
-@FunctionalInterface
-public interface PluginRunnerDecoder {
-
-    A6Request decode(ByteBuffer buffer);
+@Configuration
+public class A6HandlerConfiguration {
+    @Bean
+    public Cache<Long, A6Conf> configurationCache(@Value("${cache.config.expired:3610}") long expired,
+                                                  @Value("${cache.config.capacity:1000}") int capacity) {
+        return CacheBuilder.newBuilder().expireAfterWrite(expired + 10, TimeUnit.SECONDS).maximumSize(capacity).build();
+    }
 }

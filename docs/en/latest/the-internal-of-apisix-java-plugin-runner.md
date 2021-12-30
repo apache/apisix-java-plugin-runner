@@ -33,7 +33,7 @@ This article explains the internal design of apisix-java-plugin-runner.
 
 ## Overview
 
-The apisix-java-plugin-runner designed as a TCP server built using [reactor-netty](https://github.com/reactor/reactor-netty),
+The apisix-java-plugin-runner designed as a TCP server built using [netty](https://github.com/netty/netty),
 it provides a `PluginFilter` interface for users to implement.
 
 Users only need to focus on their business logic, not on the details of how the apisix java plugin runner communicates with APISIX.

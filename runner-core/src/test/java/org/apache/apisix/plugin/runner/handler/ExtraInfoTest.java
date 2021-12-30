@@ -20,15 +20,14 @@ package org.apache.apisix.plugin.runner.handler;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.flatbuffers.FlatBufferBuilder;
-import com.google.gson.Gson;
-import io.github.api7.A6.Err.Code;
-import io.github.api7.A6.HTTPReqCall.Action;
+import io.github.api7.A6.ExtraInfo.Resp;
 import io.github.api7.A6.TextEntry;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
-import org.apache.apisix.plugin.runner.A6ErrResponse;
+import org.apache.apisix.plugin.runner.ExtraInfoRequest;
+import org.apache.apisix.plugin.runner.ExtraInfoResponse;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
@@ -38,19 +37,23 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-@DisplayName("test filter handle")
-class A6HttpCallHandlerTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DisplayName("test extra info")
+class ExtraInfoTest {
     private PrintStream console = null;
     private ByteArrayOutputStream bytes = null;
+
+    private static final String[] EXTRAINFO_VARS = new String[]{"remote_addr", "server_port", "content_type"};
 
     HTTPReqCallHandler httpReqCallHandler;
 
@@ -81,46 +84,21 @@ class A6HttpCallHandlerTest {
             @Override
             @SuppressWarnings("unchecked")
             public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                System.out.println("do filter: FooFilter, order: " + chain.getIndex());
-                System.out.println("do filter: FooFilter, config: " + request.getConfig(this));
-                Gson gson = new Gson();
-                Map<String, Object> conf = new HashMap<>();
-                conf = gson.fromJson(request.getConfig(this), conf.getClass());
-                System.out.println("do filter: FooFilter, conf_key1 value: " + conf.get("conf_key1"));
-                System.out.println("do filter: FooFilter, conf_key2 value: " + conf.get("conf_key2"));
-                if (!Objects.isNull(request.getPath())) {
-                    System.out.println("do filter: path: " + request.getPath());
-                }
-
-                if (!Objects.isNull(request.getArgs())) {
-                    for (Map.Entry<String, String> arg : request.getArgs().entrySet()) {
-                        System.out.println("do filter: arg key: " + arg.getKey());
-                        System.out.println("do filter: arg value: " + arg.getValue());
-                    }
-                }
-
-                if (!Objects.isNull(request.getHeader())) {
-                    for (Map.Entry<String, String> header : request.getHeader().entrySet()) {
-                        System.out.println("do filter: header key: " + header.getKey());
-                        System.out.println("do filter: header value: " + header.getValue());
-                    }
-                }
-
-                if (!Objects.isNull(request.getMethod())) {
-                    System.out.println("do filter: method: " + request.getMethod());
-                }
-
+                String remote_addr = request.getVars("remote_addr");
+                String server_port = request.getVars("server_port");
+                System.out.println("remote_addr: " + remote_addr);
+                System.out.println("server_port: " + server_port);
                 chain.filter(request, response);
             }
 
             @Override
             public List<String> requiredVars() {
-                return null;
+                return List.of("remote_addr", "server_port");
             }
 
             @Override
             public Boolean requiredBody() {
-                return null;
+                return false;
             }
         });
 
@@ -132,21 +110,21 @@ class A6HttpCallHandlerTest {
 
             @Override
             public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                System.out.println("do filter: CatFilter, order: " + chain.getIndex());
-                System.out.println("do filter: CatFilter, config: " + request.getConfig(this));
-
-                response.setStatusCode(401);
+                String body = request.getBody();
+                String content_type = request.getVars("content_type");
+                System.out.println("content_type: " + content_type);
+                System.out.println("body: " + body);
                 chain.filter(request, response);
             }
 
             @Override
             public List<String> requiredVars() {
-                return null;
+                return List.of("content_type");
             }
 
             @Override
             public Boolean requiredBody() {
-                return null;
+                return true;
             }
         });
         cache = CacheBuilder.newBuilder().expireAfterWrite(3600, TimeUnit.SECONDS).maximumSize(1000).build();
@@ -185,26 +163,8 @@ class A6HttpCallHandlerTest {
     }
 
     @Test
-    @DisplayName("test cannot find conf token")
-    void testCannotFindConfToken() {
-        FlatBufferBuilder builder = new FlatBufferBuilder();
-
-        io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
-        io.github.api7.A6.HTTPReqCall.Req.addConfToken(builder, 9999L);
-        builder.finish(io.github.api7.A6.HTTPReqCall.Req.endReq(builder));
-
-        io.github.api7.A6.HTTPReqCall.Req req = io.github.api7.A6.HTTPReqCall.Req.getRootAsReq(builder.dataBuffer());
-        HttpRequest request = new HttpRequest(req);
-        channel.writeInbound(request);
-        channel.finish();
-        A6ErrResponse response = channel.readOutbound();
-        io.github.api7.A6.Err.Resp err = io.github.api7.A6.Err.Resp.getRootAsResp(response.encode());
-        Assertions.assertEquals(err.code(), Code.CONF_TOKEN_NOT_FOUND);
-    }
-
-    @Test
-    @DisplayName("test do filter and get config")
-    void testDoFilter1() {
+    @DisplayName("test fetch nginx vars of extra info")
+    void testFetchVars() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
         io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
@@ -215,64 +175,17 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         channel.writeInbound(request);
         channel.finish();
-
-        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, order: 1"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, order: 1"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, config: {\"conf_key1\":\"conf_value1\",\"conf_key2\":2}"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, conf_key1 value: conf_value1"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, conf_key2 value: 2.0"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, order: 2"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, config: Dog"));
+        ExtraInfoRequest eir1 = channel.readOutbound();
+        ExtraInfoRequest eir2 = channel.readOutbound();
+        ExtraInfoRequest eir3 = channel.readOutbound();
+        assertThat(EXTRAINFO_VARS).contains((String) ReflectionTestUtils.getField(eir1, "var"));
+        assertThat(EXTRAINFO_VARS).contains((String) ReflectionTestUtils.getField(eir2, "var"));
+        assertThat(EXTRAINFO_VARS).contains((String) ReflectionTestUtils.getField(eir3, "var"));
     }
 
     @Test
-    @DisplayName("test get request params")
-    void testDoFilter2() {
-        FlatBufferBuilder builder = new FlatBufferBuilder();
-        int argKey = builder.createString("argKey");
-        int argValue = builder.createString("argValue");
-        int arg = TextEntry.createTextEntry(builder, argKey, argValue);
-        int argsVector = io.github.api7.A6.HTTPReqCall.Req.createArgsVector(builder, new int[]{arg});
-
-        int headerKey = builder.createString("headerKey");
-        int headerValue = builder.createString("headerValue");
-
-        int header = TextEntry.createTextEntry(builder, headerKey, headerValue);
-        int headerVector =
-                io.github.api7.A6.HTTPReqCall.Req.createHeadersVector(builder, new int[]{header});
-
-        int path = builder.createString("/path");
-
-        io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
-        io.github.api7.A6.HTTPReqCall.Req.addId(builder, 8888L);
-        io.github.api7.A6.HTTPReqCall.Req.addConfToken(builder, confToken);
-        io.github.api7.A6.HTTPReqCall.Req.addMethod(builder, io.github.api7.A6.Method.GET);
-        io.github.api7.A6.HTTPReqCall.Req.addHeaders(builder, headerVector);
-        io.github.api7.A6.HTTPReqCall.Req.addPath(builder, path);
-        io.github.api7.A6.HTTPReqCall.Req.addArgs(builder, argsVector);
-        builder.finish(io.github.api7.A6.HTTPReqCall.Req.endReq(builder));
-        io.github.api7.A6.HTTPReqCall.Req req = io.github.api7.A6.HTTPReqCall.Req.getRootAsReq(builder.dataBuffer());
-        HttpRequest request = new HttpRequest(req);
-        channel.writeInbound(request);
-        channel.finish();
-
-        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, order: 1"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: FooFilter, config: {\"conf_key1\":\"conf_value1\",\"conf_key2\":2}"));
-
-        Assertions.assertTrue(bytes.toString().contains("do filter: path: /path"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: arg key: argKey"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: arg value: argValue"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: header key: headerKey"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: header value: headerValue"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: method: GET"));
-
-        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, order: 2"));
-        Assertions.assertTrue(bytes.toString().contains("do filter: CatFilter, config: Dog"));
-    }
-
-    @Test
-    @DisplayName("test stop the request")
-    void testDoFilter3() {
+    @DisplayName("test fetch request body of extra info")
+    void testFetchBody() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
         io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
@@ -283,12 +196,86 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         channel.writeInbound(request);
         channel.finish();
-        HttpResponse response = channel.readOutbound();
-
-        io.github.api7.A6.HTTPReqCall.Resp resp =
-                io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(response.encode());
-        Assertions.assertEquals(resp.actionType(), Action.Stop);
+        channel.readOutbound();
+        channel.readOutbound();
+        channel.readOutbound();
+        ExtraInfoRequest exr = channel.readOutbound();
+        Assertions.assertEquals(true, ReflectionTestUtils.getField(exr, "reqBody"));
     }
 
-    //TODO add test cases about fetch nginx vars and request body
+    @Test
+    @DisplayName("test fetch request body of extra info")
+    void testGetVarsInPluginFilter() {
+        FlatBufferBuilder builder = new FlatBufferBuilder();
+
+        io.github.api7.A6.HTTPReqCall.Req.startReq(builder);
+        io.github.api7.A6.HTTPReqCall.Req.addConfToken(builder, confToken);
+        builder.finish(io.github.api7.A6.HTTPReqCall.Req.endReq(builder));
+
+        io.github.api7.A6.HTTPReqCall.Req req = io.github.api7.A6.HTTPReqCall.Req.getRootAsReq(builder.dataBuffer());
+        HttpRequest request = new HttpRequest(req);
+        channel.writeInbound(request);
+        channel.flushInbound();
+
+        for (int i = 0; i < 4; i++) {
+            ExtraInfoRequest eir = channel.readOutbound();
+            if (ReflectionTestUtils.getField(eir, "var") != null && "remote_addr" == ReflectionTestUtils.getField(eir, "var")) {
+                builder.clear();
+                int res1 = builder.createString("127.0.0.1");
+                io.github.api7.A6.ExtraInfo.Resp.startResp(builder);
+                io.github.api7.A6.ExtraInfo.Resp.addResult(builder, res1);
+                int resp1 = Resp.endResp(builder);
+                builder.finish(resp1);
+                ExtraInfoResponse extraInfoResponse1 = ExtraInfoResponse.from(builder.dataBuffer());
+                channel.writeInbound(extraInfoResponse1);
+                channel.flushInbound();
+                continue;
+            }
+
+            if (ReflectionTestUtils.getField(eir, "var") != null && "server_port" == ReflectionTestUtils.getField(eir, "var")) {
+                builder.clear();
+                int res2 = builder.createString("9080");
+                io.github.api7.A6.ExtraInfo.Resp.startResp(builder);
+                io.github.api7.A6.ExtraInfo.Resp.addResult(builder, res2);
+                int resp2 = Resp.endResp(builder);
+                builder.finish(resp2);
+                ExtraInfoResponse extraInfoResponse2 = ExtraInfoResponse.from(builder.dataBuffer());
+                channel.writeInbound(extraInfoResponse2);
+                channel.flushInbound();
+                continue;
+            }
+
+            if (ReflectionTestUtils.getField(eir, "var") != null && "content_type" == ReflectionTestUtils.getField(eir, "var")) {
+                builder.clear();
+                int res3 = builder.createString("application/json");
+                io.github.api7.A6.ExtraInfo.Resp.startResp(builder);
+                io.github.api7.A6.ExtraInfo.Resp.addResult(builder, res3);
+                int resp3 = Resp.endResp(builder);
+                builder.finish(resp3);
+                ExtraInfoResponse extraInfoResponse3 = ExtraInfoResponse.from(builder.dataBuffer());
+                channel.writeInbound(extraInfoResponse3);
+                channel.flushInbound();
+                continue;
+            }
+
+            if ((ReflectionTestUtils.getField(eir, "reqBody") == null) || !((Boolean) ReflectionTestUtils.getField(eir, "reqBody"))) {
+                continue;
+            }
+            builder.clear();
+            int res4 = builder.createString("abcd");
+            io.github.api7.A6.ExtraInfo.Resp.startResp(builder);
+            io.github.api7.A6.ExtraInfo.Resp.addResult(builder, res4);
+            int resp4 = Resp.endResp(builder);
+            builder.finish(resp4);
+            ExtraInfoResponse extraInfoResponse4 = ExtraInfoResponse.from(builder.dataBuffer());
+            channel.writeInbound(extraInfoResponse4);
+            channel.flushInbound();
+        }
+
+        Assertions.assertTrue(bytes.toString().contains("remote_addr: 127.0.0.1"));
+        Assertions.assertTrue(bytes.toString().contains("server_port: 9080"));
+        Assertions.assertTrue(bytes.toString().contains("content_type: application/json"));
+        Assertions.assertTrue(bytes.toString().contains("body: abcd"));
+    }
+
 }

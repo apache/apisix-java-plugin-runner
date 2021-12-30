@@ -15,25 +15,35 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec.impl;
+package org.apache.apisix.plugin.runner.handler;
 
 import io.github.api7.A6.Err.Code;
-import org.apache.apisix.plugin.runner.A6ConfigRequest;
-import org.apache.apisix.plugin.runner.A6ErrRequest;
-import org.apache.apisix.plugin.runner.A6Request;
-import org.apache.apisix.plugin.runner.HttpRequest;
-import org.apache.apisix.plugin.runner.codec.PluginRunnerDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
-public class FlatBuffersDecoder implements PluginRunnerDecoder {
+import org.apache.apisix.plugin.runner.A6ConfigRequest;
+import org.apache.apisix.plugin.runner.A6ErrRequest;
+import org.apache.apisix.plugin.runner.A6Request;
+import org.apache.apisix.plugin.runner.HttpRequest;
+import org.apache.apisix.plugin.runner.ExtraInfoResponse;
+import org.apache.apisix.plugin.runner.constants.Constants;
 
-    private final Logger logger = LoggerFactory.getLogger(FlatBuffersDecoder.class);
+public class PayloadDecoder extends SimpleChannelInboundHandler<ByteBuf> {
+    private final Logger logger = LoggerFactory.getLogger(PayloadDecoder.class);
 
     @Override
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf byteBuf) {
+        ByteBuffer buffer = byteBuf.nioBuffer();
+        A6Request request = decode(buffer);
+        ctx.fireChannelRead(request);
+    }
+
     public A6Request decode(ByteBuffer buffer) {
         byte type;
         try {
@@ -45,7 +55,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
 
         ByteBuffer body;
         switch (type) {
-            case 1:
+            case Constants.RPC_PREPARE_CONF:
                 A6ConfigRequest a6ConfigRequest;
                 try {
                     body = getBody(buffer);
@@ -55,7 +65,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
                     return new A6ErrRequest(Code.BAD_REQUEST);
                 }
                 return a6ConfigRequest;
-            case 2:
+            case Constants.RPC_HTTP_REQ_CALL:
                 HttpRequest httpRequest;
                 try {
                     body = getBody(buffer);
@@ -64,6 +74,16 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
                     return new A6ErrRequest(Code.BAD_REQUEST);
                 }
                 return httpRequest;
+
+            case Constants.RPC_EXTRA_INFO:
+                ExtraInfoResponse extraInfoResponse;
+                try {
+                    body = getBody(buffer);
+                    extraInfoResponse = ExtraInfoResponse.from(body);
+                } catch (BufferUnderflowException | IndexOutOfBoundsException e) {
+                    return new A6ErrRequest(Code.BAD_REQUEST);
+                }
+                return extraInfoResponse;
             default:
                 break;
         }
@@ -89,7 +109,7 @@ public class FlatBuffersDecoder implements PluginRunnerDecoder {
         return buffer;
     }
 
-    int bytes2Int(byte[] b, int start, int len) {
+    private int bytes2Int(byte[] b, int start, int len) {
         int sum = 0;
         int end = start + len;
         for (int i = start; i < end; i++) {

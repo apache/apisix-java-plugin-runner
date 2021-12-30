@@ -21,9 +21,10 @@ import com.google.gson.Gson;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -59,7 +60,7 @@ public class RewriteRequestDemoFilter implements PluginFilter {
     }
 
     @Override
-    public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+    public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
         /*
          * If the conf you configured is of type json, you can convert it to Map or json.
          */
@@ -86,6 +87,33 @@ public class RewriteRequestDemoFilter implements PluginFilter {
          */
         request.setArg((String) conf.get("conf_arg_name"), (String) conf.get("conf_arg_value"));
 
-        return chain.filter(request, response);
+        /*
+         * You can fetch the Nginx variables, and the request body
+         */
+        String remoteAddr = request.getVars("remote_addr");
+        String serverPort = request.getVars("server_port");
+        String body = request.getBody();
+
+        chain.filter(request, response);
+    }
+
+    /**
+     * If you need to fetch some Nginx variables in the current plugin, you will need to declare them in this function.
+     * @return a list of Nginx variables that need to be called in this plugin
+     */
+    @Override
+    public List<String> requiredVars() {
+        List<String> vars = new ArrayList<>();
+        vars.add("remote_addr");
+        vars.add("server_port");
+        return vars;
+    }
+
+    /**
+     * If you need to fetch request body in the current plugin, you will need to return true in this function.
+     */
+    @Override
+    public Boolean requiredBody() {
+        return true;
     }
 }

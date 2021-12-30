@@ -36,7 +36,7 @@
         <dependency>
             <groupId>io.github.api7</groupId>
             <artifactId>A6</artifactId>
-            <version>0.1.0-RELEASE</version>
+            <version>0.3.0-RELEASE</version>
         </dependency>
 
         <dependency>
@@ -59,16 +59,6 @@
                     <artifactId>jul-to-slf4j</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-reactor-netty</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
