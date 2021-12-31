@@ -15,21 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.apisix.plugin.runner.codec.impl;
+package org.apache.apisix.plugin.runner.handler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import org.apache.apisix.plugin.runner.A6Response;
-import org.apache.apisix.plugin.runner.codec.PluginRunnerEncoder;
 
 import java.nio.ByteBuffer;
 
-public class FlatBuffersEncoder implements PluginRunnerEncoder {
+public class PayloadEncoder extends ChannelOutboundHandlerAdapter {
 
-    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (msg instanceof A6Response) {
+            A6Response response = (A6Response) msg;
+            ByteBuffer buffer = encode(response);
+            ByteBuf buf = Unpooled.wrappedBuffer(buffer);
+            ctx.write(buf, promise);
+        }
+    }
+
     public ByteBuffer encode(A6Response response) {
         ByteBuffer buffer = response.encode();
-        if (null != response.getErrResponse()) {
-            return setBody(buffer, (byte) 0);
-        }
         return setBody(buffer, response.getType());
     }
 

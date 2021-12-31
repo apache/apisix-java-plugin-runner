@@ -22,6 +22,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.flatbuffers.FlatBufferBuilder;
 import io.github.api7.A6.PrepareConf.Req;
 import io.github.api7.A6.TextEntry;
+import io.netty.channel.embedded.EmbeddedChannel;
+
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
@@ -33,9 +35,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +48,7 @@ class A6ConfigHandlerTest {
 
     Map<String, PluginFilter> filters;
 
-    A6ConfigHandler a6ConfigHandler;
+    PrepareConfHandler prepareConfHandler;
 
     @BeforeEach
     void setUp() {
@@ -58,8 +60,18 @@ class A6ConfigHandlerTest {
             }
 
             @Override
-            public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                return chain.filter(request, response);
+            public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+                chain.filter(request, response);
+            }
+
+            @Override
+            public List<String> requiredVars() {
+                return null;
+            }
+
+            @Override
+            public Boolean requiredBody() {
+                return null;
             }
         });
 
@@ -70,12 +82,22 @@ class A6ConfigHandlerTest {
             }
 
             @Override
-            public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                return chain.filter(request, response);
+            public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+                chain.filter(request, response);
+            }
+
+            @Override
+            public List<String> requiredVars() {
+                return null;
+            }
+
+            @Override
+            public Boolean requiredBody() {
+                return null;
             }
         });
         cache = CacheBuilder.newBuilder().expireAfterWrite(3600, TimeUnit.SECONDS).maximumSize(1000).build();
-        a6ConfigHandler = new A6ConfigHandler(cache, filters);
+        prepareConfHandler = new PrepareConfHandler(cache, filters);
     }
 
     @Test
@@ -92,10 +114,12 @@ class A6ConfigHandlerTest {
         Req req = Req.getRootAsReq(builder.dataBuffer());
 
         A6ConfigRequest request = new A6ConfigRequest(req);
-        A6ConfigResponse response = new A6ConfigResponse(0L);
-        a6ConfigHandler.handle(request, response);
+        EmbeddedChannel channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler);
+        channel.writeInbound(request);
+        channel.finish();
+        A6ConfigResponse response = channel.readOutbound();
 
-        A6Conf config = cache.getIfPresent(0L);
+        A6Conf config = cache.getIfPresent(response.getConfToken());
         Assertions.assertNotNull(config.getChain());
         Assertions.assertEquals(config.getChain().getFilters().size(), 1);
         Assertions.assertEquals(config.getChain().getIndex(), 0);
@@ -121,10 +145,12 @@ class A6ConfigHandlerTest {
         Req req = Req.getRootAsReq(builder.dataBuffer());
 
         A6ConfigRequest request = new A6ConfigRequest(req);
-        A6ConfigResponse response = new A6ConfigResponse(0L);
-        a6ConfigHandler.handle(request, response);
+        EmbeddedChannel channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler);
+        channel.writeInbound(request);
+        channel.finish();
+        A6ConfigResponse response = channel.readOutbound();
 
-        A6Conf config = cache.getIfPresent(0L);
+        A6Conf config = cache.getIfPresent(response.getConfToken());
         Assertions.assertEquals(config.getChain().getFilters().size(), 2);
     }
 
@@ -147,10 +173,12 @@ class A6ConfigHandlerTest {
         Req req = Req.getRootAsReq(builder.dataBuffer());
 
         A6ConfigRequest request = new A6ConfigRequest(req);
-        A6ConfigResponse response = new A6ConfigResponse(0L);
-        a6ConfigHandler.handle(request, response);
+        EmbeddedChannel channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler);
+        channel.writeInbound(request);
+        channel.finish();
+        A6ConfigResponse response = channel.readOutbound();
 
-        A6Conf config = cache.getIfPresent(0L);
+        A6Conf config = cache.getIfPresent(response.getConfToken());
         Assertions.assertEquals(config.getChain().getFilters().size(), 1);
     }
 
@@ -169,10 +197,12 @@ class A6ConfigHandlerTest {
         Req req = Req.getRootAsReq(builder.dataBuffer());
 
         A6ConfigRequest request = new A6ConfigRequest(req);
-        A6ConfigResponse response = new A6ConfigResponse(0L);
-        a6ConfigHandler.handle(request, response);
+        EmbeddedChannel channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler);
+        channel.writeInbound(request);
+        channel.finish();
+        A6ConfigResponse response = channel.readOutbound();
 
-        A6Conf config = cache.getIfPresent(0L);
+        A6Conf config = cache.getIfPresent(response.getConfToken());
         Assertions.assertEquals(config.getChain().getFilters().size(), 0);
     }
 
@@ -190,10 +220,12 @@ class A6ConfigHandlerTest {
         Req req = Req.getRootAsReq(builder.dataBuffer());
 
         A6ConfigRequest request = new A6ConfigRequest(req);
-        A6ConfigResponse response = new A6ConfigResponse(0L);
-        a6ConfigHandler.handle(request, response);
+        EmbeddedChannel channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler);
+        channel.writeInbound(request);
+        channel.finish();
+        A6ConfigResponse response = channel.readOutbound();
 
-        A6Conf a6Conf = cache.getIfPresent(0L);
+        A6Conf a6Conf = cache.getIfPresent(response.getConfToken());
         Assertions.assertTrue(a6Conf.getConfig() instanceof HashMap);
         for (int i = 0; i < 100; i++) {
             Assertions.assertEquals(a6Conf.get("FooFilter"), "Bar");

@@ -26,21 +26,23 @@ import io.netty.buffer.Unpooled;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.HttpResponse;
+import org.apache.apisix.plugin.runner.handler.PayloadEncoder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.ByteBuffer;
 
 @DisplayName("test encode data")
-class FlatBuffersEncoderTest {
-    FlatBuffersEncoder flatBuffersEncoder = new FlatBuffersEncoder();
+class PayloadEncoderTest {
+    PayloadEncoder payloadEncoder = new PayloadEncoder();
 
     @Test
     @DisplayName("test encode error response(1)")
     void testErrResponseEncode1() {
         A6ErrResponse errResponse = new A6ErrResponse(Code.BAD_REQUEST);
-        ByteBuffer result = flatBuffersEncoder.encode(errResponse);
+        ByteBuffer result = payloadEncoder.encode(errResponse);
         byte[] res = new byte[result.remaining()];
         result.get(res);
 
@@ -53,7 +55,7 @@ class FlatBuffersEncoderTest {
     @DisplayName("test encode error response(2)")
     void testErrResponseEncode2() {
         A6ErrResponse errResponse = new A6ErrResponse(Code.BAD_REQUEST);
-        ByteBuffer result = flatBuffersEncoder.encode(errResponse);
+        ByteBuffer result = payloadEncoder.encode(errResponse);
         result.position(4);
         io.github.api7.A6.Err.Resp resp = io.github.api7.A6.Err.Resp.getRootAsResp(result);
         Assertions.assertEquals(Code.BAD_REQUEST, resp.code());
@@ -63,7 +65,7 @@ class FlatBuffersEncoderTest {
     @DisplayName("test prepare conf response(1)")
     void testPrepareConfResponseEncode1() {
         A6ConfigResponse configResponse = new A6ConfigResponse(0L);
-        ByteBuffer result = flatBuffersEncoder.encode(configResponse);
+        ByteBuffer result = payloadEncoder.encode(configResponse);
         byte[] res = new byte[result.remaining()];
         result.get(res);
 
@@ -76,7 +78,7 @@ class FlatBuffersEncoderTest {
     @DisplayName("test prepare conf response(2)")
     void testPrepareConfResponseEncode2() {
         A6ConfigResponse configResponse = new A6ConfigResponse(0L);
-        ByteBuffer result = flatBuffersEncoder.encode(configResponse);
+        ByteBuffer result = payloadEncoder.encode(configResponse);
         result.position(4);
         io.github.api7.A6.PrepareConf.Resp resp = io.github.api7.A6.PrepareConf.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.confToken(), 0L);
@@ -86,7 +88,7 @@ class FlatBuffersEncoderTest {
     @DisplayName("test http call response")
     void testHTTPCallResponseEncode1() {
         HttpResponse errResponse = new HttpResponse(0L);
-        ByteBuffer result = flatBuffersEncoder.encode(errResponse);
+        ByteBuffer result = payloadEncoder.encode(errResponse);
         byte[] res = new byte[result.remaining()];
         result.get(res);
 
@@ -99,7 +101,7 @@ class FlatBuffersEncoderTest {
     @DisplayName("test http call response, action: none")
     void testHTTPCallResponseEncode2() {
         HttpResponse httpResponse = new HttpResponse(0L);
-        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        ByteBuffer result = payloadEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.id(), 0L);
@@ -115,7 +117,7 @@ class FlatBuffersEncoderTest {
         httpResponse.setPath("/hello");
         httpResponse.setArg("foo", "bar");
         httpResponse.setReqHeader("Server", "APISIX");
-        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        ByteBuffer result = payloadEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Rewrite);
@@ -136,7 +138,7 @@ class FlatBuffersEncoderTest {
         httpResponse.setStatusCode(401);
         httpResponse.setHeader("code", "401");
         httpResponse.setBody("Unauthorized");
-        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        ByteBuffer result = payloadEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Stop);
@@ -165,7 +167,7 @@ class FlatBuffersEncoderTest {
         httpResponse.setStatusCode(401);
         httpResponse.setHeader("code", "401");
         httpResponse.setBody("Unauthorized");
-        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        ByteBuffer result = payloadEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Stop);
@@ -184,7 +186,7 @@ class FlatBuffersEncoderTest {
         httpResponse.setReqHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
         httpResponse.setReqHeader("Timestamp", "1623408133");
 
-        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        ByteBuffer result = payloadEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Rewrite);
@@ -230,7 +232,7 @@ class FlatBuffersEncoderTest {
         httpResponse.setHeader("Server", "APISIX");
         httpResponse.setHeader("Error", "Unauthorized");
         httpResponse.setHeader("Timestamp", "1623408133");
-        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        ByteBuffer result = payloadEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Stop);
@@ -253,7 +255,7 @@ class FlatBuffersEncoderTest {
     @Test
     @DisplayName("test encode data length greater then 256")
     void testEncodeDataGreaterLargeThen256() {
-        byte[] bytes = flatBuffersEncoder.int2Bytes(260, 3);
+        byte[] bytes = ReflectionTestUtils.invokeMethod(payloadEncoder, "int2Bytes", 260, 3);
 
         // use Bytebuf getInt function (default 4 bytes) to verify
         ByteBuf buf = Unpooled.buffer(4);
@@ -271,7 +273,7 @@ class FlatBuffersEncoderTest {
         HttpResponse httpResponse = new HttpResponse(0L);
         // only set header, without setStatusCode, use 200 as default
         httpResponse.setHeader("Foo", "Bar");
-        ByteBuffer result = flatBuffersEncoder.encode(httpResponse);
+        ByteBuffer result = payloadEncoder.encode(httpResponse);
         result.position(4);
         io.github.api7.A6.HTTPReqCall.Resp resp = io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(result);
         Assertions.assertEquals(resp.actionType(), Action.Stop);

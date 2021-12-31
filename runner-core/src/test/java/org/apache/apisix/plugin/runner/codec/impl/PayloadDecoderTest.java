@@ -25,22 +25,24 @@ import io.netty.buffer.Unpooled;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ErrRequest;
 import org.apache.apisix.plugin.runner.A6Request;
+import org.apache.apisix.plugin.runner.handler.PayloadDecoder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.ByteBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("test decode data")
-class FlatBuffersDecoderTest {
+class PayloadDecoderTest {
 
     @InjectMocks
-    FlatBuffersDecoder flatBuffersDecoder;
+    PayloadDecoder payloadDecoder;
 
     @BeforeEach
     void setUp() {
@@ -52,7 +54,7 @@ class FlatBuffersDecoderTest {
     void testEmptyData() {
         byte[] bytes = new byte[]{};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        A6Request result = flatBuffersDecoder.decode(buffer);
+        A6Request result = payloadDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
     }
 
@@ -61,7 +63,7 @@ class FlatBuffersDecoderTest {
     void testUnsupportedType() {
         byte[] bytes = new byte[]{4};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        A6Request result = flatBuffersDecoder.decode(buffer);
+        A6Request result = payloadDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
     }
 
@@ -71,7 +73,7 @@ class FlatBuffersDecoderTest {
         // data length is greater than actual length
         byte[] bytes = new byte[]{1, 0, 0, 3, 0};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        A6Request result = flatBuffersDecoder.decode(buffer);
+        A6Request result = payloadDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
     }
 
@@ -81,7 +83,7 @@ class FlatBuffersDecoderTest {
         // data length equal to 0
         byte[] bytes = new byte[]{1, 0, 0, 0, 0};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        A6Request result = flatBuffersDecoder.decode(buffer);
+        A6Request result = payloadDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
     }
 
@@ -91,7 +93,7 @@ class FlatBuffersDecoderTest {
         // wrong data content
         byte[] bytes = new byte[]{1, 0, 0, 1, 0, 1};
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        A6Request result = flatBuffersDecoder.decode(buffer);
+        A6Request result = payloadDecoder.decode(buffer);
         Assertions.assertEquals(Code.BAD_REQUEST, ((A6ErrRequest) result).getCode());
     }
 
@@ -117,7 +119,7 @@ class FlatBuffersDecoderTest {
         System.arraycopy(data, 0, bytes, header.length, data.length);
 
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        A6ConfigRequest configReq = (A6ConfigRequest) flatBuffersDecoder.decode(buffer);
+        A6ConfigRequest configReq = (A6ConfigRequest) payloadDecoder.decode(buffer);
         for (int i = 0; i < configReq.getReq().confLength(); i++) {
             TextEntry conf = configReq.getReq().conf(i);
             Assertions.assertEquals("foo", conf.name());
@@ -148,7 +150,7 @@ class FlatBuffersDecoderTest {
         System.arraycopy(data, 0, bytes, header.length, data.length);
 
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        A6ConfigRequest configReq = (A6ConfigRequest) flatBuffersDecoder.decode(buffer);
+        A6ConfigRequest configReq = (A6ConfigRequest) payloadDecoder.decode(buffer);
         assertThrows(IndexOutOfBoundsException.class, () -> configReq.getReq().conf(0));
     }
 
@@ -156,8 +158,7 @@ class FlatBuffersDecoderTest {
     @DisplayName("test decode data length greater then 256")
     void testDecodeDataGreaterLargeThen256() {
         byte[] bytes = new byte[]{0, 1, 4};
-        int length = flatBuffersDecoder.bytes2Int(bytes, 0, 3);
-
+        int length = ReflectionTestUtils.invokeMethod(payloadDecoder, "bytes2Int", bytes, 0, 3);
         // use Bytebuf getInt function (default 4 bytes) to verify
         ByteBuf buf = Unpooled.buffer(4);
         byte[] bufBytes = {0, 0, 1, 4};

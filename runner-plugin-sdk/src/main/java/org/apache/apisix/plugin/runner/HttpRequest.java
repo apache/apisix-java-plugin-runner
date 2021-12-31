@@ -47,6 +47,10 @@ public class HttpRequest implements A6Request {
 
     private Map<String, String> args;
 
+    private Map<String, String> vars;
+
+    private String body;
+
     public HttpRequest(Req req) {
         this.req = req;
     }
@@ -128,6 +132,7 @@ public class HttpRequest implements A6Request {
      * request.getHeaders()
      * }
      * </pre>
+     *
      * @return the all headers
      */
     public Map<String, String> getHeader() {
@@ -184,6 +189,7 @@ public class HttpRequest implements A6Request {
      * request.setHeader("Accept", null);
      * }
      * </pre>
+     *
      * @param headerKey   the header key
      * @param headerValue the header value
      */
@@ -252,7 +258,8 @@ public class HttpRequest implements A6Request {
      * request.setArg("foo", null);
      * }
      * </pre>
-     * @param argKey the arg key
+     *
+     * @param argKey   the arg key
      * @param argValue the arg value
      */
     public void setArg(String argKey, String argValue) {
@@ -276,6 +283,25 @@ public class HttpRequest implements A6Request {
     @Override
     public byte getType() {
         return 2;
+    }
+
+    public String getVars(String key) {
+        if (CollectionUtils.isEmpty(vars)) {
+            return null;
+        }
+        return vars.get(key);
+    }
+
+    public void setVars(Map<String, String> vars) {
+        this.vars = vars;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public enum Method {

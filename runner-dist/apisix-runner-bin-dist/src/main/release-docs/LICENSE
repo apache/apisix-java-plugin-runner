@@ -225,8 +225,7 @@ The text of each license is the standard Apache 2.0 license.
    listenablefuture 9999.0-empty-to-avoid-conflict-with-guava:https://github.com/google/guava, Apache 2.0
    jsr305 3.0.2: http://findbugs.sourceforge.net, Apache 2.0
    gson 2.8.6: https://github.com/google/gson, Apache 2.0
-   reactor-core 3.4.5: https://github.com/reactor/reactor-core, Apache 2.0
-   reactor-netty 1.0.6: https://github.com/reactor/reactor-netty, Apache 2.0
+   netty 4.1.63.Final: https://github.com/netty/netty, Apache 2.0
    netty 4.1.63: https://github.com/netty/netty, Apache 2.0
    log4j2 2.6.2: https://github.com/apache/logging-log4j2, Apache 2.0
    slf4j-api 1.7.28: http://www.slf4j.org, Apache 2.0

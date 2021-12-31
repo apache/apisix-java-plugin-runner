@@ -21,9 +21,9 @@ import com.google.gson.Gson;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -34,7 +34,7 @@ public class StopRequestDemoFilter implements PluginFilter {
     }
 
     @Override
-    public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+    public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
         /*
          * If the conf you configured is of type json, you can convert it to Map or json.
          */
@@ -71,6 +71,16 @@ public class StopRequestDemoFilter implements PluginFilter {
             body:
             {"key1":"value1","key2":2}
          */
-        return chain.filter(request, response);
+        chain.filter(request, response);
+    }
+
+    @Override
+    public List<String> requiredVars() {
+        return null;
+    }
+
+    @Override
+    public Boolean requiredBody() {
+        return null;
     }
 }

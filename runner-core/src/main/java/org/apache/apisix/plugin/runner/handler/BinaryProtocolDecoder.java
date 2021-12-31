@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 package org.apache.apisix.plugin.runner.handler;
 
-import org.apache.apisix.plugin.runner.A6Request;
-import org.apache.apisix.plugin.runner.A6Response;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
-public interface Dispatcher {
-    
-    A6Response dispatch(A6Request request);
+public class BinaryProtocolDecoder extends LengthFieldBasedFrameDecoder {
+
+    public BinaryProtocolDecoder() {
+        super(16777215, 1, 3, 0, 0);
+    }
 }

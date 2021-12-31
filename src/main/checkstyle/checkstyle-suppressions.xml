@@ -24,5 +24,11 @@
 <suppressions>
     <suppress checks="RegexpSingleline"
               files="A6HttpCallHandlerTest.java"
-              lines="75-120"/>
+              lines="1-1000"/>
+    <suppress checks="RegexpSingleline"
+              files="ExtraInfoTest.java"
+              lines="1-1000"/>
+    <suppress checks="LocalVariableName"
+              files="ExtraInfoTest.java"
+              lines="1-1000"/>
 </suppressions>

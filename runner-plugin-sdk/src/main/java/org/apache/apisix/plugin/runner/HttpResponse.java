@@ -58,8 +58,6 @@ public class HttpResponse implements A6Response {
 
     private Integer statusCode;
 
-    private A6ErrResponse errResponse;
-
     public HttpResponse(long requestId) {
         this.requestId = requestId;
     }
@@ -134,20 +132,8 @@ public class HttpResponse implements A6Response {
         this.statusCode = statusCode;
     }
 
-    public void setErrResponse(A6ErrResponse errResponse) {
-        this.errResponse = errResponse;
-    }
-
-    @Override
-    public A6ErrResponse getErrResponse() {
-        return this.errResponse;
-    }
-
     @Override
     public ByteBuffer encode() {
-        if (!Objects.isNull(errResponse)) {
-            return errResponse.encode();
-        }
 
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
