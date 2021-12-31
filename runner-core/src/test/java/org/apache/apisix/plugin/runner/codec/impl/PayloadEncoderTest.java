@@ -287,7 +287,6 @@ class PayloadEncoderTest {
         }
     }
 
-
     @Test
     @DisplayName("test set the parameter of the rewrite request to null")
     void testHttpResponseNPE() {
@@ -298,7 +297,7 @@ class PayloadEncoderTest {
         httpResponse.setHeader(null, null);
         HashMap<String, String> reqHeaders = (HashMap<String, String>) ReflectionTestUtils.getField(httpResponse, "reqHeaders");
         HashMap<String, String> args = (HashMap<String, String>) ReflectionTestUtils.getField(httpResponse, "args");
-        HashMap<String,String> respHeaders = (HashMap<String, String>) ReflectionTestUtils.getField(httpResponse, "respHeaders");
+        HashMap<String, String> respHeaders = (HashMap<String, String>) ReflectionTestUtils.getField(httpResponse, "respHeaders");
         Assertions.assertNull(reqHeaders);
         Assertions.assertNull(args);
         Assertions.assertNull(respHeaders);

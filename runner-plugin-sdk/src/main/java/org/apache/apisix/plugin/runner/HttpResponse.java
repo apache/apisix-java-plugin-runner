@@ -104,11 +104,6 @@ public class HttpResponse implements A6Response {
      * @param path the path
      */
     public void setPath(String path) {
-        if (path == null) {
-            logger.warn("path is empty, ignore it");
-            return;
-        }
-
         actionType = ActionType.Rewrite;
         this.path = path;
     }
@@ -138,10 +133,6 @@ public class HttpResponse implements A6Response {
      * @param body the body(string)
      */
     public void setBody(String body) {
-        if (body == null) {
-            logger.warn("body is null, ignore it");
-            return;
-        }
         actionType = ActionType.Stop;
         this.body = body;
     }
