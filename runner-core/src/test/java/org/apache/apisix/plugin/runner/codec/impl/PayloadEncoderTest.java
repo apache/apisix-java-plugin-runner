@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 @DisplayName("test encode data")
 class PayloadEncoderTest {
@@ -284,5 +285,21 @@ class PayloadEncoderTest {
                 Assertions.assertEquals(stop.headers(i).value(), "Bar");
             }
         }
+    }
+
+    @Test
+    @DisplayName("test set the parameter of the rewrite request to null")
+    void testHttpResponseNPE() {
+        HttpResponse httpResponse = new HttpResponse(0L);
+        // HashMap accepts null as key and value, but we want to disable null as key
+        httpResponse.setArg(null, null);
+        httpResponse.setReqHeader(null, null);
+        httpResponse.setHeader(null, null);
+        HashMap<String, String> reqHeaders = (HashMap<String, String>) ReflectionTestUtils.getField(httpResponse, "reqHeaders");
+        HashMap<String, String> args = (HashMap<String, String>) ReflectionTestUtils.getField(httpResponse, "args");
+        HashMap<String, String> respHeaders = (HashMap<String, String>) ReflectionTestUtils.getField(httpResponse, "respHeaders");
+        Assertions.assertNull(reqHeaders);
+        Assertions.assertNull(args);
+        Assertions.assertNull(respHeaders);
     }
 }

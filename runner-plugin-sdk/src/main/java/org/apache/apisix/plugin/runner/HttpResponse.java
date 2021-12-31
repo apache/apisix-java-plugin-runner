@@ -67,6 +67,12 @@ public class HttpResponse implements A6Response {
     }
 
     public void setReqHeader(String headerKey, String headerValue) {
+        // key is null will cause the request to block
+        if (headerKey == null) {
+            logger.warn("headerKey is null, ignore it");
+            return;
+        }
+
         actionType = ActionType.Rewrite;
         if (Objects.isNull(reqHeaders)) {
             reqHeaders = new HashMap<>();
@@ -81,6 +87,10 @@ public class HttpResponse implements A6Response {
      * @param argValue the arg value
      */
     public void setArg(String argKey, String argValue) {
+        if (argKey == null) {
+            logger.warn("argKey is null, ignore it");
+            return;
+        }
         actionType = ActionType.Rewrite;
         if (Objects.isNull(args)) {
             args = new HashMap<>();
@@ -105,6 +115,11 @@ public class HttpResponse implements A6Response {
      * @param headerValue the header value
      */
     public void setHeader(String headerKey, String headerValue) {
+        if (headerKey == null) {
+            logger.warn("headerKey is null, ignore it");
+            return;
+        }
+
         actionType = ActionType.Stop;
         if (Objects.isNull(respHeaders)) {
             respHeaders = new HashMap<>();
