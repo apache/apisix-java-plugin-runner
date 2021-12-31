@@ -51,9 +51,6 @@ public class PluginFilterChain {
             PluginFilterChain next = new PluginFilterChain(this,
                     this.index + 1);
             filter.filter(request, response, next);
-        } else {
-            //TODO log error
-            return;
         }
     }
 }

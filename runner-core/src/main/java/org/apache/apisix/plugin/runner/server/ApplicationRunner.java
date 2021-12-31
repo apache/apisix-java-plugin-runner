@@ -22,8 +22,12 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerDomainSocketChannel;
+import io.netty.channel.kqueue.KQueue;
+import io.netty.channel.kqueue.KQueueEventLoopGroup;
+import io.netty.channel.kqueue.KQueueServerDomainSocketChannel;
 import io.netty.channel.unix.DomainSocketAddress;
 import io.netty.channel.unix.DomainSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
@@ -84,10 +88,22 @@ public class ApplicationRunner implements CommandLineRunner {
     }
 
     public void start(String path) throws Exception {
-        EventLoopGroup group = new EpollEventLoopGroup();
+        EventLoopGroup group;
+        ServerBootstrap bootstrap = new ServerBootstrap();
+        if (KQueue.isAvailable()) {
+            group = new KQueueEventLoopGroup();
+            bootstrap.group(group).channel(KQueueServerDomainSocketChannel.class);
+        } else if (Epoll.isAvailable()) {
+            group = new EpollEventLoopGroup();
+            bootstrap.group(group).channel(EpollServerDomainSocketChannel.class);
+        } else {
+            String errMsg = "java runner is only support epoll or kqueue";
+            logger.warn(errMsg);
+            throw new RuntimeException(errMsg);
+        }
+
         try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            initServerBootstrap(group, bootstrap);
+            initServerBootstrap(bootstrap);
             ChannelFuture future = bootstrap.bind(new DomainSocketAddress(path)).sync();
             Runtime.getRuntime().exec("chmod 777 " + socketFile);
             logger.warn("java runner is listening on the socket file: {}", socketFile);
@@ -98,21 +114,19 @@ public class ApplicationRunner implements CommandLineRunner {
         }
     }
 
-    private ServerBootstrap initServerBootstrap(EventLoopGroup group, ServerBootstrap bootstrap) {
-        return bootstrap.group(group)
-                .channel(EpollServerDomainSocketChannel.class)
-                .childHandler(new ChannelInitializer<DomainSocketChannel>() {
-                    @Override
-                    protected void initChannel(DomainSocketChannel channel) {
-                        channel.pipeline().addFirst("logger", new LoggingHandler())
-                                .addAfter("logger", "payloadEncoder", new PayloadEncoder())
-                                .addAfter("payloadEncoder", "delayedDecoder", new BinaryProtocolDecoder())
-                                .addLast("payloadDecoder", new PayloadDecoder())
-                                .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, beanProvider))
-                                .addAfter("prepareConfHandler", "hTTPReqCallHandler", createA6HttpHandler(cache));
+    private void initServerBootstrap(ServerBootstrap bootstrap) {
+        bootstrap.childHandler(new ChannelInitializer<DomainSocketChannel>() {
+            @Override
+            protected void initChannel(DomainSocketChannel channel) {
+                channel.pipeline().addFirst("logger", new LoggingHandler())
+                        .addAfter("logger", "payloadEncoder", new PayloadEncoder())
+                        .addAfter("payloadEncoder", "delayedDecoder", new BinaryProtocolDecoder())
+                        .addLast("payloadDecoder", new PayloadDecoder())
+                        .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, beanProvider))
+                        .addAfter("prepareConfHandler", "hTTPReqCallHandler", createA6HttpHandler(cache));
 
-                    }
-                });
+            }
+        });
     }
 
     @Override
