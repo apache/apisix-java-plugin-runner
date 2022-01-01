@@ -28,6 +28,8 @@ import java.util.Set;
 
 import com.google.common.cache.Cache;
 import io.github.api7.A6.Err.Code;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -118,7 +120,9 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
         PluginFilterChain chain = conf.getChain();
         chain.filter(currReq, currResp);
 
-        ctx.writeAndFlush(currResp);
+        ChannelFuture future = ctx.writeAndFlush(currResp);
+        future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+
     }
 
     private void handleHttpReqCall(ChannelHandlerContext ctx, HttpRequest request) {
@@ -140,7 +144,8 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
         // if the filter chain is empty, then return the response directly
         if (Objects.isNull(chain) || 0 == chain.getFilters().size()) {
-            ctx.writeAndFlush(currResp);
+            ChannelFuture future = ctx.writeAndFlush(currResp);
+            future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             return;
         }
 
@@ -170,7 +175,8 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
                     return;
                 }
                 ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(varKey, null);
-                ctx.writeAndFlush(extraInfoRequest);
+                ChannelFuture future = ctx.writeAndFlush(currResp);
+                future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             }
         }
 
@@ -178,7 +184,8 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
         if (requiredBody) {
             queue.offer(EXTRA_INFO_REQ_BODY_KEY);
             ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true);
-            ctx.writeAndFlush(extraInfoRequest);
+            ChannelFuture future = ctx.writeAndFlush(currResp);
+            future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         }
 
         // no need to fetch the nginx variables or request body, just do filter

@@ -289,6 +289,4 @@ class A6HttpCallHandlerTest {
                 io.github.api7.A6.HTTPReqCall.Resp.getRootAsResp(response.encode());
         Assertions.assertEquals(resp.actionType(), Action.Stop);
     }
-
-    //TODO add test cases about fetch nginx vars and request body
 }
