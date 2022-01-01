@@ -175,7 +175,7 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
                     return;
                 }
                 ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(varKey, null);
-                ChannelFuture future = ctx.writeAndFlush(currResp);
+                ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
                 future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             }
         }
@@ -184,7 +184,7 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
         if (requiredBody) {
             queue.offer(EXTRA_INFO_REQ_BODY_KEY);
             ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true);
-            ChannelFuture future = ctx.writeAndFlush(currResp);
+            ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
             future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         }
 
