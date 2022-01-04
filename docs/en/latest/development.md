@@ -87,6 +87,74 @@ curl http://127.0.0.1:9080/apisix/admin/routes/1 -H 'X-API-KEY: edd1c9f034335f13
 apisix-java-plugin-runner will look for implementation classes named `FooFilter`,
 and the name of each filter's implementation class is the return value of its overridden function `public String name()`.
 
+#### The functions must be implemented of filter execution
+
+- `String name();`
+
+  description: return the name of plugin filter
+
+  code example:
+  
+  ```java
+    @Override
+    public String name() {
+        return "FooFilter";
+    }
+  ```
+
+- `void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain);`
+
+  description: implementing custom business logic
+
+  code example:
+
+  ```java
+    @Override
+    public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+        // get conf of current filter
+        String configStr = request.getConfig(this);
+        Gson gson = new Gson();
+        Map<String, Object> conf = new HashMap<>();
+        // convert according to the actual configured conf type
+        conf = gson.fromJson(configStr, conf.getClass());
+  
+        // get extra info
+        String remoteAddr = request.getVars("remote_addr");
+        String serverPort = request.getVars("server_port");
+        String body = request.getBody();
+
+        chain.filter(request, response);
+    }
+  ```
+
+- `List<String> requiredVars();`
+
+  description: declare in advance the nginx variables you want to use in the current filter
+
+  code example:
+
+  ```java
+    @Override
+    public List<String> requiredVars() {
+        List<String> vars = new ArrayList<>();
+        vars.add("remote_addr");
+        vars.add("server_port");
+        return vars;
+    }
+  ```
+
+- `Boolean requiredBody();`
+
+  description: whether the request body is required in the current filter, true means yes.
+
+  code example:
+
+  ```java
+    @Override
+    public Boolean requiredBody() {
+        return true;
+    }
+  ```
 
 ####  Rewrite Request
 
