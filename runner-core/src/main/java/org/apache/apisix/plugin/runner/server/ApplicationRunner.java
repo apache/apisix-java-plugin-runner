@@ -17,6 +17,21 @@
 
 package org.apache.apisix.plugin.runner.server;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 import com.google.common.cache.Cache;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -39,21 +54,7 @@ import org.apache.apisix.plugin.runner.handler.HTTPReqCallHandler;
 import org.apache.apisix.plugin.runner.handler.PayloadDecoder;
 import org.apache.apisix.plugin.runner.handler.BinaryProtocolDecoder;
 import org.apache.apisix.plugin.runner.handler.PayloadEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import org.apache.apisix.plugin.runner.handler.ExceptionCaughtHandler;
 
 @Component
 @RequiredArgsConstructor
@@ -123,7 +124,8 @@ public class ApplicationRunner implements CommandLineRunner {
                         .addAfter("payloadEncoder", "delayedDecoder", new BinaryProtocolDecoder())
                         .addLast("payloadDecoder", new PayloadDecoder())
                         .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, beanProvider))
-                        .addAfter("prepareConfHandler", "hTTPReqCallHandler", createA6HttpHandler(cache));
+                        .addAfter("prepareConfHandler", "hTTPReqCallHandler", createA6HttpHandler(cache))
+                        .addLast("exceptionCaughtHandler", new ExceptionCaughtHandler());
 
             }
         });
