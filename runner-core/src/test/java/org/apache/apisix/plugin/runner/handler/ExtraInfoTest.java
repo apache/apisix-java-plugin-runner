@@ -278,7 +278,7 @@ class ExtraInfoTest {
         Assertions.assertTrue(bytes.toString().contains("body: abcd"));
 
         // test pre-read request in HttpCallHandler
-        Assertions.assertEquals(HttpRequest.Method.GET,request.getMethod());
+        Assertions.assertEquals(HttpRequest.Method.GET, request.getMethod());
     }
 
 }
