@@ -21,6 +21,7 @@ import io.github.api7.A6.HTTPReqCall.Req;
 import io.github.api7.A6.TextEntry;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -84,7 +85,9 @@ public class HttpRequest implements A6Request {
             for (int i = 0; i < req.srcIpLength(); i++) {
                 builder.append(req.srcIp(i)).append('.');
             }
-            sourceIP = builder.substring(0, builder.length() - 1);
+            if (StringUtils.hasText(builder.toString())) {
+                sourceIP = builder.substring(0, builder.length() - 1);
+            }
         }
 
         return sourceIP;
