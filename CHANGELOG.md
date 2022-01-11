@@ -35,7 +35,7 @@ This release mainly provides the ability to get variables and request body.
 - change the network communication framework from reactor-netty to netty. [100](https://github.com/apache/apisix-java-plugin-runner/pull/100)
 - change the return value of filter function in PluginFilter interface. [100](https://github.com/apache/apisix-java-plugin-runner/pull/100)
 - the requiredVars and requiredBody functions have been added to the PluginFilter interface. [100](https://github.com/apache/apisix-java-plugin-runner/pull/100)
-- JDK requirements upgrade from 8 to 11
+- JDK requirements upgrade from 8 to 11.
 
 ### Core
 
