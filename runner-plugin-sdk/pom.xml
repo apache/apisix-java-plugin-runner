@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.apisix</groupId>
         <artifactId>apisix-plugin-runner</artifactId>
-        <version>0.1.0</version>
+        <version>0.2.0</version>
     </parent>
 
     <artifactId>apisix-runner-plugin-sdk</artifactId>

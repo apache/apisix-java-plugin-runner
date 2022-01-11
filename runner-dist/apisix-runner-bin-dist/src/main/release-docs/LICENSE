@@ -247,5 +247,3 @@ The following components are provided under the MIT License. See project link fo
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     checker-qual 2.11.1: https://github.com/typetools/checker-framework/blob/master/checker-qual, MIT
-    reactive-streams 1.0.3 https://github.com/reactive-streams/reactive-streams-jvm, MIT
-
