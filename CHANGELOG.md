@@ -49,7 +49,7 @@ This release mainly provides the ability to get variables and request body.
 - convert the conf req to an object and put it in the cache. [#73](https://github.com/apache/apisix-java-plugin-runner/pull/73)
 - modify socket file permissions so that APISIX has permission to read and write. [#96](https://github.com/apache/apisix-java-plugin-runner/pull/96)
 - disable null as key of req/resp headers and args. [#105](https://github.com/apache/apisix-java-plugin-runner/pull/105)
-- pre-read requests prevent read/write index confusion. [#105](https://github.com/apache/apisix-java-plugin-runner/pull/113)
+- pre-read requests prevent read/write index confusion. [#113](https://github.com/apache/apisix-java-plugin-runner/pull/113)
 
 [Back to TOC](#table-of-contents)
 
