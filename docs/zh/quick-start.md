@@ -2,7 +2,7 @@
 
 ### 准备工作
 
-* JDK 8
+* JDK 11
 * APISIX 2.10.0
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project。
 

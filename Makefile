@@ -17,7 +17,7 @@
 
 SHELL := /bin/bash -o pipefail
 
-VERSION ?= 0.1.0
+VERSION ?= 0.2.0
 RELEASE_SRC = apisix-java-plugin-runner-${VERSION}-src
 
 .PHONY: release-src
