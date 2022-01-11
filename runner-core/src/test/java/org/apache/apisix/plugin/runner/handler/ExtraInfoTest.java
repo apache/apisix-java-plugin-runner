@@ -204,7 +204,7 @@ class ExtraInfoTest {
     }
 
     @Test
-    @DisplayName("test fetch request body of extra info")
+    @DisplayName("test get vars in plugin filter")
     void testGetVarsInPluginFilter() {
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
@@ -276,6 +276,9 @@ class ExtraInfoTest {
         Assertions.assertTrue(bytes.toString().contains("server_port: 9080"));
         Assertions.assertTrue(bytes.toString().contains("content_type: application/json"));
         Assertions.assertTrue(bytes.toString().contains("body: abcd"));
+
+        // test pre-read request in HttpCallHandler
+        Assertions.assertEquals(HttpRequest.Method.GET, request.getMethod());
     }
 
 }

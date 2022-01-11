@@ -142,6 +142,10 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
         PluginFilterChain chain = conf.getChain();
 
+        // here we pre-read parameters in the req to
+        // prevent confusion over the read/write index of the req.
+        preReadReq();
+
         // if the filter chain is empty, then return the response directly
         if (Objects.isNull(chain) || 0 == chain.getFilters().size()) {
             ChannelFuture future = ctx.writeAndFlush(currResp);
@@ -192,6 +196,14 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
         if (!requiredBody && !requiredVars) {
             doFilter(ctx);
         }
+    }
+
+    private void preReadReq() {
+        currReq.getHeader();
+        currReq.getPath();
+        currReq.getMethod();
+        currReq.getArgs();
+        currReq.getSourceIP();
     }
 
     private void errorHandle(ChannelHandlerContext ctx, int code) {
