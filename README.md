@@ -28,7 +28,7 @@ Version Matrix
 | apisix-java-plugin-runner | APISIX                                                                      |
 |---------------------------|-----------------------------------------------------------------------------|
 | 0.1.0                     | >= [2.7.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#270)   |
-| 0.2.0                     | >= [2.10.2](https://github.com/apache/apisix/blob/master/CHANGELOG.md#2102) |
+| 0.2.0                     | >= [2.12.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#2102) |
 
 How it Works
 -------------
