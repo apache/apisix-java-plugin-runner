@@ -29,7 +29,7 @@ Prerequisites
 -------------
 
 * JDK 11
-* APISIX 2.10.x
+* APISIX 2.12.0
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project.
 * Refer to [Debug](how-it-works.md#debug)  to build the debug environment.
 

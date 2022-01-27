@@ -3,7 +3,7 @@
 ### 准备工作
 
 * JDK 11
-* APISIX 2.10.0
+* APISIX 2.12.0
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project。
 
 ### 开发扩展插件过滤器
@@ -54,7 +54,7 @@ apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz
 在`dist`目录添加`Dockerfile`文件
 
 ```dockerfile
-FROM apache/apisix:2.10.0-alpine
+FROM apache/apisix:${version}-alpine
 
 RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories && apk add --no-cache openjdk8-jre
 
@@ -66,7 +66,7 @@ ADD apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
 
 ```shell
  cd dist
- docker build -t apache/apisix:2.10.0-alpine-with-java-plugin .
+ docker build -t apache/apisix:${version}-alpine-with-java-plugin .
 ```
 
 最后在 APISIX 的 `config.yaml` 文件中增加配置，如下
@@ -76,7 +76,7 @@ ext-plugin:
   cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/path/to/apisix-runner-bin/apisix-java-plugin-runner.jar']
 ```
 
-构建完成的 `apache/apisix:2.10.0-alpine-with-java-plugin` 镜像内即包含 APISIX 与 apisix-java-plugun-runner。
+构建完成的 `apache/apisix:${version}-alpine-with-java-plugin` 镜像内即包含 APISIX 与 apisix-java-plugun-runner。
 
 ### 使用插件
 
