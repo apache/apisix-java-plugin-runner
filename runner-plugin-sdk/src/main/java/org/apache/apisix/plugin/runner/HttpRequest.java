@@ -138,7 +138,7 @@ public class HttpRequest implements A6Request {
      *
      * @return the all headers
      */
-    public Map<String, String> getHeader() {
+    public Map<String, String> getHeaders() {
         if (Objects.isNull(headers)) {
             headers = new HashMap<>();
             for (int i = 0; i < req.headersLength(); i++) {
@@ -164,7 +164,7 @@ public class HttpRequest implements A6Request {
      * @return the header value or null
      */
     public String getHeader(String headerName) {
-        Map<String, String> headers = getHeader();
+        Map<String, String> headers = getHeaders();
         if (!CollectionUtils.isEmpty(headers)) {
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 if (header.getKey().equals(headerName)) {
