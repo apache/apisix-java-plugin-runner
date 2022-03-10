@@ -22,10 +22,10 @@ name: Runner E2E Test
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 env:
   JAVA_RUNNER_VERSION: 0.2.0
