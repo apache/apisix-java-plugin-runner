@@ -199,7 +199,7 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
     }
 
     private void preReadReq() {
-        currReq.getHeader();
+        currReq.getHeaders();
         currReq.getPath();
         currReq.getMethod();
         currReq.getArgs();

@@ -99,8 +99,8 @@ class A6HttpCallHandlerTest {
                     }
                 }
 
-                if (!Objects.isNull(request.getHeader())) {
-                    for (Map.Entry<String, String> header : request.getHeader().entrySet()) {
+                if (!Objects.isNull(request.getHeaders())) {
+                    for (Map.Entry<String, String> header : request.getHeaders().entrySet()) {
                         System.out.println("do filter: header key: " + header.getKey());
                         System.out.println("do filter: header value: " + header.getValue());
                     }
