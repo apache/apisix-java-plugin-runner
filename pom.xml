@@ -20,9 +20,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.apache.apisix</groupId>
+    <groupId>io.github.ericluoliu</groupId>
     <artifactId>apisix-plugin-runner</artifactId>
     <version>0.2.0</version>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <parent>
         <groupId>org.apache</groupId>
@@ -30,22 +41,18 @@
         <version>21</version>
         <relativePath />
     </parent>
+
     <packaging>pom</packaging>
 
     <name>APISIX Java Plugin Runner</name>
-    <url>https://github.com/apache/apisix-java-plugin-runner</url>
+    <url>https://github.com/ericluoliu/apisix-java-plugin-runner</url>
 
     <scm>
-        <url>https://github.com/apache/apisix-java-plugin-runner</url>
-        <connection>scm:git:https://github.com/apache/apisix-java-plugin-runner.git</connection>
-        <developerConnection>scm:git:https://github.com/apache/apisix-java-plugin-runner.git</developerConnection>
+        <url>https://github.com/ericluoliu/apisix-java-plugin-runner</url>
+        <connection>scm:git:https://github.com/ericluoliu/apisix-java-plugin-runner.git</connection>
+        <developerConnection>scm:git:https://github.com/ericluoliu/apisix-java-plugin-runner.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-
-    <issueManagement>
-        <system>GitHub</system>
-        <url>https://github.com/apache/apisix/issues</url>
-    </issueManagement>
 
     <licenses>
         <license>
@@ -54,6 +61,15 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>Eric Liu</name>
+            <email>erikiceliu@gmail.com</email>
+            <organization>ASF</organization>
+            <organizationUrl>https://www.apache.org/</organizationUrl>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <compiler.version>11</compiler.version>
@@ -61,6 +77,7 @@
         <guava.version>30.1.1-jre</guava.version>
         <spring-boot.version>2.4.5</spring-boot.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <sourceReleaseAssemblyDescriptor>source-release-zip-tar</sourceReleaseAssemblyDescriptor>
     </properties>
 
     <modules>
@@ -74,6 +91,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.sonatype.oss</groupId>
+                <artifactId>oss-parent</artifactId>
+                <version>9</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>
@@ -105,9 +129,101 @@
 
     <build>
         <plugins>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-compiler-plugin</artifactId>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M2</version>
+                
+            </plugin>
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <!--
+                        <configuration>
+                            <file>${file}.jar</file>
+                            <keyname>${gpg,keyname}</keyname>
+                        </configuration>
+                        -->
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <source>8</source>
+                </configuration>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <release>${compiler.version}</release>
                     <source>${compiler.version}</source>
@@ -115,6 +231,7 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
+
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.0</version>
