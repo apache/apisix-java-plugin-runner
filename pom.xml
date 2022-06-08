@@ -87,6 +87,7 @@
         <module>runner-starter</module>
         <module>sample</module>
         <module>runner-dist</module>
+        <module>apisix-java-plugin-runner-builder</module>
     </modules>
 
     <dependencyManagement>
