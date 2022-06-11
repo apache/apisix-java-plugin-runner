@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.github.ericluoliu</groupId>
         <artifactId>apisix-plugin-runner</artifactId>
-        <version>0.2.0</version>
+        <version>0.3.0</version>
     </parent>
 
     <artifactId>apisix-java-plugin-runner-builder</artifactId>
@@ -35,34 +35,34 @@
     <dependencies>
         <dependency>
             <groupId>io.github.ericluoliu</groupId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <artifactId>apisix-runner-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.ericluoliu</groupId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <artifactId>apisix-runner-dist</artifactId>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
         <dependency>
             <groupId>io.github.ericluoliu</groupId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <artifactId>apisix-runner-plugin-sdk</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.ericluoliu</groupId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <artifactId>apisix-runner-plugin</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.ericluoliu</groupId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <artifactId>apisix-runner-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.ericluoliu</groupId>
-            <version>0.2.0</version>
+            <version>0.3.0</version>
             <artifactId>apisix-runner-sample</artifactId>
         </dependency>
     </dependencies>
