@@ -59,6 +59,7 @@ Follow link to https://search.maven.org/artifact/io.github.ericluoliu/apisix-run
 cd path/to/apisix-runner-bin-dist-0.4.0.tar.gz
 tar -zxvf apisix-runner-bin-dist-0.4.0.tar.gz
 ```
+A new directory called `apisix-runner-bin` will be created.
 
 ```
 cd apisix-runner-bin
