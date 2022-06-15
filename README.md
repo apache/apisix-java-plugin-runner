@@ -50,7 +50,7 @@ Welcome to make contributions, but before you start, please check out
 [development.md](./docs/en/latest/development.md) to learn how to run and debug apisix-java-plugin-runner
 in your own environment.
 
-Installing Plugins from Maven Central Repository
+Installing Plugin from Maven Central Repository
 ----------------------------------------
 
 Follow link to https://search.maven.org/artifact/io.github.ericluoliu/apisix-runner-bin-dist/0.4.0/jar. Download tar.gz. Follow the path that contains the apisix-runner-bin-dist-0.4.0.tar.gz file, and tar the file.
