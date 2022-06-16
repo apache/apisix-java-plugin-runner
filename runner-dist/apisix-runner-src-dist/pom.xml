@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.github.ericluoliu</groupId>
         <artifactId>apisix-runner-dist</artifactId>
-        <version>0.3.0</version>
+        <version>0.4.0</version>
     </parent>
 
     <artifactId>apisix-runner-src-dist</artifactId>

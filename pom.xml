@@ -22,7 +22,7 @@
 
     <groupId>io.github.ericluoliu</groupId>
     <artifactId>apisix-plugin-runner</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -87,7 +87,6 @@
         <module>runner-starter</module>
         <module>sample</module>
         <module>runner-dist</module>
-        <module>apisix-java-plugin-runner-builder</module>
     </modules>
 
     <dependencyManagement>
@@ -200,45 +199,7 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <skip>false</skip>
-                    <configLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/checkstyle.xml</configLocation>
-                    <suppressionsLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
-                    <headerLocation>${maven.multiModuleProjectDirectory}/src/main/checkstyle/HEADER</headerLocation>
-                    <encoding>UTF-8</encoding>
-                    <consoleOutput>true</consoleOutput>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <failOnViolation>true</failOnViolation>
-                    <sourceDirectories>
-                        <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                        <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
-                    </sourceDirectories>
-                    <resourceIncludes>
-                        **/*.properties,
-                        **/*.sh,
-                        **/*.bat,
-                        **/*.yml,
-                        **/*.yaml,
-                        **/*.xml
-                    </resourceIncludes>
-                    <resourceExcludes>
-                        **/.asf.yaml,
-                        **/.github/**
-                    </resourceExcludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
     </build>
 </project>
