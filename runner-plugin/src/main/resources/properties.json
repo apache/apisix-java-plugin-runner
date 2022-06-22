@@ -1,0 +1,4 @@
+
+"validate_header" = "token",
+"validate_url" = "https://www.sso.foo.com/token/validate",
+"rejected_code" = "403"
