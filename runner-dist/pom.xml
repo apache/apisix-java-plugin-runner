@@ -21,9 +21,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.github.ericluoliu</groupId>
+        <groupId>org.apache.apisix</groupId>
         <artifactId>apisix-plugin-runner</artifactId>
-        <version>0.4.0</version>
+        <version>0.2.0</version>
     </parent>
 
     <artifactId>apisix-runner-dist</artifactId>

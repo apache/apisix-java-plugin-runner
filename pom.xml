@@ -17,12 +17,13 @@
   ~
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.ericluoliu</groupId>
+    <groupId>org.apache.apisix</groupId>
     <artifactId>apisix-plugin-runner</artifactId>
-    <version>0.4.0</version>
+    <version>0.2.0</version>
 
     <distributionManagement>
         <snapshotRepository>
@@ -39,20 +40,25 @@
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>21</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <packaging>pom</packaging>
 
     <name>APISIX Java Plugin Runner</name>
-    <url>https://github.com/ericluoliu/apisix-java-plugin-runner</url>
+    <url>https://github.com/apache/apisix-java-plugin-runner</url>
 
     <scm>
-        <url>https://github.com/ericluoliu/apisix-java-plugin-runner</url>
-        <connection>scm:git:https://github.com/ericluoliu/apisix-java-plugin-runner.git</connection>
-        <developerConnection>scm:git:https://github.com/ericluoliu/apisix-java-plugin-runner.git</developerConnection>
+        <url>https://github.com/apache/apisix-java-plugin-runner</url>
+        <connection>scm:git:https://github.com/apache/apisix-java-plugin-runner.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/apisix-java-plugin-runner.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/apache/apisix/issues</url>
+    </issueManagement>
 
     <licenses>
         <license>
@@ -60,15 +66,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
-    <developers>
-        <developer>
-            <name>Eric Liu</name>
-            <email>erikiceliu@gmail.com</email>
-            <organization>ASF</organization>
-            <organizationUrl>https://www.apache.org/</organizationUrl>
-        </developer>
-    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -132,7 +129,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M6</version>  
+                <version>3.0.0-M6</version>
             </plugin>
 
             <plugin>
@@ -146,16 +143,10 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
-                        <!--
-                        <configuration>
-                            <file>${file}.jar</file>
-                            <keyname>${gpg,keyname}</keyname>
-                        </configuration>
-                        -->
                     </execution>
                 </executions>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -174,6 +165,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -198,7 +190,6 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-
 
         </plugins>
     </build>
