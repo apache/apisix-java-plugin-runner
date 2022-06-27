@@ -39,9 +39,8 @@
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>21</version>
-        <relativePath/>
+        <relativePath />
     </parent>
-
     <packaging>pom</packaging>
 
     <name>APISIX Java Plugin Runner</name>

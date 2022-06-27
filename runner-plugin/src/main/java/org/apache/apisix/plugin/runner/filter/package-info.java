@@ -20,4 +20,3 @@
  */
 
 package org.apache.apisix.plugin.runner.filter;
-
