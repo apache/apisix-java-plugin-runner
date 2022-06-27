@@ -50,32 +50,6 @@ Welcome to make contributions, but before you start, please check out
 [development.md](./docs/en/latest/development.md) to learn how to run and debug apisix-java-plugin-runner
 in your own environment.
 
-<<<<<<< HEAD
-Installing Plugin from Maven Central Repository
-----------------------------------------
-
-Follow link to https://search.maven.org/artifact/io.github.ericluoliu/apisix-runner-bin-dist/0.4.0/jar. Download tar.gz. Follow the path that contains the apisix-runner-bin-dist-0.4.0.tar.gz file, and tar the file.
-
-```
-cd path/to/apisix-runner-bin-dist-0.4.0.tar.gz
-tar -zxvf apisix-runner-bin-dist-0.4.0.tar.gz
-```
-A new directory called `apisix-runner-bin` will be created.
-
-```
-cd apisix-runner-bin
-```
-You will find a JAR file called apisix-java-plugin-runner.jar. To use this JAR in an APISIX process, add the following configuration in the `config.yaml` file of APISIX
-
-```yaml
-ext-plugin:
-  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/path/to/apisix-runner-bin/apisix-java-plugin-runner.jar']
-```
-
-
-
-=======
->>>>>>> parent of 144c1bb (Update README.md)
 License
 -------
 
