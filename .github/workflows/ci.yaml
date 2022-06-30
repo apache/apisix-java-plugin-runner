@@ -41,7 +41,7 @@ jobs:
         env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: 'Install & Test'
-        run: mvn clean install
+        run: mvn clean install -Dgpg.skip=true
 
   CI-on-MacOS:
     runs-on: macos-latest

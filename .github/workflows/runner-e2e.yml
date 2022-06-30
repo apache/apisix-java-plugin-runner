@@ -52,7 +52,7 @@ jobs:
     - name: build runner
       run: |
         cp ./sample/src/main/java/org/apache/apisix/plugin/runner/filter/* ./runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter/
-        ./mvnw install
+        ./mvnw clean install -Dgpg.skip=true
 
     - name: startup runner
       run: |
