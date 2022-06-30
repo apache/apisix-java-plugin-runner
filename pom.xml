@@ -70,7 +70,7 @@
         <compiler.version>11</compiler.version>
         <netty.version>4.1.54.Final</netty.version>
         <guava.version>30.1.1-jre</guava.version>
-        <spring-boot.version>2.4.5</spring-boot.version>
+        <spring-boot.version>2.6.8</spring-boot.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
     </properties>
 
