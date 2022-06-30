@@ -55,4 +55,4 @@ jobs:
           distribution: 'zulu'
           java-version: '11'
       - name: 'Install & Test'
-        run: ./mvnw clean install
+        run: ./mvnw clean install -Dgpg.skip=true
