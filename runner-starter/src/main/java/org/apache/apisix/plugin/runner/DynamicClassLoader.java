@@ -6,20 +6,27 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashSet;
 
-public class MyClassLoader extends ClassLoader {
-    public MyClassLoader(ClassLoader parent) {
+public class DynamicClassLoader extends ClassLoader {
+    private HashSet<String> allFilters;
+    private String dir;
+    private String packageName;
+
+    public DynamicClassLoader(ClassLoader parent) {
         super(parent);
+        allFilters = new HashSet<>();
     }
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
 
-        if(!"org.apache.apisix.plugin.runner.filter.RewriteRequestDemoFilter".equals(name)){
+        if(!allFilters.contains(name)) {
             return super.loadClass(name);
         }
         try {
-            String url = "file:/home/parallels/Documents/apisix-java-plugin-runner/runner-plugin/target/classes/org/apache/apisix/plugin/runner/filter/RewriteRequestDemoFilter.class";
+            String packagePath = packageName.replaceAll("\\.", "/");
+            String url = "file:" + dir + "/" + packagePath + "/" + name + ".class";
             URL myUrl = new URL(url);
             URLConnection connection = myUrl.openConnection();
             InputStream input = connection.getInputStream();
@@ -35,7 +42,8 @@ public class MyClassLoader extends ClassLoader {
 
             byte[] classData = buffer.toByteArray();
 
-            return defineClass("org.apache.apisix.plugin.runner.filter.RewriteRequestDemoFilter",
+            String fullyQualifiedName = packageName + "." + name;
+            return defineClass(fullyQualifiedName,
                     classData, 0, classData.length);
 
         } catch (MalformedURLException e) {
@@ -47,7 +55,15 @@ public class MyClassLoader extends ClassLoader {
         return null;
     }
 
+    public void setDir(String path) {
+        dir = path;
+    }
 
+    public void setFilters(HashSet<String> filters) {
+        allFilters = filters;
+    }
+
+    public void setPackageName(String name) {
+        packageName = name;
+    }
 }
-
-
