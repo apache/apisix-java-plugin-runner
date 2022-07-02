@@ -31,7 +31,12 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,13 +53,13 @@ public class PluginRunnerApplication {
     private YAMLConfig myConfig;
     @Autowired
     private ApplicationContext ctx;
-    private static ClassLoader ParentClassLoader;
-    private static DynamicClassLoader ClassLoader;
+    private static ClassLoader PARENT_CLASS_LOADER;
+    private static DynamicClassLoader CLASS_LOADER;
 
     public static void main(String[] args) {
-        ParentClassLoader = DynamicClassLoader.class.getClassLoader();
-        ClassLoader = new DynamicClassLoader(ParentClassLoader);
-        Thread.currentThread().setContextClassLoader(ClassLoader);
+        PARENT_CLASS_LOADER = DynamicClassLoader.class.getClassLoader();
+        CLASS_LOADER = new DynamicClassLoader(PARENT_CLASS_LOADER);
+        Thread.currentThread().setContextClassLoader(CLASS_LOADER);
         new SpringApplicationBuilder(PluginRunnerApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
@@ -110,11 +115,11 @@ public class PluginRunnerApplication {
                         String[] args = {"-d", pathToProject + "/target/classes", absolutePath + filterName + ".java"};
                         compiler.run(null, null, null, args);
 
-                        ClassLoader = new DynamicClassLoader(ParentClassLoader);
-                        ClassLoader.setDir(pathToProject + "/target/classes");
-                        ClassLoader.setFilters(set);
-                        ClassLoader.setPackageName(packageName);
-                        Class myObjectClass = ClassLoader.loadClass(filterName);
+                        CLASS_LOADER = new DynamicClassLoader(PARENT_CLASS_LOADER);
+                        CLASS_LOADER.setDir(pathToProject + "/target/classes");
+                        CLASS_LOADER.setFilters(set);
+                        CLASS_LOADER.setPackageName(packageName);
+                        Class myObjectClass = CLASS_LOADER.loadClass(filterName);
                         BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(myObjectClass).setLazyInit(true);
                         registry.registerBeanDefinition(beanFilterName, builder.getBeanDefinition());
                     }
