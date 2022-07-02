@@ -38,7 +38,7 @@ public class DynamicClassLoader extends ClassLoader {
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
 
-        if(!allFilters.contains(name)) {
+        if (!allFilters.contains(name)) {
             return super.loadClass(name);
         }
         try {
@@ -50,7 +50,7 @@ public class DynamicClassLoader extends ClassLoader {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             int data = input.read();
 
-            while(data != -1){
+            while (data != -1) {
                 buffer.write(data);
                 data = input.read();
             }

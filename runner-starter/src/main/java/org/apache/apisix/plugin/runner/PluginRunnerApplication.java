@@ -27,15 +27,18 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import javax.tools.*;
-import java.io.BufferedReader;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
-import static java.nio.file.StandardWatchEventKinds.*;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 @SpringBootApplication
 @EnableScheduling
@@ -45,13 +48,13 @@ public class PluginRunnerApplication {
     private YAMLConfig myConfig;
     @Autowired
     private ApplicationContext ctx;
-    private static ClassLoader parentClassLoader;
-    private static DynamicClassLoader classLoader;
+    private static ClassLoader ParentClassLoader;
+    private static DynamicClassLoader ClassLoader;
 
     public static void main(String[] args) {
-        parentClassLoader = DynamicClassLoader.class.getClassLoader();
-        classLoader = new DynamicClassLoader(parentClassLoader);
-        Thread.currentThread().setContextClassLoader(classLoader);
+        ParentClassLoader = DynamicClassLoader.class.getClassLoader();
+        ClassLoader = new DynamicClassLoader(ParentClassLoader);
+        Thread.currentThread().setContextClassLoader(ClassLoader);
         new SpringApplicationBuilder(PluginRunnerApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
@@ -67,7 +70,7 @@ public class PluginRunnerApplication {
         //get packagename and path to user's filters from YAML file
         String packageName = myConfig.getPackageName();
         String absolutePath = myConfig.getPath();
-        if(packageName.equals("")) {
+        if (packageName.equals("")) {
             packageName = "org.apache.apisix.plugin.runner.filter";
         }
         if (absolutePath.equals("")) {
@@ -107,11 +110,11 @@ public class PluginRunnerApplication {
                         String[] args = {"-d", pathToProject + "/target/classes", absolutePath + filterName + ".java"};
                         compiler.run(null, null, null, args);
 
-                        classLoader = new DynamicClassLoader(parentClassLoader);
-                        classLoader.setDir(pathToProject + "/target/classes");
-                        classLoader.setFilters(set);
-                        classLoader.setPackageName(packageName);
-                        Class myObjectClass = classLoader.loadClass(filterName);
+                        ClassLoader = new DynamicClassLoader(ParentClassLoader);
+                        ClassLoader.setDir(pathToProject + "/target/classes");
+                        ClassLoader.setFilters(set);
+                        ClassLoader.setPackageName(packageName);
+                        Class myObjectClass = ClassLoader.loadClass(filterName);
                         BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(myObjectClass).setLazyInit(true);
                         registry.registerBeanDefinition(beanFilterName, builder.getBeanDefinition());
                     }
@@ -119,9 +122,9 @@ public class PluginRunnerApplication {
 
                 //removes a filter dynamically
                 List<String> allRemovedFilters = findRemovedFilters(pathToProject, packageName, set);
-                for(String removedFilter : allRemovedFilters) {
+                for (String removedFilter : allRemovedFilters) {
                     String beanRemovedFilter = Character.toLowerCase(removedFilter.charAt(0)) + removedFilter.substring(1);
-                    if(registry.containsBeanDefinition(beanRemovedFilter)) {
+                    if (registry.containsBeanDefinition(beanRemovedFilter)) {
                         registry.removeBeanDefinition(beanRemovedFilter);
                     }
                 }
@@ -131,7 +134,7 @@ public class PluginRunnerApplication {
         }
     }
 
-    public List<String> findRemovedFilters (String pathToProject, String packageName, HashSet<String> set) {
+    public List<String> findRemovedFilters(String pathToProject, String packageName, HashSet<String> set) {
         List<String> allRemovedFilters = new ArrayList<>();
         String packagePath = packageName.replaceAll("\\.", "/");
         String[] allClasses = new File(pathToProject + "/target/classes/" + packagePath + "/").list();
