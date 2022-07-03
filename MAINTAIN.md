@@ -3,7 +3,7 @@ Project Maintenance
 
 Publishing to Maven Central Repository:
 
-1. Create Jira account by signing up at: https://issues.sonatype.org/secure/Signup!default.jspa
+1. Create a Jira account by signing up at: https://issues.sonatype.org/secure/Signup!default.jspa
 2. Create a new project ticket at: https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&pid=10134 (make sure the Issue Type is *New Project*)
 3. Generate a PGP Signature and distribute it to one or more public key servers. To generate a PGP Signature:
    ```
@@ -53,5 +53,3 @@ $ mvn clean deploy
 12. Comment your Jira ticket to sync Maven Central with your Group ID
 
 Congratulations! You have released to Maven Central Repository. The search query should sync within a few hours to a day.
-
-
