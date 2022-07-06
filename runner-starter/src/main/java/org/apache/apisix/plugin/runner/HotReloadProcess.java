@@ -59,7 +59,7 @@ public class HotReloadProcess {
 
         String pathToProject = System.getProperty("user.dir");
 
-        //get package name and path to user's filters from YAML file
+        //get package name and path to user's filters from appplication.yaml
         String packageName = myConfig.getPackageName();
         String absolutePath = myConfig.getPath();
         if (packageName.equals("")) {
