@@ -82,7 +82,7 @@ public class HotReloadProcess {
             for (WatchEvent<?> event : key.pollEvents()) {
                 String[] allFilters = new File(absolutePath).list();
                 HashSet<String> set = new HashSet<>();
-                if(allFilters.length != 0) {
+                if (allFilters.length != 0) {
                     for (int i = 0; i < allFilters.length; i++) {
                         //strangely, watchservice creates a file that ends with ".java~", we ignore this file
                         if (!allFilters[i].equals("package-info.java") && allFilters[i].charAt(allFilters[i].length() - 1) != '~') {
@@ -92,7 +92,6 @@ public class HotReloadProcess {
                     }
 
                     for (String filterName : allFilters) {
-                        System.out.println(filterName);
                         if ((!filterName.equals("package-info.java")) && filterName.charAt(filterName.length() - 1) != '~') {
                             //Bean Filter Name necessary because beans always start with lower case letters
                             String beanFilterName = Character.toLowerCase(filterName.charAt(0)) + filterName.substring(1);

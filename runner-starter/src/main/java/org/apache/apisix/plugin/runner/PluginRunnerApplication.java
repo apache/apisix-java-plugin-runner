@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class PluginRunnerApplication {
     private static ClassLoader PARENT_CLASS_LOADER;
     private static DynamicClassLoader CLASS_LOADER;
+
     public static void main(String[] args) {
 
         //load specified classes using dynamic class loader
