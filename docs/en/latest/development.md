@@ -160,6 +160,7 @@ and the name of each filter's implementation class is the return value of its ov
 
 If you perform the following function call in the filter chain of the implementation class
 
+* request.getConfig()
 *  request.setPath()
 *  request.setHeader()
 *  request.setArg()
@@ -177,6 +178,24 @@ If you perform the following function call in the filter chain of the implementa
 
 this means to stop the current request, the client will receive
 the relevant parameters generated here.
+
+####  Get the upstream response and process
+
+You can override the `postFilter` function, in your override function,
+you can get the origin upstream response by `PostRequest`,
+and you can also set the `PostResponse` to override the origin upstream response and return it to the client.
+
+##### PostRequest
+
+* request.getConfig()
+* request.getUpstreamHeaders()
+* request.getUpstreamStatusCode()
+
+##### PostResponse
+
+*  response.setStatusCode()
+*  response.setHeader()
+*  response.setBody()
 
 Test
 ----

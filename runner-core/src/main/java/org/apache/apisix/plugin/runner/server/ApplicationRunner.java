@@ -50,7 +50,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.handler.PrepareConfHandler;
-import org.apache.apisix.plugin.runner.handler.HTTPReqCallHandler;
+import org.apache.apisix.plugin.runner.handler.RpcCallHandler;
 import org.apache.apisix.plugin.runner.handler.PayloadDecoder;
 import org.apache.apisix.plugin.runner.handler.BinaryProtocolDecoder;
 import org.apache.apisix.plugin.runner.handler.PayloadEncoder;
@@ -84,8 +84,8 @@ public class ApplicationRunner implements CommandLineRunner {
         return new PrepareConfHandler(cache, filterMap);
     }
 
-    public HTTPReqCallHandler createA6HttpHandler(Cache<Long, A6Conf> cache) {
-        return new HTTPReqCallHandler(cache);
+    public RpcCallHandler createA6HttpHandler(Cache<Long, A6Conf> cache) {
+        return new RpcCallHandler(cache);
     }
 
     public void start(String path) throws Exception {

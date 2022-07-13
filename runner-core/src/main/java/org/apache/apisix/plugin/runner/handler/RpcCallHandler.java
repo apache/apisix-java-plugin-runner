@@ -32,26 +32,29 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
-import lombok.RequiredArgsConstructor;
-
 import org.apache.apisix.plugin.runner.A6Conf;
+import org.apache.apisix.plugin.runner.A6ErrRequest;
 import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.ExtraInfoRequest;
 import org.apache.apisix.plugin.runner.ExtraInfoResponse;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
+import org.apache.apisix.plugin.runner.PostRequest;
+import org.apache.apisix.plugin.runner.PostResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+import lombok.RequiredArgsConstructor;
+
 import org.apache.apisix.plugin.runner.constants.Constants;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 
 @RequiredArgsConstructor
-public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
+public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
-    private final Logger logger = LoggerFactory.getLogger(HTTPReqCallHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(RpcCallHandler.class);
 
     private final static String EXTRA_INFO_REQ_BODY_KEY = "request_body";
 
@@ -61,11 +64,15 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
      * the name of the nginx variable to be queried with queue staging
      * whether thread-safe collections are required?
      */
-    private Queue<String> queue = new LinkedList<>();
+    private final Queue<String> queue = new LinkedList<>();
 
     private HttpRequest currReq;
 
+    private PostRequest postReq;
+
     private HttpResponse currResp;
+
+    private PostResponse postResp;
 
     private long confToken;
 
@@ -74,17 +81,72 @@ public class HTTPReqCallHandler extends SimpleChannelInboundHandler<A6Request> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, A6Request request) {
         try {
+            if (request instanceof A6ErrRequest) {
+                errorHandle(ctx, ((A6ErrRequest) request).getCode());
+                return;
+            }
+
             if (request.getType() == Constants.RPC_EXTRA_INFO) {
+                assert request instanceof ExtraInfoResponse;
                 handleExtraInfo(ctx, (ExtraInfoResponse) request);
             }
 
             if (request.getType() == Constants.RPC_HTTP_REQ_CALL) {
+                assert request instanceof HttpRequest;
                 handleHttpReqCall(ctx, (HttpRequest) request);
+            }
+
+            if (request.getType() == Constants.RPC_HTTP_RESP_CALL) {
+                assert request instanceof PostRequest;
+                handleHttpRespCall(ctx, (PostRequest) request);
             }
         } catch (Exception e) {
             logger.error("handle request error: ", e);
             errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
         }
+    }
+
+    private void handleHttpRespCall(ChannelHandlerContext ctx, PostRequest request) {
+        cleanCtx();
+
+        // save HttpCallRequest
+        postReq = request;
+        postResp = new PostResponse(postReq.getRequestId());
+
+        confToken = postReq.getConfToken();
+        A6Conf conf = cache.getIfPresent(confToken);
+        if (Objects.isNull(conf)) {
+            logger.warn("cannot find conf token: {}", confToken);
+            errorHandle(ctx, Code.CONF_TOKEN_NOT_FOUND);
+            return;
+        }
+
+        PluginFilterChain chain = conf.getChain();
+
+        if (Objects.isNull(chain) || 0 == chain.getFilters().size()) {
+            ChannelFuture future = ctx.writeAndFlush(postResp);
+            future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+            return;
+        }
+
+        doPostFilter(ctx);
+    }
+
+    private void doPostFilter(ChannelHandlerContext ctx) {
+        A6Conf conf = cache.getIfPresent(confToken);
+        if (Objects.isNull(conf)) {
+            logger.warn("cannot find conf token: {}", confToken);
+            errorHandle(ctx, Code.CONF_TOKEN_NOT_FOUND);
+            return;
+        }
+
+        postReq.initCtx(conf.getConfig());
+
+        PluginFilterChain chain = conf.getChain();
+        chain.postFilter(postReq, postResp);
+
+        ChannelFuture future = ctx.writeAndFlush(postResp);
+        future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
 
     private void handleExtraInfo(ChannelHandlerContext ctx, ExtraInfoResponse request) {

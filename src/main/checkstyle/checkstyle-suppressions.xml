@@ -26,6 +26,9 @@
               files="A6HttpCallHandlerTest.java"
               lines="1-1000"/>
     <suppress checks="RegexpSingleline"
+              files="PostFilterTest.java"
+              lines="1-1000"/>
+    <suppress checks="RegexpSingleline"
               files="ExtraInfoTest.java"
               lines="1-1000"/>
     <suppress checks="LocalVariableName"

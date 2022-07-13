@@ -62,10 +62,6 @@ public class HttpResponse implements A6Response {
         this.requestId = requestId;
     }
 
-    public long getRequestId() {
-        return requestId;
-    }
-
     public void setReqHeader(String headerKey, String headerValue) {
         // key is null will cause the request to block
         if (headerKey == null) {
@@ -167,7 +163,7 @@ public class HttpResponse implements A6Response {
         Resp.startResp(builder);
         Resp.addAction(builder, action);
         Resp.addActionType(builder, actionType.getType());
-        Resp.addId(builder, getRequestId());
+        Resp.addId(builder, this.requestId);
         builder.finish(Resp.endResp(builder));
         return builder.dataBuffer();
     }
