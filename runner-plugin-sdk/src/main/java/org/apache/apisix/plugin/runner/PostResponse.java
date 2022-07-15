@@ -103,9 +103,6 @@ public class PostResponse implements A6Response {
         return A6Response.super.getErrResponse();
     }
 
-    public void setStatusCode(Integer code) {
-    }
-
     public void setHeader(String headerKey, String headerValue) {
         if (headerKey == null) {
             logger.warn("headerKey is null, ignore it");
