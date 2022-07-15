@@ -52,7 +52,7 @@ class A6HttpCallHandlerTest {
     private PrintStream console = null;
     private ByteArrayOutputStream bytes = null;
 
-    HTTPReqCallHandler httpReqCallHandler;
+    RpcCallHandler rpcCallHandler;
 
     Cache<Long, A6Conf> cache;
 
@@ -175,8 +175,8 @@ class A6HttpCallHandlerTest {
         confToken = response.getConfToken();
 
         prepareConfHandler = new PrepareConfHandler(cache, filters);
-        httpReqCallHandler = new HTTPReqCallHandler(cache);
-        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, httpReqCallHandler);
+        rpcCallHandler = new RpcCallHandler(cache);
+        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, rpcCallHandler);
     }
 
     @AfterEach

@@ -26,4 +26,6 @@ public class Constants {
     public static final byte RPC_HTTP_REQ_CALL = 2;
 
     public static final byte RPC_EXTRA_INFO = 3;
+
+    public static final byte RPC_HTTP_RESP_CALL = 4;
 }

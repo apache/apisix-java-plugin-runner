@@ -55,7 +55,7 @@ class ExtraInfoTest {
 
     private static final String[] EXTRAINFO_VARS = new String[]{"remote_addr", "server_port", "content_type"};
 
-    HTTPReqCallHandler httpReqCallHandler;
+    RpcCallHandler rpcCallHandler;
 
     Cache<Long, A6Conf> cache;
 
@@ -153,8 +153,8 @@ class ExtraInfoTest {
         confToken = response.getConfToken();
 
         prepareConfHandler = new PrepareConfHandler(cache, filters);
-        httpReqCallHandler = new HTTPReqCallHandler(cache);
-        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, httpReqCallHandler);
+        rpcCallHandler = new RpcCallHandler(cache);
+        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, rpcCallHandler);
     }
 
     @AfterEach

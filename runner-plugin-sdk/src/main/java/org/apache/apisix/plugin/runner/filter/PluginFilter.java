@@ -19,6 +19,9 @@ package org.apache.apisix.plugin.runner.filter;
 
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
+import org.apache.apisix.plugin.runner.PostRequest;
+import org.apache.apisix.plugin.runner.PostResponse;
+
 import java.util.List;
 
 public interface PluginFilter {
@@ -30,23 +33,39 @@ public interface PluginFilter {
 
     /**
      * do the plugin filter chain
-     *  @param request the request form APISIX
+     *
+     * @param request  the request form APISIX
      * @param response the response for APISIX
-     * @param chain the chain of filters
+     * @param chain    the chain of filters
      */
-    void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain);
+    default void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+    }
+
+    /**
+     * filtering after the upstream response is complete
+     *
+     * @param request  context of the upstream return
+     * @param response modify the context of the upstream response
+     */
+    default void postFilter(PostRequest request, PostResponse response, PluginFilterChain chain) {
+    }
 
     /**
      * declare in advance the nginx variables that you want to use in the plugin
+     *
      * @return the nginx variables as list
      */
-    List<String> requiredVars();
+    default List<String> requiredVars() {
+        return null;
+    }
 
     /**
      * need request body in plugins or not
      *
      * @return true if need request body
      */
-    Boolean requiredBody();
+    default Boolean requiredBody() {
+        return false;
+    }
 }
 

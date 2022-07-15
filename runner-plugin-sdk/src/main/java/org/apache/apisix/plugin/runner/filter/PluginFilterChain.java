@@ -19,6 +19,8 @@ package org.apache.apisix.plugin.runner.filter;
 
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
+import org.apache.apisix.plugin.runner.PostRequest;
+import org.apache.apisix.plugin.runner.PostResponse;
 
 import java.util.List;
 
@@ -51,6 +53,15 @@ public class PluginFilterChain {
             PluginFilterChain next = new PluginFilterChain(this,
                     this.index + 1);
             filter.filter(request, response, next);
+        }
+    }
+
+    public void postFilter(PostRequest request, PostResponse response) {
+        if (this.index < filters.size()) {
+            PluginFilter filter = filters.get(this.index);
+            PluginFilterChain next = new PluginFilterChain(this,
+                    this.index + 1);
+            filter.postFilter(request, response, next);
         }
     }
 }
