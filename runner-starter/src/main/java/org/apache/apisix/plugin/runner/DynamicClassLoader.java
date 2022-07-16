@@ -17,67 +17,68 @@
 
 package org.apache.apisix.plugin.runner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashSet;
 
 public class DynamicClassLoader extends ClassLoader {
-    private HashSet<String> allFilters;
-    private String dir;
+    private final Logger logger = LoggerFactory.getLogger(DynamicClassLoader.class);
+
+    private String name;
+    private String classDir;
     private String packageName;
 
     public DynamicClassLoader(ClassLoader parent) {
         super(parent);
-        allFilters = new HashSet<>();
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
-
-        if (!allFilters.contains(name)) {
-            return super.loadClass(name);
+    public Class<?> findClass(String name) throws ClassNotFoundException {
+        if (this.name == null) {
+            return super.findClass(name);
         }
-        try {
-            String packagePath = packageName.replaceAll("\\.", "/");
-            String url = "file:" + dir + "/" + packagePath + "/" + name + ".class";
-            URL myUrl = new URL(url);
-            URLConnection connection = myUrl.openConnection();
-            InputStream input = connection.getInputStream();
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            int data = input.read();
 
+        // can we do replacements for windows only?
+        String packagePath = packageName.replaceAll("\\.", "/");
+        String classPath = "file:" + classDir + "/" + packagePath + "/" + this.name + ".class";
+
+        URL url;
+        URLConnection connection;
+        try {
+            url = new URL(classPath);
+            connection = url.openConnection();
+        } catch (IOException e) {
+            logger.error("failed to open class file: {}", classPath, e);
+            throw new RuntimeException(e);
+        }
+        try (InputStream input = connection.getInputStream();
+             ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            int data = input.read();
             while (data != -1) {
                 buffer.write(data);
                 data = input.read();
             }
-
             input.close();
-
             byte[] classData = buffer.toByteArray();
-
             String fullyQualifiedName = packageName + "." + name;
-            return defineClass(fullyQualifiedName,
-                    classData, 0, classData.length);
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            return defineClass(fullyQualifiedName, classData, 0, classData.length);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("failed to read class file: {}", classPath, e);
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 
-    public void setDir(String path) {
-        dir = path;
+    public void setClassDir(String classDir) {
+        this.classDir = classDir;
     }
 
-    public void setFilters(HashSet<String> filters) {
-        allFilters = filters;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setPackageName(String name) {

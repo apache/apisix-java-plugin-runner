@@ -22,5 +22,9 @@ cache.config:
 socket:
   file: ${APISIX_LISTEN_ADDRESS}
 
-plugin-directory-absolute-path:     #please include a '/' at the beginning and end of path
-filter-package-name:
+
+#apisix:
+#  runner:
+#    dynamic-filter:
+#      load-path:
+#      package-name:

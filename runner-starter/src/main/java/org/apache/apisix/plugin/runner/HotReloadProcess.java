@@ -17,10 +17,14 @@
 
 package org.apache.apisix.plugin.runner;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -34,109 +38,110 @@ import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 @Component
-public class HotReloadProcess {
-    @Autowired
-    private YAMLConfig myConfig;
-    @Autowired
+public class HotReloadProcess implements ApplicationContextAware {
+    private final Logger logger = LoggerFactory.getLogger(HotReloadProcess.class);
     private ApplicationContext ctx;
-    private static ClassLoader PARENT_CLASS_LOADER;
-    private static DynamicClassLoader CLASS_LOADER;
 
-    @Scheduled(fixedDelay = Long.MAX_VALUE, initialDelay = 1000)
-    public void reload() throws ClassNotFoundException, IOException, InterruptedException {
-        PARENT_CLASS_LOADER = DynamicClassLoader.class.getClassLoader();
-        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) ctx.getAutowireCapableBeanFactory();
-        WatchService watchService = FileSystems.getDefault().newWatchService();
-
-        String pathToProject = System.getProperty("user.dir");
-
-        //get package name and path to user's filters from appplication.yaml
-        String packageName = myConfig.getPackageName();
-        String absolutePath = myConfig.getPath();
-        if (packageName.equals("")) {
-            packageName = "org.apache.apisix.plugin.runner.filter";
-        }
-        if (absolutePath.equals("")) {
-            absolutePath = pathToProject + "/runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter/";
-        }
-        Path path = Paths.get(absolutePath);
-
-        //make /target/classes directory if not already exists, compiled java files are output here
-        new File(pathToProject + "/target").mkdirs();
-        new File(pathToProject + "/target/classes").mkdirs();
-
-        //detect changes when files in the path are created, modified, or deleted
-        path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-        boolean poll = true;
-        while (poll) {
-            WatchKey key = watchService.take();
-            for (WatchEvent<?> event : key.pollEvents()) {
-                String[] allFilters = new File(absolutePath).list();
-                HashSet<String> set = new HashSet<>();
-                if (allFilters.length != 0) {
-                    for (int i = 0; i < allFilters.length; i++) {
-                        //strangely, watchservice creates a file that ends with ".java~", we ignore this file
-                        if (!allFilters[i].equals("package-info.java") && allFilters[i].charAt(allFilters[i].length() - 1) != '~') {
-                            allFilters[i] = allFilters[i].substring(0, allFilters[i].length() - 5);
-                            set.add(allFilters[i]);
-                        }
-                    }
-
-                    for (String filterName : allFilters) {
-                        if ((!filterName.equals("package-info.java")) && filterName.charAt(filterName.length() - 1) != '~') {
-                            //Bean Filter Name necessary because beans always start with lower case letters
-                            String beanFilterName = Character.toLowerCase(filterName.charAt(0)) + filterName.substring(1);
-                            if (registry.containsBeanDefinition(beanFilterName)) {
-                                registry.removeBeanDefinition(beanFilterName);
-                            }
-                            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                            String[] args = {"-d", pathToProject + "/target/classes", absolutePath + filterName + ".java"};
-                            compiler.run(null, null, null, args);
-
-                            CLASS_LOADER = new DynamicClassLoader(PARENT_CLASS_LOADER);
-                            CLASS_LOADER.setDir(pathToProject + "/target/classes");
-                            CLASS_LOADER.setFilters(set);
-                            CLASS_LOADER.setPackageName(packageName);
-                            Class<?> myObjectClass = CLASS_LOADER.loadClass(filterName);
-                            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(myObjectClass).setLazyInit(true);
-                            registry.registerBeanDefinition(beanFilterName, builder.getBeanDefinition());
-                        }
-                    }
-                }
-
-                //removes a filter dynamically
-                List<String> allRemovedFilters = findRemovedFilters(pathToProject, packageName, set);
-                for (String removedFilter : allRemovedFilters) {
-                    String beanRemovedFilter = Character.toLowerCase(removedFilter.charAt(0)) + removedFilter.substring(1);
-                    if (registry.containsBeanDefinition(beanRemovedFilter)) {
-                        registry.removeBeanDefinition(beanRemovedFilter);
-                    }
-                }
-
-            }
-            poll = key.reset();
-        }
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.ctx = applicationContext;
     }
 
-    public List<String> findRemovedFilters(String pathToProject, String packageName, HashSet<String> set) {
-        List<String> allRemovedFilters = new ArrayList<>();
-        String packagePath = packageName.replaceAll("\\.", "/");
-        String[] allClasses = new File(pathToProject + "/target/classes/" + packagePath + "/").list();
-        for (String className : allClasses) {
-            className = className.substring(0, className.length() - 6);
-            if (!set.contains(className)) {
-                allRemovedFilters.add(className);
+    @Value("${apisix.runner.dynamic-filter.load-path:/runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter/}")
+    private String loadPath;
+
+    @Value("${apisix.runner.dynamic-filter.package-name:org.apache.apisix.plugin.runner.filter}")
+    private String packageName;
+
+
+    private BeanDefinitionBuilder compile(String userDir, String filterName, String filePath) throws ClassNotFoundException {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
+        String classDir = userDir + "/target/classes";
+        File file = new File(userDir);
+        if (!file.exists() && !file.isDirectory()) {
+            boolean flag = file.mkdirs();
+            if (!flag) {
+                logger.error("mkdirs:{} error", file.getAbsolutePath());
             }
         }
-        return allRemovedFilters;
+
+        String[] args = {"-d", classDir, filePath};
+        compiler.run(null, null, null, args);
+
+        ClassLoader PARENT_CLASS_LOADER = DynamicClassLoader.class.getClassLoader();
+        DynamicClassLoader CLASS_LOADER = new DynamicClassLoader(PARENT_CLASS_LOADER);
+        CLASS_LOADER.setClassDir(classDir);
+        CLASS_LOADER.setName(filterName);
+        CLASS_LOADER.setPackageName(packageName);
+        Class<?> myObjectClass = CLASS_LOADER.loadClass(filterName);
+        return BeanDefinitionBuilder.genericBeanDefinition(myObjectClass).setLazyInit(true);
+    }
+
+
+    @Scheduled(fixedRate = 1000, initialDelay = 1000)
+    private void watch() {
+        final BeanDefinitionRegistry registry = (BeanDefinitionRegistry) ctx.getAutowireCapableBeanFactory();
+        long now = System.currentTimeMillis() / 1000;
+        logger.warn("Fixed rate task with one second initial delay - {}", now);
+        String userDir = System.getProperty("user.dir");
+        String workDir = userDir + loadPath;
+
+        try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
+            Path path = Paths.get(workDir);
+            path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+
+            while (true) {
+                final WatchKey key = watchService.take();
+                for (WatchEvent<?> watchEvent : key.pollEvents()) {
+                    final WatchEvent.Kind<?> kind = watchEvent.kind();
+                    final String filterFile = watchEvent.context().toString();
+
+                    // ignore the file that is not java file
+                    if (!filterFile.endsWith(".java")) {
+                        continue;
+                    }
+
+                    String filterName = filterFile.substring(0, filterFile.length() - 5);
+                    String filterBean = Character.toLowerCase(filterFile.charAt(0)) + filterName.substring(1);
+                    final String filePath = workDir + filterFile;
+
+                    if (kind == ENTRY_CREATE) {
+                        logger.info("file create: {}", filePath);
+                        BeanDefinitionBuilder builder = compile(userDir, filterName, filePath);
+                        registry.registerBeanDefinition(filterBean, builder.getBeanDefinition());
+                    } else if (kind == ENTRY_MODIFY) {
+                        logger.info("file modify: {}", filePath);
+                        registry.removeBeanDefinition(filterBean);
+                        BeanDefinitionBuilder builder = compile(userDir, filterName, filePath);
+                        registry.registerBeanDefinition(filterBean, builder.getBeanDefinition());
+                    } else if (kind == ENTRY_DELETE) {
+                        if (registry.containsBeanDefinition(filterBean)) {
+                            logger.info("file delete: {}, and remove filter: {} ", filePath, filterBean);
+                            registry.removeBeanDefinition(filterBean);
+                            /*TODO: we need to remove the filter from the filter chain
+                             * by remove the conf token in cache or other way
+                             * */
+                        }
+                    } else {
+                        logger.warn("unknown event: {}", kind);
+                    }
+                }
+
+                boolean valid = key.reset();
+                if (!valid) {
+                    logger.warn("key is invalid");
+                }
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            logger.error("watch error", e);
+            throw new RuntimeException(e);
+        }
     }
 }
