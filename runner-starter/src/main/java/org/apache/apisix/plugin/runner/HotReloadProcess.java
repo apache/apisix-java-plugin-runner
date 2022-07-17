@@ -59,7 +59,6 @@ public class HotReloadProcess implements ApplicationContextAware {
     @Value("${apisix.runner.dynamic-filter.package-name:org.apache.apisix.plugin.runner.filter}")
     private String packageName;
 
-
     private BeanDefinitionBuilder compile(String userDir, String filterName, String filePath) throws ClassNotFoundException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
@@ -75,15 +74,14 @@ public class HotReloadProcess implements ApplicationContextAware {
         String[] args = {"-d", classDir, filePath};
         compiler.run(null, null, null, args);
 
-        ClassLoader PARENT_CLASS_LOADER = DynamicClassLoader.class.getClassLoader();
-        DynamicClassLoader CLASS_LOADER = new DynamicClassLoader(PARENT_CLASS_LOADER);
-        CLASS_LOADER.setClassDir(classDir);
-        CLASS_LOADER.setName(filterName);
-        CLASS_LOADER.setPackageName(packageName);
-        Class<?> myObjectClass = CLASS_LOADER.loadClass(filterName);
+        ClassLoader parentClassLoader = DynamicClassLoader.class.getClassLoader();
+        DynamicClassLoader classLoader = new DynamicClassLoader(parentClassLoader);
+        classLoader.setClassDir(classDir);
+        classLoader.setName(filterName);
+        classLoader.setPackageName(packageName);
+        Class<?> myObjectClass = classLoader.loadClass(filterName);
         return BeanDefinitionBuilder.genericBeanDefinition(myObjectClass).setLazyInit(true);
     }
-
 
     @Scheduled(fixedRate = 1000, initialDelay = 1000)
     private void watch() {
