@@ -20,14 +20,24 @@ package org.apache.apisix.plugin.runner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class PluginRunnerApplication {
-    
+    private static ClassLoader PARENT_CLASS_LOADER;
+    private static DynamicClassLoader CLASS_LOADER;
+
     public static void main(String[] args) {
+
+        //load specified classes using dynamic class loader
+        PARENT_CLASS_LOADER = DynamicClassLoader.class.getClassLoader();
+        CLASS_LOADER = new DynamicClassLoader(PARENT_CLASS_LOADER);
+        Thread.currentThread().setContextClassLoader(CLASS_LOADER);
         new SpringApplicationBuilder(PluginRunnerApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
     }
-    
 }
+
+

@@ -21,3 +21,10 @@ cache.config:
 
 socket:
   file: ${APISIX_LISTEN_ADDRESS}
+
+
+#apisix:
+#  runner:
+#    dynamic-filter:
+#      load-path:
+#      package-name:
