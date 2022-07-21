@@ -21,6 +21,8 @@
 
 This document explains how to develop Java plugins using apisix-java-plugin-runner's official Maven release.
 
+A Demo Project can be found at: https://github.com/ericluoliu/java-plugin-runner-demo
+
 ___
 
 Create a new Maven Spring Boot Project.
