@@ -130,9 +130,9 @@ The final pom.xml file should look similar to
 
 In the Java main class, include the line
 ```
-@SpringBootApplication(scanBasePackages = "org.apache.apisix.plugin.runner")
+@SpringBootApplication(scanBasePackages = {"your-filter's-package-name","org.apache.apisix.plugin.runner"})
 ```
-*scanBasePackages* allows Spring Boot to read the *@Component* classes that exist inside of the Maven JAR.
+*scanBasePackages* allows Spring Boot to read the *@Component* classes that exist inside of the Maven JAR along with the implemented Java filter.
 
 An example main class looks like
 ```
@@ -141,7 +141,7 @@ package com.example.demo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "org.apache.apisix.plugin.runner")
+@SpringBootApplication(scanBasePackages = {"com.example.demo","org.apache.apisix.plugin.runner"})
 public class DemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
