@@ -34,9 +34,12 @@ release-src: compress-tar
 compress-tar:
 	./mvnw package
 
-.PHONY: release-prepare
-release-prepare:
-	./mvnw release:clean
+.PHONY: dry-run
+dry-run:
 	./mvnw release:prepare -pl runner-starter -am -DdryRun=true -DautoVersionSubmodules=true
 	./mvnw release:prepare -pl runner-core -am -DdryRun=true -DautoVersionSubmodules=true
 	./mvnw release:prepare -pl runner-plugin-sdk -am -DdryRun=true -DautoVersionSubmodules=true
+
+.PHONY: deploy
+deploy:
+	./mvnw deploy -pl runner-starter,runner-core,runner-plugin-sdk -am -DskipTests=true
