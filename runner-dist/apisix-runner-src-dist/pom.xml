@@ -64,7 +64,7 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/apisix-java-plugin-runner.tgz"
-                                      tofile="${project.basedir}/../../dist/apisix-java-plugin-runner-${project.version}-src.tgz"
+                                      tofile="${project.basedir}/../../apisix-java-plugin-runner-${project.version}-src.tgz"
                                       overwrite="true" />
                             </target>
                         </configuration>
