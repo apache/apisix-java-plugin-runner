@@ -27,8 +27,8 @@ Apache projects release all software packages through the ASF distribution syste
 
 1. Set up your development environment. For more details, see the [Publishing Maven Releases to Maven Central Repository](https://infra.apache.org/publishing-maven-artifacts.html).
 
-2. 
+2. Deploy the snapshot artifacts to Apache Nexus
 
 ```shell
-mvn release:prepare -pl runner-starter -am -DdryRun=true -DautoVersionSubmodules=true
+make deploy
 ```
