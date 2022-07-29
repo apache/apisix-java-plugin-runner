@@ -30,5 +30,5 @@ Apache projects release all software packages through the ASF distribution syste
 2. 
 
 ```shell
-mvn release:prepare -DdryRun=true -pl runner-core,runner-plugin-sdk,runner-starter
+mvn release:prepare -pl runner-starter -am -DdryRun=true -DautoVersionSubmodules=true
 ```
