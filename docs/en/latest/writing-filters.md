@@ -156,7 +156,7 @@ socket.file = /tmp/runner.sock
 ```
 This allows our java-plugin-runner to communicate with the main APISIX process.
 
-Finally, build your Java plugin! Be sure to import the necessary classes while following the guide at:
+Finally, build your Java plugin! Be sure to label each filter class as a Spring *@Component* while following the guide at:
 https://github.com/apache/apisix-java-plugin-runner/blob/main/docs/en/latest/development.md
 
 
