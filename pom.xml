@@ -65,9 +65,10 @@
 
     <modules>
         <module>runner-core</module>
+        <module>runner-plugin</module>
         <module>runner-plugin-sdk</module>
         <module>runner-starter</module>
-        <module>runner-plugin</module>
+        <module>sample</module>
         <module>runner-dist</module>
     </modules>
 
