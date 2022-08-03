@@ -52,6 +52,7 @@ jobs:
 
     - name: startup runner
       run: |
+        sed -i 's/apisix-runner-plugin-sdk/apisix-runner-plugin/' rrunner-core/pom.xml
         cd dist
         tar -zxvf apache-apisix-java-plugin-runner-*bin.tar.gz
         java -jar -DAPISIX_LISTEN_ADDRESS=unix:/tmp/runner.sock -DAPISIX_CONF_EXPIRE_TIME=3600 ./apisix-runner-bin/apisix-java-plugin-runner.jar &
