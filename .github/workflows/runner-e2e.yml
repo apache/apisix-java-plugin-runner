@@ -47,12 +47,12 @@ jobs:
 
     - name: build runner
       run: |
+        sed -i 's/apisix-runner-plugin-sdk/apisix-runner-plugin/' runner-core/pom.xml
         cp ./sample/src/main/java/org/apache/apisix/plugin/runner/filter/* ./runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter/
         ./mvnw clean install -Dgpg.skip=true
 
     - name: startup runner
       run: |
-        sed -i 's/apisix-runner-plugin-sdk/apisix-runner-plugin/' runner-core/pom.xml
         cd dist
         tar -zxvf apache-apisix-java-plugin-runner-*bin.tar.gz
         java -jar -DAPISIX_LISTEN_ADDRESS=unix:/tmp/runner.sock -DAPISIX_CONF_EXPIRE_TIME=3600 ./apisix-runner-bin/apisix-java-plugin-runner.jar &
