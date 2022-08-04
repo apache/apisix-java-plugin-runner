@@ -21,22 +21,21 @@
 
 This document explains how to develop Java plugins using apisix-java-plugin-runner's official Maven release.
 
-A Demo Project can be found at: https://github.com/ericluoliu/java-plugin-runner-demo
+A Demo Project can be found at: https://github.com/tzssangglass/java-plugin-runner-demo-1
 
 ___
 
 Create a new Maven Spring Boot Project.
 
-Add the apisix-java-plugin-runner Maven release as a dependency
+Add the GAV of `apisix-java-plugin-runner` in `pom.xml`.
 ```
-#TODO: needs to be changed once once official java-plugin-runner release is on Maven
 <dependency>
-    <groupId>io.github.ericluoliu</groupId> 
+    <groupId>org.apache.apisix</groupId> 
     <artifactId>apisix-runner-starter</artifactId>
-    <version>0.5.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
-Be sure to add the Maven JAR into the class path. Use *io.github.ericluoliu:apisix-runner-starter:0.5.0* when asked for Maven coordinates. For Intellij IDEA users unsure on how to add files to the class path, follow https://stackoverflow.com/questions/16742085/adding-jar-files-to-intellijidea-classpath.
+Be sure to add the Maven JAR into the class path. Use `org.apache.apisix:apisix-runner-starter:0.3.0` when asked for Maven coordinates. For Intellij IDEA users unsure on how to add files to the class path, follow https://stackoverflow.com/questions/16742085/adding-jar-files-to-intellijidea-classpath.
 
 To prevent multiple slf4j (a facade for various logging frameworks) bindings, exclude the *logback-classic* and *log4j-to-slf4j* transitive dependencies from being built within *spring-boot-starter*
 
@@ -101,12 +100,9 @@ The final pom.xml file should look similar to
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
-        #TODO: needs to be changed once once official java-plugin-runner release is on Maven
-        <dependency>  
-            <groupId>io.github.ericluoliu</groupId> 
+            <groupId>org.apache.apisix</groupId> 
             <artifactId>apisix-runner-starter</artifactId>
-            <version>0.5.0</version>
+            <version>0.3.0</version>
         </dependency>
     </dependencies>
     <build>
