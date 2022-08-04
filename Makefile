@@ -17,7 +17,7 @@
 
 SHELL := /bin/bash -o pipefail
 
-VERSION ?= 0.2.0
+VERSION ?= 0.3.0-SNAPSHOT
 RELEASE_SRC = apisix-java-plugin-runner-${VERSION}-src
 
 .PHONY: release-src
@@ -34,3 +34,12 @@ release-src: compress-tar
 compress-tar:
 	./mvnw package
 
+.PHONY: dry-run
+dry-run:
+	./mvnw release:prepare -pl runner-starter -DdryRun=true -DautoVersionSubmodules=true
+	./mvnw release:prepare -pl runner-core -DdryRun=true -DautoVersionSubmodules=true
+	./mvnw release:prepare -pl runner-plugin-sdk -DdryRun=true -DautoVersionSubmodules=true
+
+.PHONY: deploy
+deploy:
+	./mvnw clean deploy -pl runner-starter,runner-core,runner-plugin-sdk -DskipTests=true

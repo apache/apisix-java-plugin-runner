@@ -26,5 +26,6 @@ socket:
 #apisix:
 #  runner:
 #    dynamic-filter:
+#      enable: true
 #      load-path:
 #      package-name:

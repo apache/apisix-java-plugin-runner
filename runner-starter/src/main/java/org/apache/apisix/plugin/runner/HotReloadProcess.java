@@ -26,6 +26,10 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
+import org.springframework.scheduling.config.ScheduledTask;
+import org.springframework.scheduling.config.Task;
+import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.stereotype.Component;
 
 import javax.tools.JavaCompiler;
@@ -33,11 +37,14 @@ import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -47,6 +54,12 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 public class HotReloadProcess implements ApplicationContextAware {
     private final Logger logger = LoggerFactory.getLogger(HotReloadProcess.class);
     private ApplicationContext ctx;
+
+    private final ScheduledAnnotationBeanPostProcessor postProcessor;
+
+    public HotReloadProcess(ScheduledAnnotationBeanPostProcessor postProcessor) {
+        this.postProcessor = postProcessor;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -58,6 +71,9 @@ public class HotReloadProcess implements ApplicationContextAware {
 
     @Value("${apisix.runner.dynamic-filter.package-name:org.apache.apisix.plugin.runner.filter}")
     private String packageName;
+
+    @Value("${apisix.runner.dynamic-filter.enable:false}")
+    private Boolean enableHotReload;
 
     private BeanDefinitionBuilder compile(String userDir, String filterName, String filePath) throws ClassNotFoundException {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -84,16 +100,33 @@ public class HotReloadProcess implements ApplicationContextAware {
     }
 
     @Scheduled(fixedRate = 1000, initialDelay = 1000)
-    private void watch() {
+    private void hotReloadFilter() {
+        if (!enableHotReload) {
+            cancelHotReload("hotReloadFilter");
+            return;
+        }
+
         final BeanDefinitionRegistry registry = (BeanDefinitionRegistry) ctx.getAutowireCapableBeanFactory();
-        long now = System.currentTimeMillis() / 1000;
-        logger.warn("Fixed rate task with one second initial delay - {}", now);
         String userDir = System.getProperty("user.dir");
         String workDir = userDir + loadPath;
 
+        Path path = Paths.get(workDir);
+        boolean exists = Files.exists(path);
+        if (!exists) {
+            logger.warn("The filter workdir fot hot reload {} not exists", workDir);
+            cancelHotReload("hotReloadFilter");
+            return;
+        }
+
         try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
-            Path path = Paths.get(workDir);
             path.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    watchService.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
+            }));
 
             while (true) {
                 final WatchKey key = watchService.take();
@@ -141,5 +174,17 @@ public class HotReloadProcess implements ApplicationContextAware {
             logger.error("watch error", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public void cancelHotReload(String taskName) {
+        Set<ScheduledTask> tasks = postProcessor.getScheduledTasks();
+        tasks.forEach(task -> {
+            Task t = task.getTask();
+            ScheduledMethodRunnable runnable = (ScheduledMethodRunnable) t.getRunnable();
+            if (Objects.equals(runnable.getMethod().getName(), taskName)) {
+                postProcessor.postProcessBeforeDestruction(runnable.getTarget(), taskName);
+                logger.warn("Cancel hot reload schedule task");
+            }
+        });
     }
 }

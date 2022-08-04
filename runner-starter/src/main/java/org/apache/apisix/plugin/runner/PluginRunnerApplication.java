@@ -20,13 +20,18 @@ package org.apache.apisix.plugin.runner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 
 @SpringBootApplication
-@EnableScheduling
 public class PluginRunnerApplication {
     private static ClassLoader PARENT_CLASS_LOADER;
     private static DynamicClassLoader CLASS_LOADER;
+
+    @Bean
+    public ScheduledAnnotationBeanPostProcessor processor() {
+        return new ScheduledAnnotationBeanPostProcessor();
+    }
 
     public static void main(String[] args) {
 
