@@ -173,3 +173,4 @@ Deploy the JARs to Maven Central.
 ### Using a deployed plugin
 
 To use someone else's plugin, add their plugin's JAR as a dependency in your project. Add the package name (usually the same as the Group ID) in *scanBasePackages* in your main SpringBootApplication class.
+
