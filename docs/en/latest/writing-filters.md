@@ -19,11 +19,13 @@
 
 # Overview
 
-This document explains how to develop Java plugins using apisix-java-plugin-runner's official Maven release.
+This document explains how to develop and ship Java plugins using apisix-java-plugin-runner's official Maven release.
 
 A Demo Project can be found at: https://github.com/tzssangglass/java-plugin-runner-demo-1
 
 ___
+
+### Write Java plugin
 
 Create a new Maven Spring Boot Project.
 
@@ -152,6 +154,23 @@ socket.file = /tmp/runner.sock
 ```
 This allows our java-plugin-runner to communicate with the main APISIX process.
 
-Finally, build your Java plugin! Be sure to label each filter class as a Spring *@Component* while following the guide at:
+Build your Java plugin! Be sure to label each filter class as a Spring *@Component* while following the guide at:
 https://github.com/apache/apisix-java-plugin-runner/blob/main/docs/en/latest/development.md
+
+### Ship plugin
+
+In your plugin's *pom.xml*, add
+```
+<configuration>
+    <classifier>exec</classifier>
+</configuration>
+```
+
+The standard Spring Boot executable JAR places all of your application classes inside *BOOT-INF/classes*, making it impossible to inject into another project. This config builds an additional non-executable JAR that can be used for dependency injection.
+
+Deploy the JARs to Maven Central.
+
+### Using a deployed plugin
+
+To use someone else's plugin, add their plugin's non-executable JAR as a dependency in your project. Add the package name of their filters (usually the same as the Group ID) in *scanBasePackages* in your main SpringBootApplication class to allow Spring to find the plugin *@Component*.
 
