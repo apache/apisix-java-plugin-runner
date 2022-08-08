@@ -166,11 +166,11 @@ In your plugin's *pom.xml*, add
 </configuration>
 ```
 
-This will build an additional non-executable JAR that does not place your application classes (your filter) inside of *BOOT-INF/classes*
+The standard Spring Boot executable JAR places all of your application classes inside *BOOT-INF/classes*, making it impossible to inject into another project. This config builds an additional non-executable JAR that can be used for dependency injection.
 
 Deploy the JARs to Maven Central.
 
 ### Using a deployed plugin
 
-To use someone else's plugin, add their plugin's JAR as a dependency in your project. Add the package name (usually the same as the Group ID) in *scanBasePackages* in your main SpringBootApplication class.
+To use someone else's plugin, add their plugin's non-executable JAR as a dependency in your project. Add the package name of their filters (usually the same as the Group ID) in *scanBasePackages* in your main SpringBootApplication class to allow Spring to find the plugin *@Component*.
 
