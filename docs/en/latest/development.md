@@ -23,38 +23,7 @@ title: Development
 
 ## Overview
 
-This document explains how to get started to develop the apisix-java-plugin-runner.
-
-Prerequisites
--------------
-
-* JDK 11
-* APISIX 2.12.0
-* Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project.
-* Refer to [Debug](how-it-works.md#debug)  to build the debug environment.
-
-Install
--------
-
-```shell
-cd /path/to/apisix-java-plugin-runner
-./mvnw install
-```
-
-Write Filter
-------------
-
-Refer to the code in the [sample](https://github.com/apache/apisix-java-plugin-runner/tree/main/sample)
-to learn how to extend `PluginFilter`, define the order, rewrite requests and stop requests.
-
-####  Code Location
-
-You need to put the code in [runner-plugin](https://github.com/apache/apisix-java-plugin-runner/tree/main/runner-plugin/src/main/java/org/apache/apisix/plugin/runner/filter)
-so that the `apisix-java-plugin-runner.jar` will contain the filter implementation class you wrote when you package it.
-
-####  The order of filter execution
-
-The order of execution of the filter in the runner is determined by the index of the `conf` array in the `ext-plugin-pre-req` or `ext-plugin-post-req` configuration.
+This document explains how to write custom plugins.
 
 ####  The name of filter execution
 

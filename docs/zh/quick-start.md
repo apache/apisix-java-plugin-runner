@@ -3,7 +3,7 @@
 ### 准备工作
 
 * JDK 11
-* APISIX 2.12.0
+* APISIX 2.15.0
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project。
 
 ### 开发扩展插件过滤器

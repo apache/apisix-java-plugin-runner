@@ -29,6 +29,7 @@ Version Matrix
 |---------------------------|-----------------------------------------------------------------------------|
 | 0.1.0                     | >= [2.7.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#270)   |
 | 0.2.0                     | >= [2.12.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#2102) |
+| 0.3.0                     | >= [2.15.0](https://github.com/apache/apisix/blob/master/CHANGELOG.md#2150) |
 
 How it Works
 -------------
