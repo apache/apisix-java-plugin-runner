@@ -25,8 +25,6 @@ import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProc
 
 @SpringBootApplication
 public class PluginRunnerApplication {
-    private static ClassLoader PARENT_CLASS_LOADER;
-    private static DynamicClassLoader CLASS_LOADER;
 
     @Bean
     public ScheduledAnnotationBeanPostProcessor processor() {
@@ -35,10 +33,6 @@ public class PluginRunnerApplication {
 
     public static void main(String[] args) {
 
-        //load specified classes using dynamic class loader
-        PARENT_CLASS_LOADER = DynamicClassLoader.class.getClassLoader();
-        CLASS_LOADER = new DynamicClassLoader(PARENT_CLASS_LOADER);
-        Thread.currentThread().setContextClassLoader(CLASS_LOADER);
         new SpringApplicationBuilder(PluginRunnerApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
