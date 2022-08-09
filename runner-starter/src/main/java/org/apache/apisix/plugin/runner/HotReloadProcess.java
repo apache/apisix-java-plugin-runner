@@ -108,12 +108,13 @@ public class HotReloadProcess implements ApplicationContextAware {
 
         final BeanDefinitionRegistry registry = (BeanDefinitionRegistry) ctx.getAutowireCapableBeanFactory();
         String userDir = System.getProperty("user.dir");
+        userDir = userDir.substring(0, userDir.lastIndexOf("apisix-java-plugin-runner") + 25);
         String workDir = userDir + loadPath;
 
         Path path = Paths.get(workDir);
         boolean exists = Files.exists(path);
         if (!exists) {
-            logger.warn("The filter workdir fot hot reload {} not exists", workDir);
+            logger.warn("The filter workdir for hot reload {} not exists", workDir);
             cancelHotReload("hotReloadFilter");
             return;
         }
