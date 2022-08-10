@@ -42,13 +42,13 @@ Install
 
 1. Create a simple web application with Spring Boot, and choose Maven as the build tool.
 
-2. Add the GAV of `apisix-java-plugin-runner` in `pom.xml`, like:
+2. Add the apisix-java-plugin-runner dependency in your POM, like:
 
 ```xml
 <dependency>
     <groupId>org.apache.apisix</groupId> 
     <artifactId>apisix-runner-starter</artifactId>
-    <version>${project.version}</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
