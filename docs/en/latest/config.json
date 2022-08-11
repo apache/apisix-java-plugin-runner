@@ -12,6 +12,18 @@
       {
         "type": "doc",
         "id": "the-internal-of-apisix-java-plugin-runner"
+      },
+      {
+        "type": "doc",
+        "id": "installation-guide"
+      },
+      {
+        "type": "doc",
+        "id": "deployment-guide"
+      },
+      {
+        "type": "doc",
+        "id": "hot-reload"
       }
     ]
   }
