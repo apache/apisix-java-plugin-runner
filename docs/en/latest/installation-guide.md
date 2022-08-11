@@ -3,7 +3,7 @@ title: Installation
 keywords:
 - apisix-java-plugin-runner
 - Installation
-  description: This document explains how to installation and use apisix-java-plugin-runner.
+description: This document explains how to installation and use apisix-java-plugin-runner.
 ---
 
 

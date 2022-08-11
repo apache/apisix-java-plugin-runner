@@ -25,11 +25,15 @@ title: Deployment Guide
 
 This document explains how to support multiple ways to deploy custom plugins.
 
-**Note: This feature is a WIP** 
+:::note
+
+This feature is WIP.
+
+:::
 
 ### Ship plugin
 
-In your plugin's `pom.xml`, add
+In your plugin's `pom.xml`, add the following configuration:
 ```
 <build>
     <plugins>
