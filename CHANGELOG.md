@@ -23,8 +23,22 @@ title: Changelog
 
 ## Table of Contents
 
+- [0.3.0](#030)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 0.3.0
+
+This release mainly provides the ability to get headers from upstream, and support download the project from Maven Center.
+
+### Change
+
+- rename the name of the function that gets all the headers. [132](https://github.com/apache/apisix-java-plugin-runner/pull/132)
+
+### Core
+
+- support filter upstream response headers. [164](https://github.com/apache/apisix-java-plugin-runner/pull/164)
+- support hot reload of plugin filters. [158](https://github.com/apache/apisix-java-plugin-runner/pull/158)
 
 ## 0.2.0
 
