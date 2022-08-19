@@ -29,7 +29,7 @@ Apache projects release all software packages through the ASF distribution syste
 2. Create a release PR, the release PR (e.g.: https://github.com/apache/apisix-java-plugin-runner/pull/183) should do the following:
    - contains the changelog
    - contains version change(remove `SNAPSHOT` suffix)
-3. After the release PR merged, create a branch named `release/<version>` form `main` branch.
+3. After the release PR merged, create a branch named `release/<version>` form `main` branch
 4. Execute `make release-src` to build vote artifact, package the vote artifact to Apache's dev-apisix repo
 5. When the vote is passed, Send the [vote email](https://lists.apache.org/thread/721kfy9yqp4cm5cokg4yydczxgr08nbq) to dev@apisix.apache.org
 6. When the vote is passed, send the [vote result email](https://lists.apache.org/thread/ky55hf5swklb880x3tf3rdwfj5wyt1hs) to dev@apisix.apache.org
