@@ -42,4 +42,4 @@ dry-run:
 
 .PHONY: deploy
 deploy:
-	./mvnw clean deploy -pl runner-starter,runner-core,runner-plugin-sdk -DskipTests=true
+	./mvnw clean deploy -pl runner-starter -am -DskipTests=true
