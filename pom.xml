@@ -22,7 +22,7 @@
 
     <groupId>org.apache.apisix</groupId>
     <artifactId>apisix-plugin-runner</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
   
     <parent>
         <groupId>org.apache</groupId>
