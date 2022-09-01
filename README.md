@@ -9,7 +9,7 @@ Implemented as a sidecar that accompanies APISIX.
 Status
 ------
 
-This project is Production available.
+This project is generally available.
 
 Why apisix-java-plugin-runner
 ---------------------
