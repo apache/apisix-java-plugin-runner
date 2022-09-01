@@ -31,7 +31,7 @@ var _ = ginkgo.Describe("Stop", func() {
 			tools.RunTestCase(tc)
 		},
 		table.Entry("create java runner stop plugin route success", tools.HttpTestCase{
-			Object: tools.GetA6Expect(),
+			Object: tools.PutA6Conf(),
 			Method: http.MethodPut,
 			Path:   "/apisix/admin/routes/1",
 			Body: `{

@@ -18,7 +18,6 @@
 package tools
 
 import (
-	"github.com/gavv/httpexpect/v2"
 	"github.com/onsi/ginkgo"
 	"net/http"
 	"strings"
@@ -26,17 +25,23 @@ import (
 )
 
 var (
-	token  = "edd1c9f034335f136f87ad84b625c8f1"
-	A6Host = "http://127.0.0.1:9080"
+	token      = "edd1c9f034335f136f87ad84b625c8f1"
+	A6_CP_Host = "http://127.0.0.1:9180"
+	A6_DP_Host = "http://127.0.0.1:9080"
 )
 
 func GetAdminToken() string {
 	return token
 }
 
+func PutA6Conf() *httpexpect.Expect {
+	t := ginkgo.GinkgoT()
+	return httpexpect.New(t, A6_CP_Host)
+}
+
 func GetA6Expect() *httpexpect.Expect {
 	t := ginkgo.GinkgoT()
-	return httpexpect.New(t, A6Host)
+	return httpexpect.New(t, A6_DP_Host)
 }
 
 type HttpTestCase struct {
