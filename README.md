@@ -9,7 +9,7 @@ Implemented as a sidecar that accompanies APISIX.
 Status
 ------
 
-This project is currently considered experimental.
+This project is generally available.
 
 Why apisix-java-plugin-runner
 ---------------------
