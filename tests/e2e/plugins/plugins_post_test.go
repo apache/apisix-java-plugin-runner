@@ -32,7 +32,7 @@ var _ = ginkgo.Describe("Post", func() {
 			tools.RunTestCase(tc)
 		},
 		table.Entry("create java runner post plugin route success", tools.HttpTestCase{
-			Object: tools.GetA6Expect(),
+			Object: tools.PutA6Conf(),
 			Method: http.MethodPut,
 			Path:   "/apisix/admin/routes/1",
 			Body: `{
