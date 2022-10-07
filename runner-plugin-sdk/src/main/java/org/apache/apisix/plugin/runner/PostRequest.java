@@ -37,6 +37,8 @@ public class PostRequest implements A6Request {
 
     private Integer status;
 
+    private String body;
+
     public PostRequest(Req req) {
         this.req = req;
     }
@@ -86,5 +88,13 @@ public class PostRequest implements A6Request {
             status = req.status();
         }
         return status;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getBody() {
+        return body;
     }
 }

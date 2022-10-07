@@ -20,6 +20,7 @@ package org.apache.apisix.plugin.runner;
 import com.google.flatbuffers.FlatBufferBuilder;
 import io.github.api7.A6.ExtraInfo.Info;
 import io.github.api7.A6.ExtraInfo.ReqBody;
+import io.github.api7.A6.ExtraInfo.RespBody;
 import io.github.api7.A6.PrepareConf.Req;
 
 import java.nio.ByteBuffer;
@@ -30,9 +31,12 @@ public class ExtraInfoRequest implements A6Response {
 
     private final Boolean reqBody;
 
-    public ExtraInfoRequest(String var, Boolean reqBody) {
+    private final Boolean reqRespBody;
+
+    public ExtraInfoRequest(String var, Boolean reqBody, Boolean reqRespBody) {
         this.var = var;
         this.reqBody = reqBody;
+        this.reqRespBody = reqRespBody;
     }
 
     @Override
@@ -51,6 +55,12 @@ public class ExtraInfoRequest implements A6Response {
             io.github.api7.A6.ExtraInfo.ReqBody.startReqBody(builder);
             int reqBodyReq = ReqBody.endReqBody(builder);
             buildExtraInfo(reqBodyReq, Info.ReqBody, builder);
+        }
+
+        if (this.reqRespBody != null && this.reqRespBody) {
+            io.github.api7.A6.ExtraInfo.RespBody.startRespBody(builder);
+            int reqBodyResp = RespBody.endRespBody(builder);
+            buildExtraInfo(reqBodyResp, Info.RespBody, builder);
         }
 
         builder.finish(Req.endReq(builder));

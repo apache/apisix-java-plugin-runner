@@ -57,6 +57,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
     private final Logger logger = LoggerFactory.getLogger(RpcCallHandler.class);
 
     private final static String EXTRA_INFO_REQ_BODY_KEY = "request_body";
+    private final static String EXTRA_INFO_RESP_BODY_KEY = "response_body";
 
     private final Cache<Long, A6Conf> cache;
 
@@ -106,6 +107,62 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
         }
     }
 
+    private Boolean[] fetchExtraInfo(ChannelHandlerContext ctx, PluginFilterChain chain) {
+        // fetch the nginx variables
+        Set<String> varKeys = new HashSet<>();
+        boolean requiredBody = false;
+        boolean requiredVars = false;
+        boolean requiredRespBody = false;
+
+        for (PluginFilter filter : chain.getFilters()) {
+            Collection<String> vars = filter.requiredVars();
+            if (!CollectionUtils.isEmpty(vars)) {
+                varKeys.addAll(vars);
+                requiredVars = true;
+            }
+
+            if (filter.requiredBody() != null && filter.requiredBody()) {
+                requiredBody = true;
+            }
+
+            if (filter.requiredRespBody() != null && filter.requiredRespBody()) {
+                requiredRespBody = true;
+            }
+        }
+
+        // fetch the nginx vars
+        if (requiredVars) {
+            for (String varKey : varKeys) {
+                boolean offer = queue.offer(varKey);
+                if (!offer) {
+                    logger.error("queue is full");
+                    errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
+                }
+                ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(varKey, null, null);
+                ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
+                future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+            }
+        }
+
+        // fetch the request body
+        if (requiredBody) {
+            queue.offer(EXTRA_INFO_REQ_BODY_KEY);
+            ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true, null);
+            ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
+            future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        }
+
+        // fetch the response body
+        if (requiredRespBody) {
+            queue.offer(EXTRA_INFO_RESP_BODY_KEY);
+            ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, null, true);
+            ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
+            future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        }
+
+        return new Boolean[]{requiredVars, requiredBody, requiredRespBody};
+    }
+
     private void handleHttpRespCall(ChannelHandlerContext ctx, PostRequest request) {
         cleanCtx();
 
@@ -129,7 +186,14 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             return;
         }
 
-        doPostFilter(ctx);
+        Boolean[] result = fetchExtraInfo(ctx, chain);
+        if (Objects.isNull(result)) {
+            return;
+        }
+        if (!result[0] && !result[2]) {
+            // no need to fetch extra info
+            doPostFilter(ctx);
+        }
     }
 
     private void doPostFilter(ChannelHandlerContext ctx) {
@@ -160,11 +224,19 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
         if (EXTRA_INFO_REQ_BODY_KEY.equals(varsKey)) {
             currReq.setBody(result);
-        } else {
+        } else if (EXTRA_INFO_RESP_BODY_KEY.equals(varsKey)) {
+            postReq.setBody(result);
+        }
+        else {
             nginxVars.put(varsKey, result);
         }
+
         if (queue.isEmpty()) {
-            doFilter(ctx);
+            if (currReq != null) {
+                doFilter(ctx);
+            } else if (postReq != null) {
+                doPostFilter(ctx);
+            }
         }
     }
 
@@ -215,48 +287,15 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             return;
         }
 
-        // fetch the nginx variables
-        Set<String> varKeys = new HashSet<>();
-        boolean requiredBody = false;
-        boolean requiredVars = false;
+        fetchExtraInfo(ctx, chain);
 
-        for (PluginFilter filter : chain.getFilters()) {
-            Collection<String> vars = filter.requiredVars();
-            if (!CollectionUtils.isEmpty(vars)) {
-                varKeys.addAll(vars);
-                requiredVars = true;
-            }
-
-            if (filter.requiredBody() != null && filter.requiredBody()) {
-                requiredBody = true;
-            }
+        Boolean[] result = fetchExtraInfo(ctx, chain);
+        if (Objects.isNull(result)) {
+            return;
         }
-
-        if (varKeys.size() > 0) {
-            for (String varKey : varKeys) {
-                boolean offer = queue.offer(varKey);
-                if (!offer) {
-                    logger.error("queue is full");
-                    errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
-                    return;
-                }
-                ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(varKey, null);
-                ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
-                future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-            }
-        }
-
-        // fetch the request body
-        if (requiredBody) {
-            queue.offer(EXTRA_INFO_REQ_BODY_KEY);
-            ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true);
-            ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
-            future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-        }
-
-        // no need to fetch the nginx variables or request body, just do filter
-        if (!requiredBody && !requiredVars) {
-            doFilter(ctx);
+        if (!result[0] && !result[1]) {
+            // no need to fetch extra info
+            doPostFilter(ctx);
         }
     }
 
