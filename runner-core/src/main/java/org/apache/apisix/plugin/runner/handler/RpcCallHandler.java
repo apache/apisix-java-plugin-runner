@@ -287,15 +287,13 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             return;
         }
 
-        fetchExtraInfo(ctx, chain);
-
         Boolean[] result = fetchExtraInfo(ctx, chain);
         if (Objects.isNull(result)) {
             return;
         }
         if (!result[0] && !result[1]) {
             // no need to fetch extra info
-            doPostFilter(ctx);
+            doFilter(ctx);
         }
     }
 
