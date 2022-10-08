@@ -31,7 +31,6 @@ services:
       - "9180:9180/tcp"
       - "9091:9091/tcp"
       - "9443:9443/tcp"
-      - "9092:9092/tcp"
     networks:
       apisix:
 
