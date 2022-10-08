@@ -27,11 +27,15 @@ apisix:
     - name: admin
       key: edd1c9f034335f136f87ad84b625c8f1
       role: admin
-etcd:
-   host:
-     - http://etcd:2379
-   prefix: "/apisix"
-   timeout: 30
+deployment:
+  role: traditional
+  role_traditional:
+    config_provider: etcd
+  etcd:
+    host:
+      - "http://etcd:2379"
+    prefix: "/apisix"
+    timeout: 30
 ext-plugin:
   path_for_test: /tmp/runner.sock
 nginx_config:
