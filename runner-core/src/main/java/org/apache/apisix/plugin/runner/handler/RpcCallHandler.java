@@ -223,9 +223,13 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
         }
 
         if (EXTRA_INFO_REQ_BODY_KEY.equals(varsKey)) {
-            currReq.setBody(result);
+            if (!Objects.isNull(currReq)) {
+                currReq.setBody(result);
+            }
         } else if (EXTRA_INFO_RESP_BODY_KEY.equals(varsKey)) {
-            postReq.setBody(result);
+            if (!Objects.isNull(postReq)) {
+                postReq.setBody(result);
+            }
         }
         else {
             nginxVars.put(varsKey, result);
