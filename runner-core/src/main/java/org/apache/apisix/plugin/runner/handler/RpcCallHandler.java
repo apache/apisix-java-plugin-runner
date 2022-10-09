@@ -110,7 +110,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
     private Boolean[] fetchExtraInfo(ChannelHandlerContext ctx, PluginFilterChain chain) {
         // fetch the nginx variables
         Set<String> varKeys = new HashSet<>();
-        boolean requiredBody = false;
+        boolean requiredReqBody = false;
         boolean requiredVars = false;
         boolean requiredRespBody = false;
 
@@ -122,7 +122,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
 
             if (filter.requiredBody() != null && filter.requiredBody()) {
-                requiredBody = true;
+                requiredReqBody = true;
             }
 
             if (filter.requiredRespBody() != null && filter.requiredRespBody()) {
@@ -145,7 +145,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
         }
 
         // fetch the request body
-        if (requiredBody) {
+        if (requiredReqBody) {
             queue.offer(EXTRA_INFO_REQ_BODY_KEY);
             ExtraInfoRequest extraInfoRequest = new ExtraInfoRequest(null, true, null);
             ChannelFuture future = ctx.writeAndFlush(extraInfoRequest);
@@ -160,7 +160,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         }
 
-        return new Boolean[]{requiredVars, requiredBody, requiredRespBody};
+        return new Boolean[]{requiredVars, requiredReqBody, requiredRespBody};
     }
 
     private void handleHttpRespCall(ChannelHandlerContext ctx, PostRequest request) {
