@@ -70,7 +70,7 @@ var _ = ginkgo.Describe("Post", func() {
 			Method: http.MethodGet,
 			Path:   "/test/java/runner/postvars",
 			ExpectHeaders: map[string]string{
-				"remote-addr": "127.0.0.1",
+				"server-port": "9080",
 			},
 			ExpectStatus: http.StatusOK,
 		}),
