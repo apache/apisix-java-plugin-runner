@@ -66,9 +66,12 @@ var _ = ginkgo.Describe("Post", func() {
 			ExpectStatusRange: httpexpect.Status2xx,
 		}),
 		table.Entry("test java runner post plugin route success", tools.HttpTestCase{
-			Object:       tools.GetA6Expect(),
-			Method:       http.MethodGet,
-			Path:         "/test/java/runner/postvars",
+			Object: tools.GetA6Expect(),
+			Method: http.MethodGet,
+			Path:   "/test/java/runner/postvars",
+			ExpectHeaders: map[string]string{
+				"remote-addr": "127.0.0.1",
+			},
 			ExpectStatus: http.StatusOK,
 		}),
 	)

@@ -205,6 +205,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
         }
 
         postReq.initCtx(conf.getConfig());
+        postReq.setVars(nginxVars);
 
         PluginFilterChain chain = conf.getChain();
         chain.postFilter(postReq, postResp);
