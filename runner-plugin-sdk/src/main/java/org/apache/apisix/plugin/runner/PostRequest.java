@@ -20,6 +20,7 @@ package org.apache.apisix.plugin.runner;
 import io.github.api7.A6.HTTPRespCall.Req;
 import io.github.api7.A6.TextEntry;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
+import org.springframework.util.CollectionUtils;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -36,6 +37,10 @@ public class PostRequest implements A6Request {
     private Map<String, String> headers;
 
     private Integer status;
+
+    private String body;
+
+    private Map<String, String> vars;
 
     public PostRequest(Req req) {
         this.req = req;
@@ -86,5 +91,24 @@ public class PostRequest implements A6Request {
             status = req.status();
         }
         return status;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public String getVars(String key) {
+        if (CollectionUtils.isEmpty(vars)) {
+            return null;
+        }
+        return vars.get(key);
+    }
+
+    public void setVars(Map<String, String> vars) {
+        this.vars = vars;
     }
 }

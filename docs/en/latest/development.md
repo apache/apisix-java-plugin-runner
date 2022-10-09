@@ -159,6 +159,7 @@ and you can also set the `PostResponse` to override the origin upstream response
 * request.getConfig()
 * request.getUpstreamHeaders()
 * request.getUpstreamStatusCode()
+* request.getBody()
 
 ##### PostResponse
 

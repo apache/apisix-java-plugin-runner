@@ -15,23 +15,22 @@
 # limitations under the License.
 #
 
-
-apisix:
-  allow_admin:
-    - 0.0.0.0/0
-  enable_control: true
-  control:
-    ip: "0.0.0.0"
-    port: 9092
-  admin_key:
-    - name: admin
-      key: edd1c9f034335f136f87ad84b625c8f1
-      role: admin
-etcd:
-   host:
-     - http://etcd:2379
-   prefix: "/apisix"
-   timeout: 30
+deployment:
+  role: traditional
+  role_traditional:
+    config_provider: etcd
+  admin:
+    admin_key:
+      - name: admin
+        key: edd1c9f034335f136f87ad84b625c8f1  # using fixed API token has security risk, please update it when you deploy to production environment
+        role: admin
+    allow_admin:
+      - 0.0.0.0/0
+  etcd:
+    host:
+      - "http://etcd:2379"
+    prefix: "/apisix"
+    timeout: 30
 ext-plugin:
   path_for_test: /tmp/runner.sock
 nginx_config:

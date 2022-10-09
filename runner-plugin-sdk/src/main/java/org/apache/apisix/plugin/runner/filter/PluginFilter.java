@@ -67,5 +67,14 @@ public interface PluginFilter {
     default Boolean requiredBody() {
         return false;
     }
+
+    /**
+     * need response body of upstream server in plugins or not
+     *
+     * @return true if need response body
+     */
+    default Boolean requiredRespBody() {
+        return false;
+    }
 }
 
