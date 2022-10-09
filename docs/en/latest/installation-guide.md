@@ -34,7 +34,7 @@ Prerequisites
 -------------
 
 * JDK 11
-* APISIX 2.99.0
+* APISIX master branch
 * Refer to [Debug](how-it-works.md#debug)  to build the debug environment.
 
 Install
