@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
+import org.apache.apisix.plugin.runner.A6ConfigWatcher;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.A6Response;
 import org.apache.apisix.plugin.runner.constants.Constants;
@@ -48,6 +49,7 @@ public class PrepareConfHandler extends SimpleChannelInboundHandler<A6Request> {
 
     private final Cache<Long, A6Conf> cache;
     private final Map<String, PluginFilter> filters;
+    private final List<A6ConfigWatcher> watchers;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, A6Request request) {
@@ -75,6 +77,9 @@ public class PrepareConfHandler extends SimpleChannelInboundHandler<A6Request> {
         }
         A6Conf a6Conf = new A6Conf(config, chain);
         cache.put(token, a6Conf);
+        for (A6ConfigWatcher watcher : watchers) {
+            watcher.watch(token, a6Conf);
+        }
         ctx.write(response);
         ctx.writeAndFlush(response);
     }

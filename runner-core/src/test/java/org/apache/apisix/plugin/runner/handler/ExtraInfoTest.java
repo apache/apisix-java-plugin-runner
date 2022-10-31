@@ -26,6 +26,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
+import org.apache.apisix.plugin.runner.A6ConfigWatcher;
 import org.apache.apisix.plugin.runner.ExtraInfoRequest;
 import org.apache.apisix.plugin.runner.ExtraInfoResponse;
 import org.apache.apisix.plugin.runner.HttpRequest;
@@ -41,6 +42,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,8 @@ class ExtraInfoTest {
     Cache<Long, A6Conf> cache;
 
     Map<String, PluginFilter> filters;
+
+    List<A6ConfigWatcher> watchers;
 
     EmbeddedChannel channel;
 
@@ -127,6 +131,7 @@ class ExtraInfoTest {
                 return true;
             }
         });
+        watchers = new ArrayList<>();
         cache = CacheBuilder.newBuilder().expireAfterWrite(3600, TimeUnit.SECONDS).maximumSize(1000).build();
         FlatBufferBuilder builder = new FlatBufferBuilder();
 
@@ -145,14 +150,14 @@ class ExtraInfoTest {
         io.github.api7.A6.PrepareConf.Req req = io.github.api7.A6.PrepareConf.Req.getRootAsReq(builder.dataBuffer());
 
         A6ConfigRequest request = new A6ConfigRequest(req);
-        prepareConfHandler = new PrepareConfHandler(cache, filters);
+        prepareConfHandler = new PrepareConfHandler(cache, filters, watchers);
         channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler);
         channel.writeInbound(request);
         channel.finish();
         A6ConfigResponse response = channel.readOutbound();
         confToken = response.getConfToken();
 
-        prepareConfHandler = new PrepareConfHandler(cache, filters);
+        prepareConfHandler = new PrepareConfHandler(cache, filters, watchers);
         rpcCallHandler = new RpcCallHandler(cache);
         channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, rpcCallHandler);
     }

@@ -17,6 +17,16 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.flatbuffers.FlatBufferBuilder;
@@ -27,19 +37,11 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
+import org.apache.apisix.plugin.runner.A6ConfigWatcher;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @DisplayName("test add filter")
 class A6ConfigHandlerTest {
@@ -48,7 +50,11 @@ class A6ConfigHandlerTest {
 
     Map<String, PluginFilter> filters;
 
+    List<A6ConfigWatcher> watchers;
+
     PrepareConfHandler prepareConfHandler;
+
+    TestWatcher tWatcher = new TestWatcher() ;
 
     @BeforeEach
     void setUp() {
@@ -96,8 +102,10 @@ class A6ConfigHandlerTest {
                 return null;
             }
         });
+        watchers = new ArrayList<>();
+        watchers.add(tWatcher);
         cache = CacheBuilder.newBuilder().expireAfterWrite(3600, TimeUnit.SECONDS).maximumSize(1000).build();
-        prepareConfHandler = new PrepareConfHandler(cache, filters);
+        prepareConfHandler = new PrepareConfHandler(cache, filters, watchers);
     }
 
     @Test
@@ -124,6 +132,7 @@ class A6ConfigHandlerTest {
         Assertions.assertEquals(config.getChain().getFilters().size(), 1);
         Assertions.assertEquals(config.getChain().getIndex(), 0);
         Assertions.assertEquals(config.get("FooFilter"), "Bar");
+        Assertions.assertEquals(tWatcher.getConfig(), config.getConfig());
     }
 
     @Test
