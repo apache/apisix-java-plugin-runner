@@ -47,7 +47,9 @@ import io.netty.channel.unix.DomainSocketAddress;
 import io.netty.channel.unix.DomainSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.RequiredArgsConstructor;
+
 import org.apache.apisix.plugin.runner.A6Conf;
+import org.apache.apisix.plugin.runner.A6ConfigWatcher;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.handler.PrepareConfHandler;
 import org.apache.apisix.plugin.runner.handler.RpcCallHandler;
@@ -67,21 +69,27 @@ public class ApplicationRunner implements CommandLineRunner {
 
     private Cache<Long, A6Conf> cache;
 
-    private ObjectProvider<PluginFilter> beanProvider;
+    private ObjectProvider<PluginFilter> filterProvider;
+    private ObjectProvider<A6ConfigWatcher> watcherProvider;
 
     @Autowired
-    public ApplicationRunner(Cache<Long, A6Conf> cache, ObjectProvider<PluginFilter> beanProvider) {
+    public ApplicationRunner(Cache<Long, A6Conf> cache,
+            ObjectProvider<PluginFilter> filterProvider, ObjectProvider<A6ConfigWatcher> watcherProvider) {
         this.cache = cache;
-        this.beanProvider = beanProvider;
+        this.filterProvider = filterProvider;
+        this.watcherProvider = watcherProvider;
     }
 
-    public PrepareConfHandler createConfigReqHandler(Cache<Long, A6Conf> cache, ObjectProvider<PluginFilter> beanProvider) {
+    public PrepareConfHandler createConfigReqHandler(Cache<Long, A6Conf> cache,
+            ObjectProvider<PluginFilter> beanProvider, ObjectProvider<A6ConfigWatcher> watcherProvider) {
         List<PluginFilter> pluginFilterList = beanProvider.orderedStream().collect(Collectors.toList());
         Map<String, PluginFilter> filterMap = new HashMap<>();
         for (PluginFilter filter : pluginFilterList) {
             filterMap.put(filter.name(), filter);
         }
-        return new PrepareConfHandler(cache, filterMap);
+        List<A6ConfigWatcher> configWatcherList = watcherProvider.orderedStream().collect(Collectors.toList());
+
+        return new PrepareConfHandler(cache, filterMap, configWatcherList);
     }
 
     public RpcCallHandler createA6HttpHandler(Cache<Long, A6Conf> cache) {
@@ -123,7 +131,7 @@ public class ApplicationRunner implements CommandLineRunner {
                         .addAfter("logger", "payloadEncoder", new PayloadEncoder())
                         .addAfter("payloadEncoder", "delayedDecoder", new BinaryProtocolDecoder())
                         .addLast("payloadDecoder", new PayloadDecoder())
-                        .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, beanProvider))
+                        .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, filterProvider, watcherProvider))
                         .addAfter("prepareConfHandler", "hTTPReqCallHandler", createA6HttpHandler(cache))
                         .addLast("exceptionCaughtHandler", new ExceptionCaughtHandler());
 
