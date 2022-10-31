@@ -133,6 +133,7 @@ class A6ConfigHandlerTest {
         Assertions.assertEquals(config.getChain().getIndex(), 0);
         Assertions.assertEquals(config.get("FooFilter"), "Bar");
         Assertions.assertEquals(tWatcher.getConfig(), config.getConfig());
+        Assertions.assertEquals(tWatcher.getToken(), response.getConfToken());
     }
 
     @Test

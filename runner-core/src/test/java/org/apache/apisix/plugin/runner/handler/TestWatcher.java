@@ -6,10 +6,15 @@ import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigWatcher;
 
 class TestWatcher implements A6ConfigWatcher {
-    public Map<String, String> config;
+    private Map<String, String> config;
+    private long token;
 
     public Map<String, String> getConfig() {
         return config;
+    }
+
+    public long getToken() {
+        return token;
     }
 
     @Override
@@ -20,5 +25,6 @@ class TestWatcher implements A6ConfigWatcher {
     @Override
     public void watch(long confToken, A6Conf a6Conf) {
         config = a6Conf.getConfig();
+        token = confToken;
     }
 }
