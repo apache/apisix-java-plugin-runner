@@ -22,13 +22,10 @@ public class CheckTokenFilter implements PluginFilter {
     }
 
     @Override
-    public Mono<Void> filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+    public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
         /*
          * todo your business here
          */
-
-        
-        return chain.filter(request, response);
     }
 }
 ```
@@ -48,18 +45,17 @@ apisix-java-plugin-runner 与 APISIX 用 `Unix Domain Socket` 进行进程间通
 构建完成，你会在 `dist` 目录看见构建产物
 
 ```
-apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz
+apache-apisix-java-plugin-runner-${your_plugin_version}-bin.tar.gz
 ```
 
 在`dist`目录添加`Dockerfile`文件
 
 ```dockerfile
-FROM apache/apisix:${version}-alpine
+FROM apache/apisix:${version}-debian
 
-RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories && apk add --no-cache openjdk8-jre
+RUN apt -y install openjdk-11-jdk
 
-ADD apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
-
+ADD apache-apisix-java-plugin-runner-${your_plugin_version}-SNAPSHOT-bin.tar.gz /usr/local/
 ```
 
 然后构建容器镜像
@@ -73,10 +69,19 @@ ADD apache-apisix-java-plugin-runner-0.1.0-bin.tar.gz /usr/local/
 
 ```yaml
 ext-plugin:
-  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/path/to/apisix-runner-bin/apisix-java-plugin-runner.jar']
+  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g', '/usr/local/apisix-runner-bin/apisix-java-plugin-runner.jar']
 ```
 
 构建完成的 `apache/apisix:${version}-alpine-with-java-plugin` 镜像内即包含 APISIX 与 apisix-java-plugun-runner。
+
+### 调试
+如果需要调试插件, 可以将上述 ext-plugin 配置中添加调试参数: 
+```yaml
+ext-plugin:
+  cmd: ['java', '-jar', '-Xmx4g', '-Xms4g','-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005', '/usr/local/apisix-runner-bin/apisix-java-plugin-runner.jar']
+```
+
+就可以通过 Docker 的 5005 端口远程调试插件。
 
 ### 使用插件
 
