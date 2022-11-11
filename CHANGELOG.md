@@ -23,9 +23,19 @@ title: Changelog
 
 ## Table of Contents
 
+- [0.4.0](#040)
 - [0.3.0](#030)
 - [0.2.0](#020)
 - [0.1.0](#010)
+
+## 0.4.0
+
+This release mainly provides the ability to get body data from upstream.
+
+### Core
+
+- support for getting upstream response body. [200](https://github.com/apache/apisix-java-plugin-runner/pull/200)
+- support watching config changes. [205](https://github.com/apache/apisix-java-plugin-runner/pull/208)
 
 ## 0.3.0
 
