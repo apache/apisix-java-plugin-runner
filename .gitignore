@@ -23,6 +23,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 release/
+logs/
 
 ### IntelliJ IDEA ###
 .idea
