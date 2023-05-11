@@ -26,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,8 +44,11 @@ public class PostResponse implements A6Response {
 
     private Map<String, String> headers;
 
+    private Charset charset;
+
     public PostResponse(long requestId) {
         this.requestId = requestId;
+        this.charset = StandardCharsets.UTF_8;
     }
 
     @Override
@@ -53,7 +57,7 @@ public class PostResponse implements A6Response {
 
         int bodyIndex = -1;
         if (StringUtils.hasText(body)) {
-            byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+            byte[] bodyBytes = body.getBytes(charset);
             bodyIndex = Resp.createBodyVector(builder, bodyBytes);
         }
 
@@ -121,5 +125,9 @@ public class PostResponse implements A6Response {
 
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
+    }
+
+    public void setCharset(Charset charset) {
+        this.charset = charset;
     }
 }
