@@ -94,6 +94,10 @@ public class PostRequest implements A6Request {
         return status;
     }
 
+    public void setBody(String body) {
+        this.body = body.getBytes();
+    }
+
     public void setBody(byte[] body) {
         this.body = body;
     }

@@ -308,6 +308,10 @@ public class HttpRequest implements A6Request {
         return new String(body, charset);
     }
 
+    public void setBody(String body) {
+        this.body = body.getBytes();
+    }
+
     public void setBody(byte[] body) {
         this.body = body;
     }
