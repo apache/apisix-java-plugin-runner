@@ -22,6 +22,7 @@ import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +93,7 @@ public class RewriteRequestDemoFilter implements PluginFilter {
          */
         String remoteAddr = request.getVars("remote_addr");
         String serverPort = request.getVars("server_port");
-        String body = request.getBody();
+        String body = request.getBody(StandardCharsets.UTF_8);
 
         chain.filter(request, response);
     }

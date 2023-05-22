@@ -35,12 +35,12 @@ public class ExtraInfoResponse implements A6Request {
         return new ExtraInfoResponse(req);
     }
 
-    public String getResult() {
-        StringBuilder builder = new StringBuilder();
+    public byte[] getResult() {
+        byte[] byteArray = new byte[this.resp.resultLength()];
         for (int i = 0; i < this.resp.resultLength(); i++) {
-            builder.append((char) this.resp.result(i));
+            byteArray[i] = (byte) this.resp.result(i);
         }
-        return builder.toString();
+        return byteArray;
     }
 
     @Override

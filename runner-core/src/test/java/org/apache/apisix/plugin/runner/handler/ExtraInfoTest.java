@@ -42,6 +42,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,7 +115,7 @@ class ExtraInfoTest {
 
             @Override
             public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
-                String body = request.getBody();
+                String body = request.getBody(StandardCharsets.UTF_8);
                 String content_type = request.getVars("content_type");
                 System.out.println("content_type: " + content_type);
                 System.out.println("body: " + body);
