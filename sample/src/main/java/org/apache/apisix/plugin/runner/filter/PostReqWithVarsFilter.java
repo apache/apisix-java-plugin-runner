@@ -24,7 +24,6 @@ import org.apache.apisix.plugin.runner.PostRequest;
 import org.apache.apisix.plugin.runner.PostResponse;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
