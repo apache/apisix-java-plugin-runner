@@ -98,6 +98,10 @@ public class PostRequest implements A6Request {
         this.body = body;
     }
 
+    public String getBody() {
+        return new String(body);
+    }
+
     public String getBody(Charset charset) {
         return new String(body, charset);
     }

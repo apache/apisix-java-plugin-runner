@@ -300,6 +300,10 @@ public class HttpRequest implements A6Request {
         this.vars = vars;
     }
 
+    public String getBody() {
+        return new String(body);
+    }
+
     public String getBody(Charset charset) {
         return new String(body, charset);
     }

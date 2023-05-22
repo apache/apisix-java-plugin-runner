@@ -17,7 +17,6 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -234,7 +233,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         }
         else {
-            nginxVars.put(varsKey, new String(result, StandardCharsets.UTF_8));
+            nginxVars.put(varsKey, new String(result));
         }
 
         if (queue.isEmpty()) {
