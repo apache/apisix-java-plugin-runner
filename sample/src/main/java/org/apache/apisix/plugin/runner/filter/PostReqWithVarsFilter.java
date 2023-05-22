@@ -53,7 +53,7 @@ public class PostReqWithVarsFilter implements PluginFilter {
         Gson gson = new Gson();
         Map<String, Object> conf = new HashMap<>();
         conf = gson.fromJson(configStr, conf.getClass());
-        String bodyStr = request.getBody(StandardCharsets.UTF_8);
+        String bodyStr = request.getBody();
         Map<String, Object> body = new HashMap<>();
         body = gson.fromJson(bodyStr, body.getClass());
         assert body.get("url").toString().endsWith((String) conf.get("rewrite_path"));
