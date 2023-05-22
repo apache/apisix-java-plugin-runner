@@ -57,7 +57,7 @@ public class PostResponse implements A6Response {
 
         int bodyIndex = -1;
         if (StringUtils.hasText(body)) {
-            byte[] bodyBytes = body.getBytes(charset);
+            byte[] bodyBytes = body.getBytes(this.charset);
             bodyIndex = Resp.createBodyVector(builder, bodyBytes);
         }
 
