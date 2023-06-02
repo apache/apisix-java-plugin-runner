@@ -24,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -50,7 +51,7 @@ public class HttpRequest implements A6Request {
 
     private Map<String, String> vars;
 
-    private String body;
+    private byte[] body;
 
     public HttpRequest(Req req) {
         this.req = req;
@@ -300,10 +301,18 @@ public class HttpRequest implements A6Request {
     }
 
     public String getBody() {
-        return body;
+        return new String(body);
+    }
+
+    public String getBody(Charset charset) {
+        return new String(body, charset);
     }
 
     public void setBody(String body) {
+        this.body = body.getBytes();
+    }
+
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
