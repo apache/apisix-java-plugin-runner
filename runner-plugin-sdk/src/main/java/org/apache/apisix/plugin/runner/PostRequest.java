@@ -23,10 +23,7 @@ import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.springframework.util.CollectionUtils;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class PostRequest implements A6Request {
     private final Req req;
@@ -35,11 +32,11 @@ public class PostRequest implements A6Request {
 
     private Map<String, String> config;
 
-    private Map<String, String> headers;
+    private Map<String, List<String>> headers;
 
     private Integer status;
 
-    private byte[] body;
+    private String body;
 
     private Map<String, String> vars;
 
@@ -76,12 +73,13 @@ public class PostRequest implements A6Request {
         return config.getOrDefault(filter.name(), null);
     }
 
-    public Map<String, String> getUpstreamHeaders() {
+    public Map<String, List<String>> getUpstreamHeaders() {
         if (Objects.isNull(headers)) {
             headers = new HashMap<>();
             for (int i = 0; i < req.headersLength(); i++) {
                 TextEntry header = req.headers(i);
-                headers.put(header.name(), header.value());
+                headers.putIfAbsent(header.name(), new ArrayList<>());
+                headers.get(header.name()).add(header.value());
             }
         }
         return headers;
@@ -95,19 +93,11 @@ public class PostRequest implements A6Request {
     }
 
     public void setBody(String body) {
-        this.body = body.getBytes();
-    }
-
-    public void setBody(byte[] body) {
         this.body = body;
     }
 
     public String getBody() {
-        return new String(body);
-    }
-
-    public String getBody(Charset charset) {
-        return new String(body, charset);
+        return body;
     }
 
     public String getVars(String key) {
