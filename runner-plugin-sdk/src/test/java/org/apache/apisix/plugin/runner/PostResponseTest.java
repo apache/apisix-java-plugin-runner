@@ -23,9 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,8 +35,9 @@ class PostResponseTest {
         long requestId = 1L;
         String body = "dummy body";
         Charset charset = StandardCharsets.UTF_16;
+        Map<String, List<String>> headers = new HashMap<>();
 
-        PostResponse postResponse = new PostResponse(requestId);
+        PostResponse postResponse = new PostResponse(requestId, headers);
         postResponse.setBody(body);
         postResponse.setCharset(charset);
 
@@ -53,8 +52,9 @@ class PostResponseTest {
         long requestId = 1L;
         String body = "dummy body";
         Charset charset = StandardCharsets.UTF_8;
+        Map<String, List<String>> headers = new HashMap<>();
 
-        PostResponse postResponse = new PostResponse(requestId);
+        PostResponse postResponse = new PostResponse(requestId, headers);
         postResponse.setBody(body);
 
         ByteBuffer encoded = postResponse.encode();
