@@ -23,6 +23,7 @@ import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.springframework.util.CollectionUtils;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.*;
 
 public class PostRequest implements A6Request {
@@ -36,7 +37,7 @@ public class PostRequest implements A6Request {
 
     private Integer status;
 
-    private String body;
+    private byte[] body;
 
     private Map<String, String> vars;
 
@@ -93,11 +94,19 @@ public class PostRequest implements A6Request {
     }
 
     public void setBody(String body) {
+        this.body = body.getBytes();
+    }
+
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
     public String getBody() {
-        return body;
+        return new String(body);
+    }
+
+    public String getBody(Charset charset) {
+        return new String(body, charset);
     }
 
     public String getVars(String key) {

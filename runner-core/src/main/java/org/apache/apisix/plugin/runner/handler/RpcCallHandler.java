@@ -212,7 +212,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         } else if (EXTRA_INFO_RESP_BODY_KEY.equals(varsKey)) {
             if (!Objects.isNull(postReq)) {
-                postReq.setBody( new String(result));
+                postReq.setBody(result);
             }
         }
         else {
