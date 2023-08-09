@@ -28,7 +28,11 @@ import org.springframework.util.StringUtils;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ArrayList;
 
 public class PostResponse implements A6Response {
 
@@ -46,7 +50,7 @@ public class PostResponse implements A6Response {
 
     public PostResponse(long requestId, Map<String, List<String>> headers) {
         this.requestId = requestId;
-        this.headers = headers!=null ? new HashMap<>(headers) : new HashMap<>();
+        this.headers = headers != null ? new HashMap<>(headers) : new HashMap<>();
         this.charset = StandardCharsets.UTF_8;
     }
 
@@ -63,7 +67,7 @@ public class PostResponse implements A6Response {
         int headerIndex = -1;
         if (!CollectionUtils.isEmpty(headers)) {
             int hsize = 0;
-            for(String hkey: headers.keySet()){
+            for (String hkey: headers.keySet()) {
                 List<String> headerValues = headers.get(hkey);
                 hsize += CollectionUtils.isEmpty(headerValues) ? 0 : headerValues.size();
             }
@@ -73,8 +77,8 @@ public class PostResponse implements A6Response {
             for (Map.Entry<String, List<String>> header : headers.entrySet()) {
                 int key = builder.createString(header.getKey());
                 List<String> headerValues = header.getValue();
-                if(!CollectionUtils.isEmpty(headerValues)){
-                    for(String hv: headerValues){
+                if (!CollectionUtils.isEmpty(headerValues)) {
+                    for (String hv: headerValues) {
                         int value = 0;
                         if (!Objects.isNull(hv)) {
                             value = builder.createString(hv);
@@ -145,7 +149,7 @@ public class PostResponse implements A6Response {
         headers.get(headerKey).add(headerValue);
     }
 
-    public Map<String, List<String>> headers(){
+    public Map<String, List<String>> headers() {
         return headers;
     }
 
@@ -156,6 +160,7 @@ public class PostResponse implements A6Response {
     public void setStatusCode(int statusCode) {
         this.statusCode = statusCode;
     }
+
     public void setCharset(Charset charset) {
         this.charset = charset;
     }
