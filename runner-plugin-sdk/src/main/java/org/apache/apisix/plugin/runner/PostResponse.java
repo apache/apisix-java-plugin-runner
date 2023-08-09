@@ -135,7 +135,7 @@ public class PostResponse implements A6Response {
         headers.get(headerKey).add(headerValue);
     }
 
-    public void addHeader(String headerKey, String headerValue) {
+    private void addHeader(String headerKey, String headerValue) {
         if (headerKey == null) {
             logger.warn("headerKey is null, ignore it");
             return;
@@ -149,7 +149,7 @@ public class PostResponse implements A6Response {
         headers.get(headerKey).add(headerValue);
     }
 
-    public Map<String, List<String>> headers() {
+    private Map<String, List<String>> headers() {
         return headers;
     }
 
