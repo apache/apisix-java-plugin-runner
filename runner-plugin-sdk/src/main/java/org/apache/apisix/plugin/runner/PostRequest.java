@@ -17,16 +17,14 @@
 
 package org.apache.apisix.plugin.runner;
 
-import io.github.api7.A6.HTTPRespCall.Req;
-import io.github.api7.A6.TextEntry;
-import org.apache.apisix.plugin.runner.filter.PluginFilter;
-import org.springframework.util.CollectionUtils;
+import io.github.api7.A6.HTTPRespCall.*;
+import io.github.api7.A6.*;
+import org.apache.apisix.plugin.runner.filter.*;
+import org.springframework.util.*;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.nio.*;
+import java.nio.charset.*;
+import java.util.*;
 
 public class PostRequest implements A6Request {
     private final Req req;
@@ -86,6 +84,16 @@ public class PostRequest implements A6Request {
         }
         return headers;
     }
+
+    public Map<String, List<String>> getUpstreamHeadersMap() {
+        Map<String, List<String>> multipleValueMap = new HashMap<>();
+        for (int i = 0; i < req.headersLength(); i++) {
+            TextEntry header = req.headers(i);
+            multipleValueMap.computeIfAbsent(header.name(), k -> new ArrayList<>()).add( header.value());
+        }
+        return multipleValueMap;
+    }
+
 
     public Integer getUpstreamStatusCode() {
         if (Objects.isNull(status)) {
