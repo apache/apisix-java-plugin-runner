@@ -25,9 +25,7 @@ import org.springframework.util.StringUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class HttpRequest implements A6Request {
 
@@ -73,6 +71,14 @@ public class HttpRequest implements A6Request {
 
         }
         return requestId;
+    }
+
+    public void changeBody(String body) {
+        this.response.changeBody(body);
+    }
+
+    public Map<String, String> getVarsMap() {
+        return vars;
     }
 
     /**
@@ -294,6 +300,13 @@ public class HttpRequest implements A6Request {
             return null;
         }
         return vars.get(key);
+    }
+
+    public Map<String, String> getVars() {
+        if (vars == null) {
+            vars = new HashMap<>();
+        }
+        return vars;
     }
 
     public void setVars(Map<String, String> vars) {

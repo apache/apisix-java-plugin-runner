@@ -1,59 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Licensed to the Apache Software Foundation (ASF) under one or more
-  ~ contributor license agreements.  See the NOTICE file distributed with
-  ~ this work for additional information regarding copyright ownership.
-  ~ The ASF licenses this file to You under the Apache License, Version 2.0
-  ~ (the "License"); you may not use this file except in compliance with
-  ~ the License.  You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  ~
-  -->
-
-<configuration status="OFF">
-
-    <Properties>
-        <Property name="LOG_LEVEL">debug</Property>
-        <Property name="USER_DIR">${sys:user.dir}</Property>
-        <Property name="FILE_ENCODING">${sys:file.encoding}</Property>
-    </Properties>
+<configuration status="warn">
+    <properties>
+        <!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+        <property name="LOG_FILE_PATTERN">
+            [%X{X-Request-Id}]%d{MM-dd HH:mm:ss.SSS.Z}[%X{QUERY_ENT_ID}] [%-5level][%t][%c{1.}.%method:%L]%msg{nolookups}%n
+        </property>
+        <!-- 定义日志存储的路径，不要配置相对路径 -->
+        <property name="FILE_PATH" value="logs"/>
+        <!--项目名称-->
+        <property name="FILE_NAME" value="apisixrunner"/>
+    </properties>
 
     <Appenders>
-        <RollingFile name="ERROR-APPENDER" fileName="${USER_DIR}/logs/java-runner-common-error.log" append="true"
-                     filePattern="${USER_DIR}/logs/java-runner-common-error.log.%d{yyyy-MM-dd}">
-            <!-- only print error log -->
-            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout charset="${FILE_ENCODING}">
-                <pattern>%d %-5p %-32t - %m%n %throwable</pattern>
-            </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
-            </Policies>
-        </RollingFile>
 
-        <RollingFile name="ROOT-APPENDER" fileName="${USER_DIR}/logs/java-runner-common-default.log" append="true"
-                     filePattern="${USER_DIR}/logs/java-runner-common-default.log.%d{yyyy-MM-dd}">
-            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout charset="${FILE_ENCODING}">
-                <pattern>%d %-5p %-32t - %m%n %throwable</pattern>
-            </PatternLayout>
+        <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFile" fileName="${FILE_PATH}/apisixrunner.log"
+                     filePattern="${FILE_PATH}/${FILE_NAME}-%d{yyyy-MM-dd}_%i.log.gz">
+            <PatternLayout pattern="${LOG_FILE_PATTERN}"/>
             <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!--interval属性用来指定多久滚动一次，默认是1 hour-->
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
             </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <DefaultRolloverStrategy max="15"/>
         </RollingFile>
     </Appenders>
-
     <Loggers>
-        <AsyncRoot level="${LOG_LEVEL}">
-            <appender-ref ref="ROOT-APPENDER"/>
-            <appender-ref ref="ERROR-APPENDER"/>
-        </AsyncRoot>
+
+        <Root level="INFO" includeLocation="true">
+            <AppenderRef ref="RollingFile"/>
+        </Root>
     </Loggers>
+
 </configuration>

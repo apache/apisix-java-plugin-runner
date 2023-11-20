@@ -54,6 +54,10 @@ public class PostRequest implements A6Request {
         return new PostRequest(req);
     }
 
+    public Map<String, String> getVarsMap() {
+        return vars;
+    }
+
     @Override
     public byte getType() {
         return 4;

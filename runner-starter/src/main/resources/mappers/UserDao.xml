@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.apisix.plugin.runner.db.UserDao">
+  <resultMap id="BaseResultMap" type="org.apache.apisix.plugin.runner.db.model.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="publickey" jdbcType="VARCHAR" property="publickey" />
+    <result column="privatekey" jdbcType="VARCHAR" property="privatekey" />
+    <result column="status" jdbcType="BOOLEAN" property="status" />
+    <result column="gmtcreate" jdbcType="TIMESTAMP" property="gmtcreate" />
+    <result column="gmtmodified" jdbcType="TIMESTAMP" property="gmtmodified" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, userid, publickey, privatekey, `status`, gmtcreate, gmtmodified
+  </sql>
+  <select id="selectByWolfUserId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where userid = #{wolfUserId,jdbcType=INTEGER} and status = 1
+  </select>
+</mapper>

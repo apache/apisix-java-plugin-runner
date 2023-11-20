@@ -56,6 +56,13 @@ public class HttpResponse implements A6Response {
 
     private String body;
 
+    private String reqBody;
+
+    public void changeBody(String body) {
+        actionType = ActionType.Rewrite;
+        this.reqBody = body;
+    }
+
     private Integer statusCode;
 
     public HttpResponse(long requestId) {
@@ -234,6 +241,12 @@ public class HttpResponse implements A6Response {
             headerIndex = Rewrite.createHeadersVector(builder, headerTexts);
         }
 
+        int reqBodyIndex = -1;
+        if (StringUtils.hasText(reqBody)) {
+            byte[] bytes = reqBody.getBytes(StandardCharsets.UTF_8);
+            reqBodyIndex = Rewrite.createBodyVector(builder, bytes);
+        }
+
         int argsIndex = -1;
         if (!CollectionUtils.isEmpty(args)) {
             int[] argTexts = new int[args.size()];
@@ -259,6 +272,11 @@ public class HttpResponse implements A6Response {
         if (-1 != argsIndex) {
             Rewrite.addArgs(builder, argsIndex);
         }
+
+        if (-1 != reqBodyIndex) {
+            Rewrite.addBody(builder, reqBodyIndex);
+        }
+
         return Rewrite.endRewrite(builder);
     }
 

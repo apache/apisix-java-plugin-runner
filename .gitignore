@@ -36,3 +36,5 @@ logs/
 
 ### tmp files
 *~
+/runner-starter/src/main/resources/application-develop.yaml
+/runner-starter/src/main/resources/application-prod.yaml
