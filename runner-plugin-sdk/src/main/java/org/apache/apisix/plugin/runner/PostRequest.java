@@ -17,14 +17,18 @@
 
 package org.apache.apisix.plugin.runner;
 
-import io.github.api7.A6.HTTPRespCall.*;
-import io.github.api7.A6.*;
-import org.apache.apisix.plugin.runner.filter.*;
-import org.springframework.util.*;
+import io.github.api7.A6.HTTPRespCall.Req;
+import io.github.api7.A6.TextEntry;
+import org.apache.apisix.plugin.runner.filter.PluginFilter;
+import org.springframework.util.CollectionUtils;
 
-import java.nio.*;
-import java.nio.charset.*;
-import java.util.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ArrayList;
 
 public class PostRequest implements A6Request {
     private final Req req;
@@ -33,7 +37,7 @@ public class PostRequest implements A6Request {
 
     private Map<String, String> config;
 
-    private Map<String, String> headers;
+    private Map<String, List<String>> headers;
 
     private Integer status;
 
@@ -74,26 +78,17 @@ public class PostRequest implements A6Request {
         return config.getOrDefault(filter.name(), null);
     }
 
-    public Map<String, String> getUpstreamHeaders() {
+    public Map<String, List<String>> getUpstreamHeaders() {
         if (Objects.isNull(headers)) {
             headers = new HashMap<>();
             for (int i = 0; i < req.headersLength(); i++) {
                 TextEntry header = req.headers(i);
-                headers.put(header.name(), header.value());
+                headers.putIfAbsent(header.name(), new ArrayList<>());
+                headers.get(header.name()).add(header.value());
             }
         }
         return headers;
     }
-
-    public Map<String, List<String>> getUpstreamHeadersMap() {
-        Map<String, List<String>> multipleValueMap = new HashMap<>();
-        for (int i = 0; i < req.headersLength(); i++) {
-            TextEntry header = req.headers(i);
-            multipleValueMap.computeIfAbsent(header.name(), k -> new ArrayList<>()).add( header.value());
-        }
-        return multipleValueMap;
-    }
-
 
     public Integer getUpstreamStatusCode() {
         if (Objects.isNull(status)) {
