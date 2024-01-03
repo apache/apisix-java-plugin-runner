@@ -215,7 +215,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
     }
 
     private void handleExtraInfo(ChannelHandlerContext ctx, ExtraInfoResponse request) {
-        String result = request.getResult();
+        byte[] result = request.getResult();
         String varsKey = queue.poll();
         if (Objects.isNull(varsKey)) {
             logger.error("queue is empty");
@@ -233,7 +233,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         }
         else {
-            nginxVars.put(varsKey, result);
+            nginxVars.put(varsKey, new String(result));
         }
 
         if (queue.isEmpty()) {
