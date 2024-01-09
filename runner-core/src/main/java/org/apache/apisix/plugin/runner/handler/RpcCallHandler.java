@@ -103,7 +103,8 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         } catch (Exception e) {
             logger.error("handle request error: ", e);
-            errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
+            throw e;
+           // errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
         }
     }
 
