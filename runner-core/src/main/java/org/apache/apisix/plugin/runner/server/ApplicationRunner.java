@@ -75,7 +75,7 @@ public class ApplicationRunner implements CommandLineRunner {
     private ObjectProvider<PluginFilter> filterProvider;
     private ObjectProvider<A6ConfigWatcher> watcherProvider;
 
-    private static final List<ExceptionCaught> EXCEPTION_LIST = new ArrayList<ExceptionCaught>();
+    public static final List<ExceptionCaught> EXCEPTION_LIST = new ArrayList<ExceptionCaught>();
 
     static {
         ServiceLoader<ExceptionCaught> serviceLoader = ServiceLoader.load(ExceptionCaught.class);

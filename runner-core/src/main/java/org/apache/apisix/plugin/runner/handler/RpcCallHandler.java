@@ -42,6 +42,7 @@ import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.PostRequest;
 import org.apache.apisix.plugin.runner.PostResponse;
+import org.apache.apisix.plugin.runner.exception.ApisixException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -103,8 +104,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
             }
         } catch (Exception e) {
             logger.error("handle request error: ", e);
-            throw e;
-           // errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
+            errorHandle(ctx, Code.SERVICE_UNAVAILABLE);
         }
     }
 
@@ -312,8 +312,9 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
     }
 
     private void errorHandle(ChannelHandlerContext ctx, int code) {
-        A6ErrResponse errResponse = new A6ErrResponse(code);
-        ctx.writeAndFlush(errResponse);
+        throw new ApisixException(code, Code.name(code));
+//        A6ErrResponse errResponse = new A6ErrResponse(code);
+//        ctx.writeAndFlush(errResponse);
     }
 
     private void cleanCtx() {
