@@ -34,7 +34,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ErrRequest;
-import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.A6Request;
 import org.apache.apisix.plugin.runner.ExtraInfoRequest;
 import org.apache.apisix.plugin.runner.ExtraInfoResponse;
@@ -313,8 +312,6 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
     private void errorHandle(ChannelHandlerContext ctx, int code) {
         throw new ApisixException(code, Code.name(code));
-//        A6ErrResponse errResponse = new A6ErrResponse(code);
-//        ctx.writeAndFlush(errResponse);
     }
 
     private void cleanCtx() {

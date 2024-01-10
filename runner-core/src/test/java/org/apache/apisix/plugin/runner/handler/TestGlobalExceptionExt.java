@@ -1,23 +1,32 @@
 package org.apache.apisix.plugin.runner.handler;
 
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.flatbuffers.FlatBufferBuilder;
+import io.github.api7.A6.Err.Code;
 import io.github.api7.A6.TextEntry;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.apache.apisix.plugin.runner.*;
+import org.apache.apisix.plugin.runner.PostResponse;
+import org.apache.apisix.plugin.runner.A6Conf;
+import org.apache.apisix.plugin.runner.A6ConfigWatcher;
+import org.apache.apisix.plugin.runner.A6ConfigRequest;
+import org.apache.apisix.plugin.runner.PostRequest;
+import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.exception.ApisixException;
-import org.apache.apisix.plugin.runner.exception.ExceptionCaught;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 import org.apache.apisix.plugin.runner.server.ApplicationRunner;
-import org.junit.jupiter.api.*;
-
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @DisplayName("test global exception passed SPI ")
@@ -42,9 +51,6 @@ public class TestGlobalExceptionExt {
 
     @BeforeEach
     void setUp() {
-
-
-
         bytes = new ByteArrayOutputStream();
         console = System.out;
         System.setOut(new PrintStream(bytes));
@@ -85,14 +91,13 @@ public class TestGlobalExceptionExt {
 
         prepareConfHandler = new PrepareConfHandler(cache, filters, watchers);
         rpcCallHandler = new RpcCallHandler(cache);
-        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, rpcCallHandler,new ExceptionCaughtHandler(ApplicationRunner.EXCEPTION_LIST));
+        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, rpcCallHandler, new ExceptionCaughtHandler(ApplicationRunner.EXCEPTION_LIST));
     }
 
     @AfterEach
     void setDown() {
         System.setOut(console);
     }
-
 
     @Test
     @DisplayName("test spiExceptionExt")
@@ -116,9 +121,7 @@ public class TestGlobalExceptionExt {
         channel.writeInbound(request);
         channel.finish();
         PostResponse response = channel.readOutbound();
-        Assertions.assertTrue(bytes.toString().contains("SERVICE_UNAVAILABLE"));
+        io.github.api7.A6.Err.Resp err = io.github.api7.A6.Err.Resp.getRootAsResp(response.encode());
+        Assertions.assertEquals(err.code(), Code.SERVICE_UNAVAILABLE);
     }
-
-
-
 }
