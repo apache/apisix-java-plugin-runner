@@ -20,11 +20,14 @@ package org.apache.apisix.plugin.runner.server;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import org.apache.apisix.plugin.runner.exception.ExceptionCaught;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -71,6 +74,13 @@ public class ApplicationRunner implements CommandLineRunner {
 
     private ObjectProvider<PluginFilter> filterProvider;
     private ObjectProvider<A6ConfigWatcher> watcherProvider;
+
+    public static final List<ExceptionCaught> EXCEPTION_LIST = new ArrayList<ExceptionCaught>();
+
+    static {
+        ServiceLoader<ExceptionCaught> serviceLoader = ServiceLoader.load(ExceptionCaught.class);
+        serviceLoader.forEach(EXCEPTION_LIST::add);
+    }
 
     @Autowired
     public ApplicationRunner(Cache<Long, A6Conf> cache,
@@ -133,7 +143,7 @@ public class ApplicationRunner implements CommandLineRunner {
                         .addLast("payloadDecoder", new PayloadDecoder())
                         .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, filterProvider, watcherProvider))
                         .addAfter("prepareConfHandler", "hTTPReqCallHandler", createA6HttpHandler(cache))
-                        .addLast("exceptionCaughtHandler", new ExceptionCaughtHandler());
+                        .addLast("exceptionCaughtHandler", new ExceptionCaughtHandler(EXCEPTION_LIST));
 
             }
         });

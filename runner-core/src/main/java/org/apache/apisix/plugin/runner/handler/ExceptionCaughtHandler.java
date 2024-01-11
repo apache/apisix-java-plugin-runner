@@ -21,15 +21,33 @@ import io.github.api7.A6.Err.Code;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.apisix.plugin.runner.A6ErrResponse;
+import org.apache.apisix.plugin.runner.exception.ExceptionCaught;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExceptionCaughtHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(ExceptionCaughtHandler.class);
 
+    List<ExceptionCaught> exceptionCaughtList = new ArrayList<ExceptionCaught>();
+
+    public ExceptionCaughtHandler() {
+
+    }
+
+    public ExceptionCaughtHandler(List<ExceptionCaught> exceptionCaughtList) {
+        this.exceptionCaughtList = exceptionCaughtList;
+    }
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("handle request error: ", cause);
+        if (!exceptionCaughtList.isEmpty()) {
+            exceptionCaughtList.get(0).exceptionCaught(ctx, cause);
+            return;
+        }
         A6ErrResponse errResponse = new A6ErrResponse(Code.SERVICE_UNAVAILABLE);
         ctx.writeAndFlush(errResponse);
     }
