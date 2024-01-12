@@ -17,6 +17,29 @@
 
 package org.apache.apisix.plugin.runner.handler;
 
+import com.google.common.cache.Cache;
+import io.github.api7.A6.Err.Code;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.RequiredArgsConstructor;
+import org.apache.apisix.plugin.runner.A6Conf;
+import org.apache.apisix.plugin.runner.A6ErrRequest;
+import org.apache.apisix.plugin.runner.A6Request;
+import org.apache.apisix.plugin.runner.ExtraInfoRequest;
+import org.apache.apisix.plugin.runner.ExtraInfoResponse;
+import org.apache.apisix.plugin.runner.HttpRequest;
+import org.apache.apisix.plugin.runner.HttpResponse;
+import org.apache.apisix.plugin.runner.PostRequest;
+import org.apache.apisix.plugin.runner.PostResponse;
+import org.apache.apisix.plugin.runner.exception.ApisixException;
+import org.apache.apisix.plugin.runner.constants.Constants;
+import org.apache.apisix.plugin.runner.filter.PluginFilter;
+import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,31 +48,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
-
-import com.google.common.cache.Cache;
-import io.github.api7.A6.Err.Code;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.apisix.plugin.runner.A6Conf;
-import org.apache.apisix.plugin.runner.A6ErrRequest;
-import org.apache.apisix.plugin.runner.A6ErrResponse;
-import org.apache.apisix.plugin.runner.A6Request;
-import org.apache.apisix.plugin.runner.ExtraInfoRequest;
-import org.apache.apisix.plugin.runner.ExtraInfoResponse;
-import org.apache.apisix.plugin.runner.HttpRequest;
-import org.apache.apisix.plugin.runner.HttpResponse;
-import org.apache.apisix.plugin.runner.PostRequest;
-import org.apache.apisix.plugin.runner.PostResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
-import lombok.RequiredArgsConstructor;
-
-import org.apache.apisix.plugin.runner.constants.Constants;
-import org.apache.apisix.plugin.runner.filter.PluginFilter;
-import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
 
 @RequiredArgsConstructor
 public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
@@ -311,8 +309,7 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
     }
 
     private void errorHandle(ChannelHandlerContext ctx, int code) {
-        A6ErrResponse errResponse = new A6ErrResponse(code);
-        ctx.writeAndFlush(errResponse);
+        throw new ApisixException(code, Code.name(code));
     }
 
     private void cleanCtx() {
