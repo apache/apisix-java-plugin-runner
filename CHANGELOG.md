@@ -23,10 +23,25 @@ title: Changelog
 
 ## Table of Contents
 
-- [0.4.0](#040)
-- [0.3.0](#030)
-- [0.2.0](#020)
-- [0.1.0](#010)
+- [0.5.0](#032)
+- [0.4.0](#046)
+- [0.3.0](#055)
+- [0.2.0](#068)
+- [0.1.0](#096)
+
+## 0.5.0
+
+This release mainly improves log4j configuration and CI, provides other encoding support and bug fixes.
+
+### Core
+
+- add log4j2 configuration. [214](https://github.com/apache/apisix-java-plugin-runner/pull/214)
+- `PostResponse` supports charset other than `UTF-8`. [239](https://github.com/apache/apisix-java-plugin-runner/pull/239)
+- update CI runs on ubuntu-latest. [242](https://github.com/apache/apisix-java-plugin-runner/pull/242)
+
+### Bugfix
+
+- fix `ExtraInfoResponse` class `getResult` method bug. [244](https://github.com/apache/apisix-java-plugin-runner/pull/244)
 
 ## 0.4.0
 

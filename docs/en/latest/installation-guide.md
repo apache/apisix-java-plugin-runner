@@ -48,7 +48,7 @@ Install
 <dependency>
     <groupId>org.apache.apisix</groupId> 
     <artifactId>apisix-runner-starter</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
