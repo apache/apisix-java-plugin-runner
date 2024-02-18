@@ -102,7 +102,7 @@ public class RewriteRequestDemoFilter implements PluginFilter {
 }
 ```
 
-You can refer to [development](./development.md) to learn how to write custom plugins.
+You can refer to [Development](development.md) to learn how to write custom plugins.
 
 Demo
 -------
