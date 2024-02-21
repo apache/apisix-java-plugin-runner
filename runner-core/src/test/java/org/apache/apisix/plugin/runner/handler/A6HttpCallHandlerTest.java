@@ -29,11 +29,12 @@ import org.apache.apisix.plugin.runner.A6Conf;
 import org.apache.apisix.plugin.runner.A6ConfigRequest;
 import org.apache.apisix.plugin.runner.A6ConfigResponse;
 import org.apache.apisix.plugin.runner.A6ConfigWatcher;
-import org.apache.apisix.plugin.runner.A6ErrResponse;
 import org.apache.apisix.plugin.runner.HttpRequest;
 import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.filter.PluginFilter;
 import org.apache.apisix.plugin.runner.filter.PluginFilterChain;
+import org.apache.apisix.plugin.runner.server.ApplicationRunner;
+import org.apache.apisix.plugin.runner.PostResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -173,7 +174,7 @@ class A6HttpCallHandlerTest {
 
         A6ConfigRequest request = new A6ConfigRequest(req);
         prepareConfHandler = new PrepareConfHandler(cache, filters, watchers);
-        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler);
+        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, new ExceptionCaughtHandler(ApplicationRunner.EXCEPTION_LIST));
         channel.writeInbound(request);
         channel.finish();
         A6ConfigResponse response = channel.readOutbound();
@@ -181,7 +182,7 @@ class A6HttpCallHandlerTest {
 
         prepareConfHandler = new PrepareConfHandler(cache, filters, watchers);
         rpcCallHandler = new RpcCallHandler(cache);
-        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, rpcCallHandler);
+        channel = new EmbeddedChannel(new BinaryProtocolDecoder(), prepareConfHandler, rpcCallHandler, new ExceptionCaughtHandler(ApplicationRunner.EXCEPTION_LIST));
     }
 
     @AfterEach
@@ -202,9 +203,9 @@ class A6HttpCallHandlerTest {
         HttpRequest request = new HttpRequest(req);
         channel.writeInbound(request);
         channel.finish();
-        A6ErrResponse response = channel.readOutbound();
+        PostResponse response = channel.readOutbound();
         io.github.api7.A6.Err.Resp err = io.github.api7.A6.Err.Resp.getRootAsResp(response.encode());
-        Assertions.assertEquals(err.code(), Code.CONF_TOKEN_NOT_FOUND);
+        Assertions.assertEquals(err.code(), Code.SERVICE_UNAVAILABLE);
     }
 
     @Test
