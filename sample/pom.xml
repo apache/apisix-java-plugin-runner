@@ -29,7 +29,6 @@
     <artifactId>apisix-runner-sample</artifactId>
     <packaging>jar</packaging>
 
-    <name>APISIX Java Plugin Runner Sample</name>
 
     <dependencies>
         <dependency>
