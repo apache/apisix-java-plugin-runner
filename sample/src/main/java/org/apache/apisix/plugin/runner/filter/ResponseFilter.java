@@ -21,8 +21,10 @@ import com.google.gson.Gson;
 import org.apache.apisix.plugin.runner.PostRequest;
 import org.apache.apisix.plugin.runner.PostResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -39,8 +41,8 @@ public class ResponseFilter implements PluginFilter {
         Map<String, Object> conf = new HashMap<>();
         conf = gson.fromJson(configStr, conf.getClass());
 
-        Map<String, String> headers = request.getUpstreamHeaders();
-        String contentType = headers.get("Content-Type");
+        Map<String, List<String>> headers = request.getUpstreamHeaders();
+        String contentType = CollectionUtils.isEmpty(headers.get("Content-Type")) ? null : headers.get("Content-Type").get(0);
         Integer upstreamStatusCode = request.getUpstreamStatusCode();
 
         response.setStatusCode(Double.valueOf(conf.get("response_code").toString()).intValue());
