@@ -22,6 +22,7 @@ import org.apache.apisix.plugin.runner.HttpResponse;
 import org.apache.apisix.plugin.runner.PostRequest;
 import org.apache.apisix.plugin.runner.PostResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PluginFilterChain {
@@ -45,6 +46,12 @@ public class PluginFilterChain {
 
     public List<PluginFilter> getFilters() {
         return filters;
+    }
+
+    public PluginFilterChain addFilter(PluginFilter filter) {
+        ArrayList<PluginFilter> pluginFilters = new ArrayList<>(filters);
+        pluginFilters.add(filter);
+        return new PluginFilterChain(pluginFilters);
     }
 
     public void filter(HttpRequest request, HttpResponse response) {
