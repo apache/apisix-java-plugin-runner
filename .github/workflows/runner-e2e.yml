@@ -59,7 +59,7 @@ jobs:
 
     - name: startup apisix
       run: |
-        docker-compose -f ci/docker-compose.yml up -d
+        docker compose -f ci/docker-compose.yml up -d
         sleep 5
 
     - name: install ginkgo cli
