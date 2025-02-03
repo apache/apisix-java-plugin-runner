@@ -2,7 +2,7 @@
 
 ### 准备工作
 
-* JDK 11
+* JDK 21
 * APISIX 2.15.0
 * Clone the [apisix-java-plugin-runner](https://github.com/apache/apisix-java-plugin-runner) project。
 
@@ -53,7 +53,7 @@ apache-apisix-java-plugin-runner-${your_plugin_version}-bin.tar.gz
 ```dockerfile
 FROM apache/apisix:${version}-debian
 
-RUN apt -y install openjdk-11-jdk
+RUN apt -y install openjdk-21-jdk
 
 ADD apache-apisix-java-plugin-runner-${your_plugin_version}-SNAPSHOT-bin.tar.gz /usr/local/
 ```
