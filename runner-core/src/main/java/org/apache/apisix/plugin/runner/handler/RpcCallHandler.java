@@ -207,11 +207,20 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
         postReq.initCtx(conf.getConfig());
         postReq.setVars(nginxVars);
 
-        PluginFilterChain chain = conf.getChain();
-        chain.postFilter(postReq, postResp);
+        PluginFilterChain chain = conf.getChain()
+            .addFilter(new PluginFilter() {
+                @Override
+                public String name() {
+                    return null;
+                }
 
-        ChannelFuture future = ctx.writeAndFlush(postResp);
-        future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                @Override
+                public void postFilter(PostRequest request, PostResponse response, PluginFilterChain chain) {
+                    ChannelFuture future = ctx.writeAndFlush(postResp);
+                    future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                }
+            });
+        chain.postFilter(postReq, postResp);
     }
 
     private void handleExtraInfo(ChannelHandlerContext ctx, ExtraInfoResponse request) {
@@ -256,12 +265,21 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
         currReq.initCtx(currResp, conf.getConfig());
         currReq.setVars(nginxVars);
 
-        PluginFilterChain chain = conf.getChain();
+        PluginFilterChain chain = conf.getChain()
+                .addFilter(new PluginFilter() {
+                    @Override
+                    public String name() {
+                        return "writeFilter";
+                    }
+
+                    @Override
+                    public void filter(HttpRequest request, HttpResponse response, PluginFilterChain chain) {
+                        ChannelFuture future = ctx.writeAndFlush(currResp);
+                        future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                    }
+                });
+
         chain.filter(currReq, currResp);
-
-        ChannelFuture future = ctx.writeAndFlush(currResp);
-        future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-
     }
 
     private void handleHttpReqCall(ChannelHandlerContext ctx, HttpRequest request) {
