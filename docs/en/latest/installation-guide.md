@@ -33,7 +33,7 @@ This document explains how to install apisix-java-plugin-runner.
 Prerequisites
 -------------
 
-* JDK 11
+* JDK 21
 * APISIX master branch
 * Refer to [Debug](how-it-works.md#debug)  to build the debug environment.
 

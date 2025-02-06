@@ -35,7 +35,7 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '21'
       - name: Check License Header
         uses: apache/skywalking-eyes/header@501a28d2fb4a9b962661987e50cf0219631b32ff
       - name: 'Install & Test'
@@ -51,6 +51,6 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '21'
       - name: 'Install & Test'
         run: ./mvnw clean install -Dgpg.skip=true
