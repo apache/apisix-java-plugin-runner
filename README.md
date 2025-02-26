@@ -46,6 +46,8 @@ If you're interested in the internal of apisix-java-plugin-runner, we recommend 
 to read the [the-internal-of-apisix-java-plugin-runner](./docs/en/latest/the-internal-of-apisix-java-plugin-runner.md),
 it explains the details of communication and protocol conversion with APISIX.
 
+To improve security, it is strongly recommended to use a separate user for apisix-plugin-runner in a production environment.
+
 Get Involved in Development
 ---------------------------
 
