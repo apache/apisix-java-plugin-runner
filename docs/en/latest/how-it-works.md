@@ -64,10 +64,15 @@ Note: If you see some error logs like
 phase_func(): failed to connect to the unix socket unix:/tmp/runner.sock: permission denied
 ```
 
-in the `error.log` of APISIX, you can change the permissions of this file for debug, execute commands like
+in the `error.log` of APISIX, ensure the APISIX user is provided rights on the socket. This can be done
+for instance by using a common group. Example:
 
-```shell
-chmod 766 /tmp/runner.sock
+```bash
+groupadd apisix_group
+usermod -aG apisix_group apisix
+usermod -aG apisix_group java_plugin_runner
+chown java_plugin_runner:apisix_group /tmp/runner.sock
+chmod 760 /tmp/runner.sock
 ```
 
 To get more detailed debugging information, you can modify the output level of the log.
