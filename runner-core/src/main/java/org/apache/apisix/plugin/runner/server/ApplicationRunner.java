@@ -114,7 +114,7 @@ public class ApplicationRunner implements CommandLineRunner {
         try {
             initServerBootstrap(bootstrap);
             ChannelFuture future = bootstrap.bind(new DomainSocketAddress(path)).sync();
-            Runtime.getRuntime().exec("chmod 777 " + socketFile);
+            Runtime.getRuntime().exec("chmod 700 " + socketFile);
             logger.warn("java runner is listening on the socket file: {}", socketFile);
 
             future.channel().closeFuture().sync();
