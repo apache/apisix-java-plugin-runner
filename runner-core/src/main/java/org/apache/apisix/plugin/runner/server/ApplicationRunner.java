@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
 import com.google.common.cache.Cache;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -114,7 +115,7 @@ public class ApplicationRunner implements CommandLineRunner {
         try {
             initServerBootstrap(bootstrap);
             ChannelFuture future = bootstrap.bind(new DomainSocketAddress(path)).sync();
-            Runtime.getRuntime().exec("chmod 777 " + socketFile);
+            Runtime.getRuntime().exec("chmod 700 " + socketFile);
             logger.warn("java runner is listening on the socket file: {}", socketFile);
 
             future.channel().closeFuture().sync();
