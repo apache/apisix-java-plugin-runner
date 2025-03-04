@@ -82,7 +82,7 @@ public class PostFilterTest {
                         System.out.println("do post filter: UpStreamFilter, order: " + chain.getIndex());
                         System.out.println("do post filter: UpStreamFilter, conf: " + request.getConfig(this));
                         System.out.println("do post filter: UpStreamFilter, upstreamStatusCode: " + request.getUpstreamStatusCode());
-                        for (Map.Entry<String, String> header : request.getUpstreamHeaders().entrySet()) {
+                        for (Map.Entry<String, List<String>> header : request.getUpstreamHeaders().entrySet()) {
                             System.out.println("do post filter: UpStreamFilter, upstreamHeader key: " + header.getKey());
                             System.out.println("do post filter: UpStreamFilter, upstreamHeader value: " + header.getValue());
                         }
@@ -150,6 +150,6 @@ public class PostFilterTest {
         Assertions.assertTrue(bytes.toString().contains("do post filter: UpStreamFilter, conf: {\"conf_key1\":\"conf_value1\",\"conf_key2\":2}"));
         Assertions.assertTrue(bytes.toString().contains("do post filter: UpStreamFilter, upstreamStatusCode: 418"));
         Assertions.assertTrue(bytes.toString().contains("do post filter: UpStreamFilter, upstreamHeader key: headerKey"));
-        Assertions.assertTrue(bytes.toString().contains("do post filter: UpStreamFilter, upstreamHeader value: headerValue"));
+        Assertions.assertTrue(bytes.toString().contains("do post filter: UpStreamFilter, upstreamHeader value: [headerValue]"));
     }
 }
