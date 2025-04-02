@@ -23,11 +23,26 @@ title: Changelog
 
 ## Table of Contents
 
-- [0.5.0](#032)
-- [0.4.0](#046)
-- [0.3.0](#055)
-- [0.2.0](#068)
-- [0.1.0](#096)
+- [0.6.0](#060)
+- [0.5.0](#050)
+- [0.4.0](#040)
+- [0.3.0](#030)
+- [0.2.0](#020)
+- [0.1.0](#010)
+
+## 0.6.0
+
+This release mainly allows async plugins and upgrades dependencies & adopts Java 21, and fix some bugs.
+
+### Core
+
+- Allow async plugins. [313](https://github.com/apache/apisix-java-plugin-runner/pull/313)
+- Upgrade dependencies & adopt Java 21. [315](https://github.com/apache/apisix-java-plugin-runner/pull/315)
+
+### Bugfix
+
+- Update development doc link in installation-guide.md. [304](https://github.com/apache/apisix-java-plugin-runner/pull/304)
+- Restrict socket permissions and manage ACLs if needed. [318](https://github.com/apache/apisix-java-plugin-runner/pull/318)
 
 ## 0.5.0
 
