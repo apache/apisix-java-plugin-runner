@@ -61,7 +61,6 @@ public class PrepareConfHandler extends SimpleChannelInboundHandler<A6Request> {
         Req req = ((A6ConfigRequest) request).getReq();
         long confToken = ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE);
         A6Response response = new A6ConfigResponse(confToken);
-        long token = ((A6ConfigResponse) response).getConfToken();
         PluginFilterChain chain = createFilterChain(req);
 
         /*
@@ -76,9 +75,9 @@ public class PrepareConfHandler extends SimpleChannelInboundHandler<A6Request> {
             config.put(conf.name(), conf.value());
         }
         A6Conf a6Conf = new A6Conf(config, chain);
-        cache.put(token, a6Conf);
+        cache.put(confToken, a6Conf);
         for (A6ConfigWatcher watcher : watchers) {
-            watcher.watch(token, a6Conf);
+            watcher.watch(confToken, a6Conf);
         }
         ctx.write(response);
         ctx.writeAndFlush(response);
