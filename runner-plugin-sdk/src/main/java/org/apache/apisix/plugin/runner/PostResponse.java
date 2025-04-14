@@ -29,8 +29,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ArrayList;
 
 public class PostResponse implements A6Response {
 
@@ -42,12 +44,13 @@ public class PostResponse implements A6Response {
 
     private Integer statusCode;
 
-    private Map<String, String> headers;
+    private Map<String, List<String>> headers;
 
     private Charset charset;
 
-    public PostResponse(long requestId) {
+    public PostResponse(long requestId, Map<String, List<String>> headers) {
         this.requestId = requestId;
+        this.headers = headers != null ? new HashMap<>(headers) : new HashMap<>();
         this.charset = StandardCharsets.UTF_8;
     }
 
@@ -63,16 +66,27 @@ public class PostResponse implements A6Response {
 
         int headerIndex = -1;
         if (!CollectionUtils.isEmpty(headers)) {
-            int[] headerTexts = new int[headers.size()];
+            int hsize = 0;
+            for (String hkey: headers.keySet()) {
+                List<String> headerValues = headers.get(hkey);
+                hsize += CollectionUtils.isEmpty(headerValues) ? 0 : headerValues.size();
+            }
+
+            int[] headerTexts = new int[hsize];
             int i = -1;
-            for (Map.Entry<String, String> header : headers.entrySet()) {
+            for (Map.Entry<String, List<String>> header : headers.entrySet()) {
                 int key = builder.createString(header.getKey());
-                int value = 0;
-                if (!Objects.isNull(header.getValue())) {
-                    value = builder.createString(header.getValue());
+                List<String> headerValues = header.getValue();
+                if (!CollectionUtils.isEmpty(headerValues)) {
+                    for (String hv: headerValues) {
+                        int value = 0;
+                        if (!Objects.isNull(hv)) {
+                            value = builder.createString(hv);
+                        }
+                        int text = TextEntry.createTextEntry(builder, key, value);
+                        headerTexts[++i] = text;
+                    }
                 }
-                int text = TextEntry.createTextEntry(builder, key, value);
-                headerTexts[++i] = text;
             }
             headerIndex = Resp.createHeadersVector(builder, headerTexts);
         }
@@ -116,7 +130,27 @@ public class PostResponse implements A6Response {
         if (Objects.isNull(headers)) {
             headers = new HashMap<>();
         }
-        headers.put(headerKey, headerValue);
+
+        headers.put(headerKey, new ArrayList<>());
+        headers.get(headerKey).add(headerValue);
+    }
+
+    private void addHeader(String headerKey, String headerValue) {
+        if (headerKey == null) {
+            logger.warn("headerKey is null, ignore it");
+            return;
+        }
+
+        if (Objects.isNull(headers)) {
+            headers = new HashMap<>();
+        }
+
+        headers.putIfAbsent(headerKey, new ArrayList<>());
+        headers.get(headerKey).add(headerValue);
+    }
+
+    private Map<String, List<String>> headers() {
+        return headers;
     }
 
     public void setBody(String body) {
