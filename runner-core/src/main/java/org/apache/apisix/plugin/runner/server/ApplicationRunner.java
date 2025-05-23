@@ -58,6 +58,7 @@ import org.apache.apisix.plugin.runner.handler.PayloadDecoder;
 import org.apache.apisix.plugin.runner.handler.BinaryProtocolDecoder;
 import org.apache.apisix.plugin.runner.handler.PayloadEncoder;
 import org.apache.apisix.plugin.runner.handler.ExceptionCaughtHandler;
+import org.apache.apisix.plugin.runner.exception.ExceptionCaught;
 
 @Component
 @RequiredArgsConstructor
@@ -73,9 +74,16 @@ public class ApplicationRunner implements CommandLineRunner {
     private ObjectProvider<PluginFilter> filterProvider;
     private ObjectProvider<A6ConfigWatcher> watcherProvider;
 
+    public static final List<ExceptionCaught> EXCEPTION_LIST = new ArrayList<ExceptionCaught>();
+
+    static {
+        ServiceLoader<ExceptionCaught> serviceLoader = ServiceLoader.load(ExceptionCaught.class);
+        serviceLoader.forEach(EXCEPTION_LIST::add);
+    }
+
     @Autowired
     public ApplicationRunner(Cache<Long, A6Conf> cache,
-            ObjectProvider<PluginFilter> filterProvider, ObjectProvider<A6ConfigWatcher> watcherProvider) {
+                             ObjectProvider<PluginFilter> filterProvider, ObjectProvider<A6ConfigWatcher> watcherProvider) {
         this.cache = cache;
         this.filterProvider = filterProvider;
         this.watcherProvider = watcherProvider;
@@ -134,7 +142,7 @@ public class ApplicationRunner implements CommandLineRunner {
                         .addLast("payloadDecoder", new PayloadDecoder())
                         .addAfter("payloadDecoder", "prepareConfHandler", createConfigReqHandler(cache, filterProvider, watcherProvider))
                         .addAfter("prepareConfHandler", "hTTPReqCallHandler", createA6HttpHandler(cache))
-                        .addLast("exceptionCaughtHandler", new ExceptionCaughtHandler());
+                        .addLast("exceptionCaughtHandler", new ExceptionCaughtHandler(EXCEPTION_LIST));
 
             }
         });
