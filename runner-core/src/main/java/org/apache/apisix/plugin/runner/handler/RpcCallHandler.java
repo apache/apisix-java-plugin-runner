@@ -180,6 +180,10 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
 
         PluginFilterChain chain = conf.getChain();
 
+        // here we pre-read parameters in the resp to
+        // prevent confusion over the read/write index of the resp.
+        preReadPostReq();
+
         if (Objects.isNull(chain) || 0 == chain.getFilters().size()) {
             ChannelFuture future = ctx.writeAndFlush(postResp);
             future.addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
@@ -326,6 +330,11 @@ public class RpcCallHandler extends SimpleChannelInboundHandler<A6Request> {
         currReq.getMethod();
         currReq.getArgs();
         currReq.getSourceIP();
+    }
+
+    private void preReadPostReq() {
+        postReq.getUpstreamHeaders();
+        postReq.getUpstreamStatusCode();
     }
 
     private void errorHandle(ChannelHandlerContext ctx, int code) {
